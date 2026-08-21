@@ -12,7 +12,7 @@ app.use(
 	"*",
 	cors({
 		origin: "*",
-		allowMethods: ["GET", "PUT", "OPTIONS"],
+		allowMethods: ["GET", "POST", "OPTIONS"],
 		allowHeaders: ["Content-Type"]
 	})
 );
