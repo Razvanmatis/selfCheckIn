@@ -1,5 +1,5 @@
 {
-  "name": "selfcheckin-frontend",
+  "name": "ui",
   "compatibility_date": "2026-08-21",
   "assets": {
     "directory": "./dist"
