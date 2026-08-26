@@ -107,6 +107,12 @@ VITE_API_BASE_URL=https://<deine-worker-domain>.workers.dev
 - Produktions-URL im Frontend immer mit dem tatsächlich deployten Backend abstimmen
 - Bei Worker-Deployments `wrangler.jsonc` und `.env`/`.env.production` nicht vergessen
 
+## Secret zu Wrangler hinzufügen (Im worker Verzeichnis)
+
+```bash
+npx wrangler secret put <SECRET_NAME>
+```
+
 ## Typische Reihenfolge für neues Deployment
 
 ```bash
