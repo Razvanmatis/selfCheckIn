@@ -1,6 +1,6 @@
 import {
-  parseAndValidateLookupPayload,
-  type CheckInLookupPayload
+  parseAndValidateCheckInLookupPayload,
+  type CheckInLookupPayload, isAdminRequest
 } from "./validation";
 import type { Env } from "./env";
 
@@ -42,9 +42,12 @@ const textHeaders = {
 const smoobuReservationsUrl = "https://login.smoobu.com/api/reservations?pageSize=100";
 
 export async function initiateCheckInProcess(
-  request: CheckInLookupPayload,
-  env: Env
+    request: CheckInLookupPayload,
+    env: Env
 ): Promise<string> {
+  if (isAdminRequest(request, env)) {
+    return "OK";
+  }
   const normalizePhone = (value: string | null | undefined): string => {
     return (value ?? "").replace(/\D/g, "");
   };
@@ -102,7 +105,7 @@ export async function initiateCheckInProcess(
 export async function handler(event: LambdaLikeEvent,
                               env: Env): Promise<LambdaLikeResponse> {
   try {
-    const payload = parseAndValidateLookupPayload(event.body);
+    const payload = parseAndValidateCheckInLookupPayload(event.body);
     const result = await initiateCheckInProcess(payload, env);
 
     return {

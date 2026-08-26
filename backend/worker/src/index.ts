@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import type { Env } from "./env";
 import { initiateCheckInProcess } from "./initiateCheckInProcess";
-import { parseAndValidateLookupPayload } from "./validation";
+import { parseAndValidateCheckInLookupPayload } from "./validation";
 import { defineKeypadCode } from "./defineKeypadCode";
 import { getCheckInInformation } from "./getCheckInInformation";
 import { cors } from "hono/cors";
@@ -25,7 +25,7 @@ app.post("/api/initiateCheckInProcess", async (c) => {
 	try {
 		const body = await c.req.json();
 
-		const payload = parseAndValidateLookupPayload(
+		const payload = parseAndValidateCheckInLookupPayload(
 			JSON.stringify(body)
 		);
 

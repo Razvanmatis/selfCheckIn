@@ -1,10 +1,7 @@
-export type CheckInLookupPayload = {
-  firstName: string;
-  lastName: string;
-  checkInDate: string;
-  checkOutDate: string;
-  phone: string;
-};
+import type { Env } from "./env.js";
+import {DefineKeypadCodeRequest} from "./types/defineKeypadCodeRequest.js";
+import {CheckInLookupPayload} from "./types/checkInLookupPayload.js";
+import {NukiCreateAuthPayload} from "./types/nukiCreateAuthPayload.js";
 
 function toLocalInputDate(date: Date): string {
   const localTime = new Date(date.getTime() - date.getTimezoneOffset() * 60_000);
@@ -74,8 +71,8 @@ export function validateCheckInLookupPayload(
     throw new Error("Das Check-in Datum darf maximal 2 Wochen in der Zukunft liegen.");
   }
 
-  if (checkInDate > maxDate || checkOutDate > maxDate) {
-    throw new Error("Check-in und Check-out Datum duerfen maximal 2 Monate in der Zukunft liegen.");
+  if (checkOutDate > maxDate) {
+    throw new Error("Check-out Datum darf maximal 2 Monate in der Zukunft liegen.");
   }
 
   if (checkOutDate < minCheckOutDate) {
@@ -102,7 +99,7 @@ export function validateCheckInLookupPayload(
   };
 }
 
-export function parseAndValidateLookupPayload(body: string | null): CheckInLookupPayload {
+export function parseAndValidateCheckInLookupPayload(body: string | null): CheckInLookupPayload {
   if (!body) {
     throw new Error("Request body fehlt.");
   }
@@ -111,3 +108,117 @@ export function parseAndValidateLookupPayload(body: string | null): CheckInLooku
   return validateCheckInLookupPayload(parsed);
 }
 
+export function isAdminRequest(request: CheckInLookupPayload, env: Env) {
+  return request.firstName === env.ADMIN_NAME && request.lastName === env.ADMIN_NAME;
+}
+
+export function parseAndValidateDefineKeypadCodeRequest(body: string | null): DefineKeypadCodeRequest {
+  if (!body) {
+    throw new Error("Request body fehlt.");
+  }
+
+  const parsed = JSON.parse(body) as Partial<DefineKeypadCodeRequest>;
+
+  const validatedLookup = validateCheckInLookupPayload(parsed);
+
+  if (!parsed.pinCode || parsed.pinCode.trim().length === 0) {
+    throw new Error("Pflichtfeld fehlt: pinCode");
+  }
+  if (!isCodeValid(parsed as DefineKeypadCodeRequest)) {
+    throw new Error("Ungültiger pinCode. Er muss 6-stellig sein, darf keine '0' enthalten und darf nicht mit '12' beginnen.");
+  }
+
+  return {
+    firstName: validatedLookup.firstName,
+    lastName: validatedLookup.lastName,
+    phone: validatedLookup.phone,
+    checkInDate: validatedLookup.checkInDate,
+    checkOutDate: validatedLookup.checkOutDate,
+    pinCode: parsed.pinCode.trim()
+  };
+}
+
+export function isCodeValid(payload: DefineKeypadCodeRequest): boolean {
+  if (!/^\d{6}$/.test(payload.pinCode)) {
+    return false;
+  }
+
+  if (payload.pinCode.includes("0")) {
+    return false;
+  }
+
+  return !payload.pinCode.startsWith("12");
+}
+
+export function normalizeDateString(value: string): string {
+  const trimmed = value.trim();
+
+  if (/^\d{4}[-.]\d{2}[-.]\d{2}$/.test(trimmed)) {
+    return `${trimmed}T00:00:00.000Z`;
+  }
+
+  const parsed = new Date(trimmed);
+  if (Number.isNaN(parsed.getTime())) {
+    throw new Error(`Ungueltiges Datumsformat: ${value}`);
+  }
+
+  return parsed.toISOString();
+}
+
+export function getDateOnly(value: string): string {
+  return normalizeDateString(value).slice(0, 10);
+}
+
+export function getOlderDate(referenceDate: string, comparisonDate?: string): string {
+  if (!comparisonDate) {
+    return referenceDate;
+  }
+
+  return new Date(normalizeDateString(referenceDate)).getTime() <= new Date(normalizeDateString(comparisonDate)).getTime()
+      ? referenceDate
+      : comparisonDate;
+}
+
+export function getNewerDate(referenceDate: string, comparisonDate?: string): string {
+  if (!comparisonDate) {
+    return referenceDate;
+  }
+
+  return new Date(normalizeDateString(referenceDate)).getTime() >= new Date(normalizeDateString(comparisonDate)).getTime()
+      ? referenceDate
+      : comparisonDate;
+}
+
+export function formatDateToDayMonth(value: string): string {
+  // Erlaubt z. B. 2026-08-21, 2026.08.21 oder ISO-Strings mit Uhrzeit
+  const datePart = getDateOnly(value);
+  const match = datePart.match(/^(\d{4})[-.](\d{2})[-.](\d{2})$/);
+  if (!match) {
+    throw new Error(`Ungueltiges Datumsformat: ${value}`);
+  }
+
+  const [, , month, day] = match;
+  return `${day}.${month}`;
+}
+
+export function getFormattedDateAsName(checkInDate: string, checkOutDate: string): string {
+  return `${formatDateToDayMonth(checkInDate)} - ${formatDateToDayMonth(checkOutDate)}`;
+}
+
+export function buildNukiCreatePayload(payload: DefineKeypadCodeRequest,
+                                env: Env): NukiCreateAuthPayload {
+  return {
+    name: getFormattedDateAsName(payload.checkInDate, payload.checkOutDate),
+    allowedFromDate: `${payload.checkInDate}T13:00:00.000Z`,
+    allowedUntilDate: `${payload.checkOutDate}T09:00:00.000Z`,
+    allowedWeekDays: 127,
+    allowedFromTime: 0,
+    allowedUntilTime: 0,
+    accountUserId: 0,
+    smartlockIds: [Number(env.NUKI_SMARTLOCK_ID)],
+    remoteAllowed: true,
+    smartActionsEnabled: true,
+    type: 13,
+    code: Number(payload.pinCode)
+  };
+}

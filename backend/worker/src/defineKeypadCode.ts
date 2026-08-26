@@ -1,45 +1,16 @@
 import {initiateCheckInProcess} from "./initiateCheckInProcess.js";
-import { validateCheckInLookupPayload } from "./validation.js";
+import {
+    buildNukiCreatePayload,
+    getFormattedDateAsName,
+    getNewerDate,
+    getOlderDate,
+    parseAndValidateDefineKeypadCodeRequest,
+    validateCheckInLookupPayload
+} from "./validation.js";
 import type { Env } from "./env.js";
-
-type DefineKeypadCodeRequest = {
-    firstName: string;
-    lastName: string;
-    phone: string;
-    checkInDate: string;
-    checkOutDate: string;
-    pinCode: string;
-};
-
-type NukiAuthEntry = {
-    id: string;
-    smartlockId: number;
-    authId: number;
-    code: number;
-    type: number;
-    name: string;
-    enabled: boolean;
-    remoteAllowed: boolean;
-    lockCount: number;
-    lastActiveDate?: string;
-    creationDate?: string;
-    updateDate?: string;
-};
-
-type NukiCreateAuthPayload = {
-    name: string;
-    allowedFromDate: string;
-    allowedUntilDate: string;
-    allowedWeekDays: number;
-    allowedFromTime: number;
-    allowedUntilTime: number;
-    accountUserId: number;
-    smartlockIds: number[];
-    remoteAllowed: boolean;
-    smartActionsEnabled: boolean;
-    type: number;
-    code: number;
-};
+import {NukiAuthEntry} from "./types/nukiAuthEntry";
+import {NukiCreateAuthPayload} from "./types/nukiCreateAuthPayload";
+import {DefineKeypadCodeRequest} from "./types/defineKeypadCodeRequest";
 
 type LambdaLikeEvent = {
     body: string | null;
@@ -59,7 +30,7 @@ const textHeaders = {
     "Content-Type": "text/plain; charset=utf-8"
 };
 
-const retryDelayMs = 2000;
+const retryDelayMs = 3000;
 const nukiBaseUrl = "https://api.nuki.io";
 
 async function wait(ms: number): Promise<void> {
@@ -74,7 +45,7 @@ async function wait(ms: number): Promise<void> {
 }
 
 async function forceNukiSync(env: Env): Promise<void> {
-    for (let attempt = 0; attempt < 3; attempt += 1) {
+    for (let attempt = 0; attempt < 6; attempt += 1) {
         const response = await fetch(`${nukiBaseUrl}/smartlock/${env.NUKI_SMARTLOCK_ID}/sync`, {
             method: "POST",
             headers: {
@@ -87,7 +58,7 @@ async function forceNukiSync(env: Env): Promise<void> {
             throw new Error("Nuki-Sync konnte nicht gestartet werden.");
         }
 
-        if (attempt < 2) {
+        if (attempt < 5) {
             await wait(retryDelayMs);
         }
     }
@@ -175,65 +146,18 @@ async function createKeypadCode(payload: NukiCreateAuthPayload, env: Env): Promi
     }
 }
 
-function parseAndValidatePayload(body: string | null): DefineKeypadCodeRequest {
-    if (!body) {
-        throw new Error("Request body fehlt.");
+async function handleDeletionOfEntries(existingEntriesToDelete: NukiAuthEntry[], env: Env) {
+    for (const entry of existingEntriesToDelete) {
+        await deleteKeypadCode(entry.id, env);
+        console.log(`Nuki-Code ${entry.code} entfernt: ${entry.name}`);
     }
 
-    const parsed = JSON.parse(body) as Partial<DefineKeypadCodeRequest>;
-
-    const validatedLookup = validateCheckInLookupPayload(parsed);
-
-    if (!parsed.pinCode || parsed.pinCode.trim().length === 0) {
-        throw new Error("Pflichtfeld fehlt: pinCode");
-    }
-
-    return {
-        firstName: validatedLookup.firstName,
-        lastName: validatedLookup.lastName,
-        phone: validatedLookup.phone,
-        checkInDate: validatedLookup.checkInDate,
-        checkOutDate: validatedLookup.checkOutDate,
-        pinCode: parsed.pinCode.trim()
-    };
-}
-
-function isCodeValid(payload: DefineKeypadCodeRequest): boolean {
-    if (!/^\d{6}$/.test(payload.pinCode)) {
-        return false;
-    }
-
-    if (payload.pinCode.includes("0")) {
-        return false;
-    }
-
-    return !payload.pinCode.startsWith("12");
-}
-
-function buildNukiCreatePayload(payload: DefineKeypadCodeRequest,
-                                env: Env): NukiCreateAuthPayload {
-    return {
-        name: getFormattedDateAsName(payload.checkInDate, payload.checkOutDate),
-        allowedFromDate: `${payload.checkInDate}T13:00:00.000Z`,
-        allowedUntilDate: `${payload.checkOutDate}T09:00:00.000Z`,
-        allowedWeekDays: 127,
-        allowedFromTime: 0,
-        allowedUntilTime: 0,
-        accountUserId: 0,
-        smartlockIds: [Number(env.NUKI_SMARTLOCK_ID)],
-        remoteAllowed: true,
-        smartActionsEnabled: true,
-        type: 13,
-        code: Number(payload.pinCode)
-    };
+    await forceNukiSync(env);
+    console.log("Nuki-Sync erfolgreich durchgeführt.");
 }
 
 export async function defineKeypadCode(request: DefineKeypadCodeRequest,
                                        env: Env): Promise<string> {
-    if (!isCodeValid(request)) {
-        return "validationError";
-    }
-
     const checkInValidationResult = await initiateCheckInProcess(request, env);
 
     if (checkInValidationResult !== "OK") {
@@ -245,7 +169,7 @@ export async function defineKeypadCode(request: DefineKeypadCodeRequest,
 
     const entries = await getAllKeypadCodes(env);
 
-    const formattedDateAsName = getFormattedDateAsName(request.checkInDate, request.checkOutDate);
+    let formattedDateAsName = getFormattedDateAsName(request.checkInDate, request.checkOutDate);
 
     const existingEntriesWithSameCodeAndName = entries.filter(
         (entry) => String(entry.code) === request.pinCode && entry.name === formattedDateAsName
@@ -256,46 +180,37 @@ export async function defineKeypadCode(request: DefineKeypadCodeRequest,
         return "OK";
     }
 
-    const existingEntriesToDelete = entries.filter(
+    const nukiPayload = buildNukiCreatePayload(request, env);
+
+    const entriesToDeleteBecauseOfSameCode = entries.filter(
         (entry) => (String(entry.code) === request.pinCode && entry.name !== formattedDateAsName)
-            || ((String(entry.code) !== request.pinCode && entry.name === formattedDateAsName))
     );
-
-    if (existingEntriesToDelete.length > 0) {
-        for (const entry of existingEntriesToDelete) {
-            await deleteKeypadCode(entry.id, env);
-            console.log(`Nuki-Code ${entry.code} entfernt: ${entry.name}`);
+    if (entriesToDeleteBecauseOfSameCode.length > 0) {
+        formattedDateAsName = getFormattedDateAsName(
+            getOlderDate(request.checkInDate, (entriesToDeleteBecauseOfSameCode.at(0) as NukiAuthEntry).allowedFromDate),
+            getNewerDate(request.checkOutDate, (entriesToDeleteBecauseOfSameCode.at(0) as NukiAuthEntry).allowedUntilDate));
+        console.log(`Neuer Zeitraum ermittelt: ${formattedDateAsName}`);
+        nukiPayload.allowedFromDate = `${getOlderDate(request.checkInDate, (entriesToDeleteBecauseOfSameCode.at(0) as NukiAuthEntry).allowedFromDate)}T13:00:00.000Z`;
+        nukiPayload.allowedUntilDate = `${getNewerDate(request.checkOutDate, (entriesToDeleteBecauseOfSameCode.at(0) as NukiAuthEntry).allowedUntilDate)}T09:00:00.000Z`;
+        await handleDeletionOfEntries(entriesToDeleteBecauseOfSameCode, env);
+    } else {
+        const entriesToDeleteBecauseOfSameNameButDifferentCode = entries.filter(
+            (entry) => (String(entry.code) !== request.pinCode && entry.name === formattedDateAsName)
+        );
+        if (entriesToDeleteBecauseOfSameNameButDifferentCode.length > 0) {
+            await handleDeletionOfEntries(entriesToDeleteBecauseOfSameNameButDifferentCode, env);
         }
-
-        await forceNukiSync(env);
-        console.log("Nuki-Sync erfolgreich durchgeführt.");
     }
 
-    const nukiPayload = buildNukiCreatePayload(request, env);
     await createKeypadCode(nukiPayload, env);
     console.log(`Neuer Nuki-Code ${request.pinCode} gesetzt: ${formattedDateAsName}`);
     return "OK";
 }
 
-function formatDateToDayMonth(value: string): string {
-    // Erlaubt z. B. 2026-08-21 oder 2026.08.21
-    const match = value.trim().match(/^(\d{4})[-.](\d{2})[-.](\d{2})$/);
-    if (!match) {
-        throw new Error(`Ungueltiges Datumsformat: ${value}`);
-    }
-
-    const [, , month, day] = match;
-    return `${day}.${month}`;
-}
-
-function getFormattedDateAsName(checkInDate: string, checkOutDate: string): string {
-    return `${formatDateToDayMonth(checkInDate)} - ${formatDateToDayMonth(checkOutDate)}`;
-}
-
 export async function handler(event: LambdaLikeEvent,
                               env: Env): Promise<LambdaLikeResponse> {
     try {
-        const payload = parseAndValidatePayload(event.body);
+        const payload = parseAndValidateDefineKeypadCodeRequest(event.body);
         const result = await defineKeypadCode(payload, env);
 
         return {
