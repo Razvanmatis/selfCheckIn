@@ -15,9 +15,12 @@ selfCheckIn/
 │   ├── getCheckInInformation.ts
 │   ├── initiateCheckInProcess.ts
 │   ├── validation.ts
+│   ├── types                   # TypeScript-Typen
 │   └── worker/                 # Cloudflare Worker-Version des Backends
 │       ├── wrangler.jsonc      # Wrangler-Konfiguration für Worker
-│       └── package.json
+│       ├── package.json
+│       └── src                 # Quellcode für den Worker
+│           └── types           # TypeScript-Typen
 ├── frontend/                   # Vite + React Frontend
 │   ├── .env                    # lokale API-URL für Entwicklung
 │   ├── .env.production         # ggf. Produktions-URL für Build
@@ -43,10 +46,13 @@ Das Backend läuft standardmäßig auf:
 
 - http://localhost:7071
 
-Die Frontend-Umgebung erwartet in `frontend/.env` eine passende URL:
+Die Backend-Umgebung erwartet in `backend/.env` folgende Werte:
 
 ```env
-VITE_API_BASE_URL=http://localhost:7071
+SMOOBU_API_KEY=""
+NUKI_API_TOKEN=""
+NUKI_SMARTLOCK_ID=""
+ADMIN_NAME=""
 ```
 
 ### 2) Frontend starten
@@ -55,6 +61,12 @@ VITE_API_BASE_URL=http://localhost:7071
 cd frontend
 npm install
 npm run dev
+```
+
+Die Frontend-Umgebung erwartet in `frontend/.env` eine passende URL:
+
+```env
+VITE_API_BASE_URL=http://localhost:7071
 ```
 
 Wichtig: Wenn das Frontend an das lokale Backend koppelt, muss die URL mit dem Backend-Port übereinstimmen. Das Frontend verwendet `import.meta.env.VITE_API_BASE_URL`.
@@ -94,10 +106,10 @@ Die Datei `frontend/wrangler.jsonc` konfiguriert den Upload des gebauten Fronten
 
 Hinweis: Vor dem Build in der Produktion muss die API-URL in `frontend/.env.production` korrekt gesetzt sein, damit das Frontend beim Deployment nicht auf den falschen Backend-Endpunkt zeigt.
 
-Beispiel:
+Inhalt von `frontend/.env.production`:
 
 ```env
-VITE_API_BASE_URL=https://<deine-worker-domain>.workers.dev
+VITE_API_BASE_URL=https://raz-check-in.workers.dev
 ```
 
 ## Wichtige Deployment-Checks
