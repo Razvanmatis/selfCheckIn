@@ -2,24 +2,7 @@ import {isAdminRequest, parseAndValidateCheckInLookupPayload} from "./validation
 import type {Env} from "./env.js";
 import {CheckInLookupPayload} from "./types/checkInLookupPayload.js";
 import {sendErrorNotificationEmail} from "./mailService.js";
-
-type SmoobuBooking = {
-  id: number;
-  firstname: string;
-  lastname: string;
-  arrival: string;
-  departure: string;
-  phone: string | null;
-  email: string;
-};
-
-type SmoobuReservationsResponse = {
-  page_count: number;
-  page_size: number;
-  total_items: number;
-  page: number;
-  bookings: SmoobuBooking[];
-};
+import {SmoobuReservationsResponse} from "./types/smoobuReservationsResponse.js";
 
 type LambdaLikeEvent = {
   body: string | null;

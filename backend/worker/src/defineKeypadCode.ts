@@ -1,9 +1,11 @@
 import {getAllOpenBookings, initiateCheckInProcess} from "./initiateCheckInProcess.js";
 import {
-    buildNukiCreatePayload, getExistingNameInitialsOfNukiAuthEntry,
+    buildNukiCreatePayload,
+    getExistingNameInitialsOfNukiAuthEntry,
     getFormattedDateAsName,
     getNewerDate,
-    getOlderDate, isAdminRequest,
+    getOlderDate,
+    isAdminRequest,
     parseAndValidateDefineKeypadCodeRequest,
 } from "./validation.js";
 import type {Env} from "./env.js";
@@ -11,6 +13,7 @@ import {NukiAuthEntry} from "./types/nukiAuthEntry.js";
 import {NukiCreateAuthPayload} from "./types/nukiCreateAuthPayload.js";
 import {DefineKeypadCodeRequest} from "./types/defineKeypadCodeRequest.js";
 import {sendBookingConfirmationEmail, sendErrorNotificationEmail} from "./mailService.js";
+import {SmoobuReservationsResponse} from "./types/smoobuReservationsResponse.js";
 
 type LambdaLikeEvent = {
     body: string | null;
@@ -156,19 +159,25 @@ async function handleDeletionOfEntries(existingEntriesToDelete: NukiAuthEntry[],
     console.log("Nuki-Sync erfolgreich durchgeführt.");
 }
 
-async function getNameInitialsOfRequest(request: DefineKeypadCodeRequest, env: Env) {
+function getMatchedBookingOfList(allBookings: SmoobuReservationsResponse, request: DefineKeypadCodeRequest) {
+    return allBookings?.bookings.find((booking) => {
+        return (
+            booking.arrival === request.checkInDate &&
+            booking.departure === request.checkOutDate &&
+            (booking.firstname.trim().toLowerCase() === request.firstName.trim().toLowerCase() &&
+                booking.lastname.trim().toLowerCase() === request.lastName.trim().toLowerCase() ||
+                booking.phone?.trim() === request.phone.trim())
+        );
+    });
+}
+
+async function getNameInitialsOfRequest(request: DefineKeypadCodeRequest, allBookings: SmoobuReservationsResponse, env: Env) {
     const hasName = request.firstName.trim().length && request.lastName.trim().length;
     let nameCharacters = "";
     if (hasName) {
         nameCharacters = `${request.firstName.trim().charAt(0).toUpperCase()}${request.lastName.trim().charAt(0).toUpperCase()}`;
     } else {
-        const allBookings = await getAllOpenBookings(env);
-        const bookingMatch = allBookings?.bookings.find((booking) => {
-            return (
-                booking.arrival === request.checkInDate &&
-                booking.departure === request.checkOutDate
-            );
-        });
+        const bookingMatch = getMatchedBookingOfList(allBookings, request);
         if (bookingMatch) {
             nameCharacters = `${bookingMatch.firstname.trim().charAt(0).toUpperCase()}${bookingMatch.lastname.trim().charAt(0).toUpperCase()}`;
         } else {
@@ -182,20 +191,11 @@ async function getNameInitialsOfRequest(request: DefineKeypadCodeRequest, env: E
     return nameCharacters;
 }
 
-async function getMailOfGuest(request: DefineKeypadCodeRequest, env: Env) {
+async function getMailOfGuest(request: DefineKeypadCodeRequest, allBookings: SmoobuReservationsResponse, env: Env) {
     if (isAdminRequest(request, env)) {
         return env.EMAIL_FROM;
     }
-    const allBookings = await getAllOpenBookings(env);
-    const bookingMatch = allBookings?.bookings.find((booking) => {
-        return (
-            booking.arrival === request.checkInDate &&
-            booking.departure === request.checkOutDate &&
-            (booking.firstname.trim().toLowerCase() === request.firstName.trim().toLowerCase() &&
-                booking.lastname.trim().toLowerCase() === request.lastName.trim().toLowerCase() ||
-                booking.phone?.trim() === request.phone.trim())
-        );
-    });
+    const bookingMatch = getMatchedBookingOfList(allBookings, request);
     if (bookingMatch === undefined) {
         console.log("Keine Buchung gefunden, um E-Mail-Adresse zu ermitteln.");
         await sendErrorNotificationEmail(`Keine Buchung gefunden, um E-Mail-Adresse zu ermitteln. Ankunft: ${request.checkInDate},
@@ -203,6 +203,36 @@ async function getMailOfGuest(request: DefineKeypadCodeRequest, env: Env) {
             `${request.checkInDate} - ${request.checkOutDate}`, env, request.pinCode);
     }
     return bookingMatch?.email ?? "";
+}
+
+async function getGuestName(request: DefineKeypadCodeRequest, allBookings: SmoobuReservationsResponse, env: Env) {
+    if (isAdminRequest(request, env)) {
+        return env.ADMIN_NAME;
+    }
+    if (request.firstName.trim().length > 0 && request.lastName.trim().length > 0) {
+        return `${request.firstName.trim()} ${request.lastName.trim()}`;
+    }
+    const bookingMatch = getMatchedBookingOfList(allBookings, request);
+    if (bookingMatch === undefined) {
+        console.log("Keine Buchung gefunden, um Namen zu ermitteln.");
+        await sendErrorNotificationEmail(`Keine Buchung gefunden, um Namen zu ermitteln. Ankunft: ${request.checkInDate},
+             Abreise: ${request.checkOutDate}`, request.firstName + " " + request.lastName,
+            `${request.checkInDate} - ${request.checkOutDate}`, env, request.pinCode);
+    }
+    return bookingMatch ? `${bookingMatch.firstname} ${bookingMatch.lastname}` : "NAME_NOT_FOUND";
+}
+
+async function sendConfirmationMail(request: DefineKeypadCodeRequest, allBookings: SmoobuReservationsResponse, env: Env, formattedDateAsName: string) {
+    const guestMail = await getMailOfGuest(request, allBookings, env);
+    const guestName = await getGuestName(request, allBookings, env);
+    await sendBookingConfirmationEmail(
+        guestMail,
+        guestName,
+        formattedDateAsName,
+        request.pinCode,
+        env,
+        request.language
+    );
 }
 
 export async function defineKeypadCode(request: DefineKeypadCodeRequest,
@@ -216,13 +246,14 @@ export async function defineKeypadCode(request: DefineKeypadCodeRequest,
     await forceNukiSync(env);
     console.log("Nuki-Sync erfolgreich durchgeführt.");
 
-    const entries = await getAllKeypadCodes(env);
+    const allCurrentKeypadCodes = await getAllKeypadCodes(env);
 
     let formattedDateAsName = getFormattedDateAsName(request.checkInDate, request.checkOutDate);
-    const requestNameInitials = "," + await getNameInitialsOfRequest(request, env);
+    const allBookings = await getAllOpenBookings(env);
+    const requestNameInitials = "," + await getNameInitialsOfRequest(request, allBookings, env);
     let formattedDateAsNameWithInitials = `${formattedDateAsName}${requestNameInitials}`;
 
-    const existingEntriesWithSameCodeAndName = entries.filter(
+    const existingEntriesWithSameCodeAndName = allCurrentKeypadCodes.filter(
         (entry) => String(entry.code) === request.pinCode && entry.name === formattedDateAsNameWithInitials
     );
 
@@ -233,7 +264,7 @@ export async function defineKeypadCode(request: DefineKeypadCodeRequest,
 
     const nukiPayload = buildNukiCreatePayload(request, env);
 
-    const entriesToDeleteBecauseOfSameCode = entries.filter(
+    const entriesToDeleteBecauseOfSameCode = allCurrentKeypadCodes.filter(
         (entry) => (String(entry.code) === request.pinCode && entry.name !== formattedDateAsNameWithInitials)
     );
     if (entriesToDeleteBecauseOfSameCode.length > 0) {
@@ -252,7 +283,7 @@ export async function defineKeypadCode(request: DefineKeypadCodeRequest,
         nukiPayload.allowedUntilDate = `${getNewerDate(request.checkOutDate, (entriesToDeleteBecauseOfSameCode.at(0) as NukiAuthEntry).allowedUntilDate)}T09:00:00.000Z`;
         await handleDeletionOfEntries(entriesToDeleteBecauseOfSameCode, env);
     } else {
-        const entriesToDeleteBecauseOfSameNameButDifferentCode = entries.filter(
+        const entriesToDeleteBecauseOfSameNameButDifferentCode = allCurrentKeypadCodes.filter(
             (entry) => (String(entry.code) !== request.pinCode && entry.name === formattedDateAsNameWithInitials)
         );
         if (entriesToDeleteBecauseOfSameNameButDifferentCode.length > 0) {
@@ -263,15 +294,7 @@ export async function defineKeypadCode(request: DefineKeypadCodeRequest,
     nukiPayload.name = formattedDateAsNameWithInitials;
     await createKeypadCode(nukiPayload, env);
     console.log(`Neuer Nuki-Code ${request.pinCode} gesetzt: ${formattedDateAsNameWithInitials}`);
-    const guestMail = await getMailOfGuest(request, env);
-    await sendBookingConfirmationEmail(
-        guestMail,
-        `${request.firstName} ${request.lastName}`,
-        formattedDateAsName,
-        request.pinCode,
-        env,
-        request.language
-    );
+    await sendConfirmationMail(request, allBookings, env, formattedDateAsName);
     return "OK";
 }
 

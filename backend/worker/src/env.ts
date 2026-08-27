@@ -5,4 +5,5 @@ export interface Env {
     ADMIN_NAME: string;
     BREVO_API_KEY: string;
     EMAIL_FROM: string;
+    ASSETS: Fetcher;
 }
