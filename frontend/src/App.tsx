@@ -4,6 +4,7 @@ import { getCheckInInformation } from "./api/getCheckInInformation";
 import { initiateCheckInProcess } from "./api/initiateCheckInProcess";
 import { LanguageSelector } from "./components/LanguageSelector";
 import { PinDialog } from "./components/PinDialog";
+import { legalContent, type LegalPage } from "./content/legalContent";
 import type { Language } from "./i18n/translations";
 import { translations } from "./i18n/translations";
 import type { GuestLookupForm } from "./types/forms";
@@ -20,9 +21,12 @@ import { generateAutoPinCode, isPinCodeValid, sanitizePinInput } from "./utils/p
 import { sanitizePhoneInput } from "./utils/phone";
 
 function App() {
+  type PageView = "main" | LegalPage;
+
   const [form, setForm] = useState<GuestLookupForm>(initialGuestLookupForm);
   const [loginMode, setLoginMode] = useState<LoginMode>("name");
   const [language, setLanguage] = useState<Language>("en");
+  const [pageView, setPageView] = useState<PageView>("main");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingInstructions, setIsLoadingInstructions] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -194,6 +198,25 @@ function App() {
     setDialogPhoneNumber("");
   };
 
+  if (pageView !== "main") {
+    return (
+      <main className="layout layout--legal">
+        <section className="card card--legal">
+          <div className="legal-content">{legalContent[pageView]}</div>
+          <div className="legal-footer">
+            <button
+              type="button"
+              className="button-secondary legal-back-button"
+              onClick={() => setPageView("main")}
+            >
+              {t.backToMainApplication}
+            </button>
+          </div>
+        </section>
+      </main>
+    );
+  }
+
   return (
     <main className="layout">
       <section className="card">
@@ -336,6 +359,22 @@ function App() {
             </p>
           ) : null}
         </form>
+        <div className="legal-links">
+          <button
+            type="button"
+            className="button-secondary legal-link-button"
+            onClick={() => setPageView("imprint")}
+          >
+            {t.imprintButton}
+          </button>
+          <button
+            type="button"
+            className="button-secondary legal-link-button"
+            onClick={() => setPageView("privacy")}
+          >
+            {t.privacyButton}
+          </button>
+        </div>
       </section>
 
       {isPinDialogOpen ? (

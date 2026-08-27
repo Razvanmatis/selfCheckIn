@@ -43,6 +43,10 @@ body {
   padding: 1.5rem;
 }
 
+.card--legal {
+  width: min(900px, 100%);
+}
+
 h1 {
   margin-top: 0;
   margin-bottom: 0;
@@ -175,6 +179,55 @@ button:disabled {
   border-color: #b0b5bd;
 }
 
+.legal-links {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.legal-link-button {
+  margin: 0;
+}
+
+.layout--legal {
+  align-items: stretch;
+}
+
+.legal-content {
+  display: grid;
+  gap: 0.9rem;
+  line-height: 1.6;
+}
+
+.legal-content h1,
+.legal-content h2,
+.legal-content p,
+.legal-content ul,
+.legal-content ol {
+  margin: 0;
+}
+
+.legal-content ul,
+.legal-content ol {
+  padding-left: 1.25rem;
+}
+
+.legal-content a {
+  color: inherit;
+}
+
+.legal-footer {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.legal-back-button {
+  margin: 0;
+}
+
 .login-mode-selector {
   border: none;
   padding: 0;
@@ -281,5 +334,9 @@ button:disabled {
   button {
     font-size: 16px;
   }
-}
 
+  .legal-links,
+  .legal-footer {
+    flex-direction: column;
+  }
+}
