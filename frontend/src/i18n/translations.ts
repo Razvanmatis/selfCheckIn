@@ -53,6 +53,7 @@ export const translations: Record<Language, Record<string, string>> = {
     defineButton: "Define",
     abortButton: "Abort",
     defining: "Defining... Can take up to 60 seconds.",
+    codeCreatedSuccess: "Code was created successfully. Please confirm.",
     unknownPinError: "Unknown error while defining the keypad code."
   },
   de: {
@@ -87,6 +88,7 @@ export const translations: Record<Language, Record<string, string>> = {
     defineButton: "Definieren",
     abortButton: "Abbrechen",
     defining: "Wird definiert... Kann max. bis zu 60 Sekunden dauern.",
+    codeCreatedSuccess: "Code wurde erfolgreich angelegt. Bitte bestätigen.",
     unknownPinError: "Unbekannter Fehler beim Definieren des Keypad-Codes."
   },
   ru: {
@@ -121,6 +123,7 @@ export const translations: Record<Language, Record<string, string>> = {
     defineButton: "Определить",
     abortButton: "Отмена",
     defining: "Определение... Может занять до 60 секунд.",
+    codeCreatedSuccess: "Код успешно создан. Пожалуйста, подтвердите.",
     unknownPinError: "Неизвестная ошибка при определении кода клавиатуры."
   },
   zh: {
@@ -155,6 +158,7 @@ export const translations: Record<Language, Record<string, string>> = {
     defineButton: "定义",
     abortButton: "取消",
     defining: "正在定义... 最多可能需要60秒。",
+    codeCreatedSuccess: "代码已成功创建。请确认。",
     unknownPinError: "定义键盘代码时出现未知错误。"
   },
   hi: {
@@ -189,6 +193,7 @@ export const translations: Record<Language, Record<string, string>> = {
     defineButton: "परिभाषित करें",
     abortButton: "रद्द करें",
     defining: "परिभाषित किया जा रहा है... अधिकतम 60 सेकंड तक ले सकता है।",
+    codeCreatedSuccess: "कोड सफलतापूर्वक बनाया गया। कृपया पुष्टि करें।",
     unknownPinError: "कीपैड कोड परिभाषित करते समय अज्ञात त्रुटि।"
   },
   it: {
@@ -223,6 +228,7 @@ export const translations: Record<Language, Record<string, string>> = {
     defineButton: "Definisci",
     abortButton: "Annulla",
     defining: "Definizione in corso... Può richiedere fino a 60 secondi.",
+    codeCreatedSuccess: "Codice creato correttamente. Conferma per favore.",
     unknownPinError: "Errore sconosciuto durante la definizione del codice tastierino."
   },
   es: {
@@ -257,6 +263,7 @@ export const translations: Record<Language, Record<string, string>> = {
     defineButton: "Definir",
     abortButton: "Cancelar",
     defining: "Definiendo... Puede tardar hasta 60 segundos.",
+    codeCreatedSuccess: "Código creado correctamente. Por favor, confirma.",
     unknownPinError: "Error desconocido al definir el código del teclado."
   },
   el: {
@@ -291,6 +298,7 @@ export const translations: Record<Language, Record<string, string>> = {
     defineButton: "Ορίστε",
     abortButton: "Ακύρωση",
     defining: "Ορισμός... Μπορεί να διαρκέσει έως 60 δευτερόλεπτα.",
+    codeCreatedSuccess: "Ο κωδικός δημιουργήθηκε επιτυχώς. Παρακαλώ επιβεβαιώστε.",
     unknownPinError: "Άγνωστο σφάλμα κατά τον ορισμό του κωδικού πληκτρολογίου."
   },
   pt: {
@@ -325,6 +333,7 @@ export const translations: Record<Language, Record<string, string>> = {
     defineButton: "Definir",
     abortButton: "Cancelar",
     defining: "Definindo... Pode levar até 60 segundos.",
+    codeCreatedSuccess: "Código criado com sucesso. Por favor, confirme.",
     unknownPinError: "Erro desconhecido ao definir o código do teclado."
   },
   ja: {
@@ -359,6 +368,7 @@ export const translations: Record<Language, Record<string, string>> = {
     defineButton: "定義",
     abortButton: "キャンセル",
     defining: "定義中... 最大60秒かかる場合があります。",
+    codeCreatedSuccess: "コードが正常に作成されました。確認してください。",
     unknownPinError: "キーパッドコード定義時に不明なエラーが発生しました。"
   },
   th: {
@@ -393,6 +403,7 @@ export const translations: Record<Language, Record<string, string>> = {
     defineButton: "กำหนด",
     abortButton: "ยกเลิก",
     defining: "กำลังกำหนด... อาจใช้เวลาสูงสุด 60 วินาที",
+    codeCreatedSuccess: "รหัสถูกสร้างเรียบร้อยแล้ว กรุณายืนยัน",
     unknownPinError: "มีข้อผิดพลาดที่ไม่ทราบสาเหตุในการกำหนดรหัสคีย์แพด"
   },
   vi: {
@@ -427,6 +438,7 @@ export const translations: Record<Language, Record<string, string>> = {
     defineButton: "Xác Định",
     abortButton: "Hủy",
     defining: "Đang xác định... Có thể mất tới 60 giây.",
+    codeCreatedSuccess: "Mã đã được tạo thành công. Vui lòng xác nhận.",
     unknownPinError: "Lỗi không xác định khi xác định mã bàn phím."
   },
   cs: {
@@ -461,6 +473,7 @@ export const translations: Record<Language, Record<string, string>> = {
     defineButton: "Definovat",
     abortButton: "Zrušit",
     defining: "Definování... Může trvat až 60 sekund.",
+    codeCreatedSuccess: "Kód byl úspěšně vytvořen. Prosím potvrďte.",
     unknownPinError: "Neznámá chyba při definování kódu klávesnice."
   },
   pl: {
@@ -495,6 +508,7 @@ export const translations: Record<Language, Record<string, string>> = {
     defineButton: "Zdefiniuj",
     abortButton: "Anuluj",
     defining: "Definiowanie... Może potrwać do 60 sekund.",
+    codeCreatedSuccess: "Kod został pomyślnie utworzony. Proszę potwierdzić.",
     unknownPinError: "Nieznany błąd podczas definiowania kodu klawiatury."
   },
   ro: {
@@ -529,6 +543,7 @@ export const translations: Record<Language, Record<string, string>> = {
     defineButton: "Definește",
     abortButton: "Anulează",
     defining: "Definire... Poate dura până la 60 de secunde.",
+    codeCreatedSuccess: "Codul a fost creat cu succes. Vă rugăm să confirmați.",
     unknownPinError: "Eroare necunoscută la definirea codului tastaturii."
   },
   sr: {
@@ -563,6 +578,7 @@ export const translations: Record<Language, Record<string, string>> = {
     defineButton: "Дефиниши",
     abortButton: "Отказ",
     defining: "Дефинисање... Може потрајати до 60 секунди.",
+    codeCreatedSuccess: "Код је успешно креиран. Молимо потврдите.",
     unknownPinError: "Непозната грешка при дефинисању кода тастатуре."
   },
   fr: {
@@ -597,6 +613,7 @@ export const translations: Record<Language, Record<string, string>> = {
     defineButton: "Définir",
     abortButton: "Annuler",
     defining: "Définition... Peut prendre jusqu'à 60 secondes.",
+    codeCreatedSuccess: "Le code a été créé avec succès. Veuillez confirmer.",
     unknownPinError: "Erreur inconnue lors de la définition du code du clavier."
   }
 };

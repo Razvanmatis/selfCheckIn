@@ -8,6 +8,7 @@ export type GuestLookupForm = {
 
 export type DefineKeypadCodeRequest = GuestLookupForm & {
   pinCode: string;
+  language?: string;
 };
 
 

@@ -9,6 +9,7 @@ import { getCheckInInformation } from "./getCheckInInformation.js";
 import {
   handler as initiateCheckInProcessHandler
 } from "./initiateCheckInProcess.js";
+import {sendErrorNotificationEmail} from "./worker/src/mailService.js";
 
 const app = express();
 const port = Number(process.env.PORT ?? 7071);
@@ -17,7 +18,9 @@ const env: Env = {
   SMOOBU_API_KEY: process.env.SMOOBU_API_KEY!,
   NUKI_API_TOKEN: process.env.NUKI_API_TOKEN!,
   NUKI_SMARTLOCK_ID: process.env.NUKI_SMARTLOCK_ID!,
-  ADMIN_NAME: process.env.ADMIN_NAME!
+  ADMIN_NAME: process.env.ADMIN_NAME!,
+  BREVO_API_KEY: process.env.BREVO_API_KEY!,
+  EMAIL_FROM: process.env.EMAIL_FROM!
 };
 
 app.use(cors());
@@ -64,6 +67,8 @@ app.post("/api/getCheckInInformation", async (req, res) => {
     res.setHeader("Content-Disposition", "attachment; filename=check_in_guestroom.pdf");
     res.status(200).send(result);
   } catch (error) {
+    await sendErrorNotificationEmail("Check-In-PDF konnte nicht geladen werden.",
+        req.body.firstName + " " + req.body.lastName, req.body.checkInDate + "-" + req.body.checkOutDate, env);
     const message =
       error instanceof Error
         ? error.message

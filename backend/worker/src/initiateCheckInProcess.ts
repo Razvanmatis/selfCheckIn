@@ -1,6 +1,7 @@
-import {isAdminRequest, parseAndValidateCheckInLookupPayload} from "./validation";
-import type {Env} from "./env";
-import {CheckInLookupPayload} from "./types/checkInLookupPayload";
+import {isAdminRequest, parseAndValidateCheckInLookupPayload} from "./validation.js";
+import type {Env} from "./env.js";
+import {CheckInLookupPayload} from "./types/checkInLookupPayload.js";
+import {sendErrorNotificationEmail} from "./mailService.js";
 
 type SmoobuBooking = {
   id: number;
@@ -9,6 +10,7 @@ type SmoobuBooking = {
   arrival: string;
   departure: string;
   phone: string | null;
+  email: string;
 };
 
 type SmoobuReservationsResponse = {
@@ -39,7 +41,7 @@ const textHeaders = {
 
 const smoobuReservationsUrl = "https://login.smoobu.com/api/reservations?pageSize=100";
 
-async function getAllOpenBookings(env: Env) {
+export async function getAllOpenBookings(env: Env) {
   const response = await fetch(smoobuReservationsUrl, {
     method: "GET",
     headers: {
@@ -56,9 +58,10 @@ async function getAllOpenBookings(env: Env) {
 }
 
 export async function initiateCheckInProcess(
-    request: CheckInLookupPayload,
-    env: Env
+  request: CheckInLookupPayload,
+  env: Env
 ): Promise<string> {
+
   if (isAdminRequest(request, env)) {
     return "OK";
   }
@@ -66,7 +69,20 @@ export async function initiateCheckInProcess(
     return (value ?? "").replace(/\D/g, "");
   };
 
-  const data = await getAllOpenBookings(env);
+  let data;
+  try {
+    data = await getAllOpenBookings(env);
+  } catch (error) {
+    await sendErrorNotificationEmail(error instanceof Error ? error.message : String(error),
+        request.firstName + " " + request.lastName, `${request.checkInDate} - ${request.checkOutDate}`, env);
+    throw error;
+  }
+
+  if (data.bookings.length === 0) {
+    await sendErrorNotificationEmail("Keine offenen Buchungen gefunden!",
+        request.firstName + " " + request.lastName, `${request.checkInDate} - ${request.checkOutDate}`, env);
+    return "validationError";
+  }
 
   // Determine search mode: by name or by phone
   const hasName = request.firstName.trim().length && request.lastName.trim().length;
@@ -106,8 +122,9 @@ export async function initiateCheckInProcess(
 
 export async function handler(event: LambdaLikeEvent,
                               env: Env): Promise<LambdaLikeResponse> {
+  let payload;
   try {
-    const payload = parseAndValidateCheckInLookupPayload(event.body);
+    payload = parseAndValidateCheckInLookupPayload(event.body);
     const result = await initiateCheckInProcess(payload, env);
 
     return {
@@ -118,6 +135,8 @@ export async function handler(event: LambdaLikeEvent,
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Unbekannter Fehler im Check-In Prozess.";
+    await sendErrorNotificationEmail(`Fehler im Check-In Prozess: ${message}`,
+        payload?.firstName + " " + payload?.lastName, `${payload?.checkInDate} - ${payload?.checkOutDate}`, env);
     return {
       statusCode: 400,
       headers: jsonHeaders,

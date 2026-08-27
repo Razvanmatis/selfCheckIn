@@ -1,7 +1,8 @@
 import type { Env } from "./env.js";
 import {DefineKeypadCodeRequest} from "./types/defineKeypadCodeRequest.js";
-import {CheckInLookupPayload} from "./types/checkInLookupPayload";
-import {NukiCreateAuthPayload} from "../../types/nukiCreateAuthPayload";
+import {CheckInLookupPayload} from "./types/checkInLookupPayload.js";
+import {NukiCreateAuthPayload} from "./types/nukiCreateAuthPayload.js";
+import {NukiAuthEntry} from "./types/nukiAuthEntry.js";
 
 function toLocalInputDate(date: Date): string {
   const localTime = new Date(date.getTime() - date.getTimezoneOffset() * 60_000);
@@ -108,7 +109,7 @@ export function parseAndValidateCheckInLookupPayload(body: string | null): Check
   return validateCheckInLookupPayload(parsed);
 }
 
-export function isAdminRequest(request: CheckInLookupPayload, env: Env) {
+export function isAdminRequest(request: CheckInLookupPayload | DefineKeypadCodeRequest, env: Env) {
   return request.firstName === env.ADMIN_NAME && request.lastName === env.ADMIN_NAME;
 }
 
@@ -128,13 +129,16 @@ export function parseAndValidateDefineKeypadCodeRequest(body: string | null): De
     throw new Error("Ungültiger pinCode. Er muss 6-stellig sein, darf keine '0' enthalten und darf nicht mit '12' beginnen.");
   }
 
+  const selectedLanguage = typeof parsed.language === "string" ? parsed.language.trim().toLowerCase() : "de";
+
   return {
     firstName: validatedLookup.firstName,
     lastName: validatedLookup.lastName,
     phone: validatedLookup.phone,
     checkInDate: validatedLookup.checkInDate,
     checkOutDate: validatedLookup.checkOutDate,
-    pinCode: parsed.pinCode.trim()
+    pinCode: parsed.pinCode.trim(),
+    language: selectedLanguage
   };
 }
 
@@ -202,13 +206,13 @@ export function formatDateToDayMonth(value: string): string {
 }
 
 export function getFormattedDateAsName(checkInDate: string, checkOutDate: string): string {
-  return `${formatDateToDayMonth(checkInDate)} - ${formatDateToDayMonth(checkOutDate)}`;
+  return `${formatDateToDayMonth(checkInDate)}-${formatDateToDayMonth(checkOutDate)}`;
 }
 
 export function buildNukiCreatePayload(payload: DefineKeypadCodeRequest,
-                                       env: Env): NukiCreateAuthPayload {
+                                env: Env): NukiCreateAuthPayload {
   return {
-    name: getFormattedDateAsName(payload.checkInDate, payload.checkOutDate),
+    name: "WILL BE DEFINED!",
     allowedFromDate: `${payload.checkInDate}T13:00:00.000Z`,
     allowedUntilDate: `${payload.checkOutDate}T09:00:00.000Z`,
     allowedWeekDays: 127,
@@ -221,4 +225,18 @@ export function buildNukiCreatePayload(payload: DefineKeypadCodeRequest,
     type: 13,
     code: Number(payload.pinCode)
   };
+}
+
+export function getExistingNameInitialsOfNukiAuthEntry(nukiAuthEntry: NukiAuthEntry) {
+  const nameParts = nukiAuthEntry.name.split(",");
+  let existingNameInitials = ",XX";
+  if (nameParts.length > 1) {
+    existingNameInitials = "";
+    for (let i = 1; i < nameParts.length; i++) {
+      existingNameInitials += "," + nameParts[i].trim();
+    }
+  } else {
+    console.log("Keine Initialen im bestehenden Nuki-Code gefunden, obwohl erwartet.");
+  }
+  return existingNameInitials;
 }

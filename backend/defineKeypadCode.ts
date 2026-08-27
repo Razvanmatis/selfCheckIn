@@ -1,15 +1,16 @@
-import {initiateCheckInProcess} from "./initiateCheckInProcess.js";
+import {getAllOpenBookings, initiateCheckInProcess} from "./initiateCheckInProcess.js";
 import {
-    buildNukiCreatePayload,
+    buildNukiCreatePayload, getExistingNameInitialsOfNukiAuthEntry,
     getFormattedDateAsName,
     getNewerDate,
-    getOlderDate,
+    getOlderDate, isAdminRequest,
     parseAndValidateDefineKeypadCodeRequest,
 } from "./validation.js";
 import type {Env} from "./env.js";
 import {NukiAuthEntry} from "./types/nukiAuthEntry.js";
 import {NukiCreateAuthPayload} from "./types/nukiCreateAuthPayload.js";
 import {DefineKeypadCodeRequest} from "./types/defineKeypadCodeRequest.js";
+import {sendBookingConfirmationEmail, sendErrorNotificationEmail} from "./mailService.js";
 
 type LambdaLikeEvent = {
     body: string | null;
@@ -97,7 +98,7 @@ async function deleteKeypadCode(entryId: string, env: Env): Promise<void> {
                 return;
             }
         } else if (![200, 204, 404].includes(response.status)) {
-            throw new Error("Bestehender Nuki-Code konnte nicht entfernt werden.");
+            throw new Error("Bestehender Nuki-Code konnte nicht entfernt werden. ID: " + entryId);
         }
 
         if (attempt < 5) {
@@ -135,7 +136,7 @@ async function createKeypadCode(payload: NukiCreateAuthPayload, env: Env): Promi
             }
         } else if (!response.ok) {
             console.log(`Fehler beim Setzen des Nuki-Codes: ${response.status} ${response.statusText}`);
-            throw new Error("Neuer Nuki-Keypad Code konnte nicht gesetzt werden.");
+            throw new Error("Neuer Nuki-Keypad Code konnte nicht gesetzt werden. Code: " + expectedCode + ", Name: " + expectedName);
         }
 
         if (attempt < 5) {
@@ -155,6 +156,55 @@ async function handleDeletionOfEntries(existingEntriesToDelete: NukiAuthEntry[],
     console.log("Nuki-Sync erfolgreich durchgeführt.");
 }
 
+async function getNameInitialsOfRequest(request: DefineKeypadCodeRequest, env: Env) {
+    const hasName = request.firstName.trim().length && request.lastName.trim().length;
+    let nameCharacters = "";
+    if (hasName) {
+        nameCharacters = `${request.firstName.trim().charAt(0).toUpperCase()}${request.lastName.trim().charAt(0).toUpperCase()}`;
+    } else {
+        const allBookings = await getAllOpenBookings(env);
+        const bookingMatch = allBookings?.bookings.find((booking) => {
+            return (
+                booking.arrival === request.checkInDate &&
+                booking.departure === request.checkOutDate
+            );
+        });
+        if (bookingMatch) {
+            nameCharacters = `${bookingMatch.firstname.trim().charAt(0).toUpperCase()}${bookingMatch.lastname.trim().charAt(0).toUpperCase()}`;
+        } else {
+            console.log("Keine Buchung gefunden, um Initialen zu ermitteln.");
+            await sendErrorNotificationEmail(`Keine Buchung gefunden, um Initialen zu ermitteln. Ankunft: ${request.checkInDate},
+             Abreise: ${request.checkOutDate}`, request.firstName + " " + request.lastName,
+                `${request.checkInDate} - ${request.checkOutDate}`, env, request.pinCode);
+            nameCharacters = "XX";
+        }
+    }
+    return nameCharacters;
+}
+
+async function getMailOfGuest(request: DefineKeypadCodeRequest, env: Env) {
+    if (isAdminRequest(request, env)) {
+        return env.EMAIL_FROM;
+    }
+    const allBookings = await getAllOpenBookings(env);
+    const bookingMatch = allBookings?.bookings.find((booking) => {
+        return (
+            booking.arrival === request.checkInDate &&
+            booking.departure === request.checkOutDate &&
+            (booking.firstname.trim().toLowerCase() === request.firstName.trim().toLowerCase() &&
+                booking.lastname.trim().toLowerCase() === request.lastName.trim().toLowerCase() ||
+                booking.phone?.trim() === request.phone.trim())
+        );
+    });
+    if (bookingMatch === undefined) {
+        console.log("Keine Buchung gefunden, um E-Mail-Adresse zu ermitteln.");
+        await sendErrorNotificationEmail(`Keine Buchung gefunden, um E-Mail-Adresse zu ermitteln. Ankunft: ${request.checkInDate},
+             Abreise: ${request.checkOutDate}`, request.firstName + " " + request.lastName,
+            `${request.checkInDate} - ${request.checkOutDate}`, env, request.pinCode);
+    }
+    return bookingMatch?.email ?? "";
+}
+
 export async function defineKeypadCode(request: DefineKeypadCodeRequest,
                                        env: Env): Promise<string> {
     const checkInValidationResult = await initiateCheckInProcess(request, env);
@@ -169,9 +219,11 @@ export async function defineKeypadCode(request: DefineKeypadCodeRequest,
     const entries = await getAllKeypadCodes(env);
 
     let formattedDateAsName = getFormattedDateAsName(request.checkInDate, request.checkOutDate);
+    const requestNameInitials = "," + await getNameInitialsOfRequest(request, env);
+    let formattedDateAsNameWithInitials = `${formattedDateAsName}${requestNameInitials}`;
 
     const existingEntriesWithSameCodeAndName = entries.filter(
-        (entry) => String(entry.code) === request.pinCode && entry.name === formattedDateAsName
+        (entry) => String(entry.code) === request.pinCode && entry.name === formattedDateAsNameWithInitials
     );
 
     if (existingEntriesWithSameCodeAndName.length > 0) {
@@ -182,34 +234,52 @@ export async function defineKeypadCode(request: DefineKeypadCodeRequest,
     const nukiPayload = buildNukiCreatePayload(request, env);
 
     const entriesToDeleteBecauseOfSameCode = entries.filter(
-        (entry) => (String(entry.code) === request.pinCode && entry.name !== formattedDateAsName)
+        (entry) => (String(entry.code) === request.pinCode && entry.name !== formattedDateAsNameWithInitials)
     );
     if (entriesToDeleteBecauseOfSameCode.length > 0) {
         formattedDateAsName = getFormattedDateAsName(
             getOlderDate(request.checkInDate, (entriesToDeleteBecauseOfSameCode.at(0) as NukiAuthEntry).allowedFromDate),
             getNewerDate(request.checkOutDate, (entriesToDeleteBecauseOfSameCode.at(0) as NukiAuthEntry).allowedUntilDate));
         console.log(`Neuer Zeitraum ermittelt: ${formattedDateAsName}`);
+        const existingNameInitials = getExistingNameInitialsOfNukiAuthEntry(entriesToDeleteBecauseOfSameCode.at(0) as NukiAuthEntry);
+        formattedDateAsNameWithInitials = `${formattedDateAsName}${existingNameInitials}${requestNameInitials}`;
+        if (formattedDateAsNameWithInitials.length > 20) {
+            console.log(`Warnung: Der Name des Nuki-Codes ist länger als 20 Zeichen: ${formattedDateAsNameWithInitials}`);
+            await sendErrorNotificationEmail(`Warnung: Der Name des Nuki-Codes ist länger als 20 Zeichen: ${formattedDateAsNameWithInitials}`,
+                request.firstName + " " + request.lastName, `${request.checkInDate} - ${request.checkOutDate}`, env, request.pinCode);
+        }
         nukiPayload.allowedFromDate = `${getOlderDate(request.checkInDate, (entriesToDeleteBecauseOfSameCode.at(0) as NukiAuthEntry).allowedFromDate)}T13:00:00.000Z`;
         nukiPayload.allowedUntilDate = `${getNewerDate(request.checkOutDate, (entriesToDeleteBecauseOfSameCode.at(0) as NukiAuthEntry).allowedUntilDate)}T09:00:00.000Z`;
         await handleDeletionOfEntries(entriesToDeleteBecauseOfSameCode, env);
     } else {
         const entriesToDeleteBecauseOfSameNameButDifferentCode = entries.filter(
-            (entry) => (String(entry.code) !== request.pinCode && entry.name === formattedDateAsName)
+            (entry) => (String(entry.code) !== request.pinCode && entry.name === formattedDateAsNameWithInitials)
         );
         if (entriesToDeleteBecauseOfSameNameButDifferentCode.length > 0) {
             await handleDeletionOfEntries(entriesToDeleteBecauseOfSameNameButDifferentCode, env);
         }
     }
 
+    nukiPayload.name = formattedDateAsNameWithInitials;
     await createKeypadCode(nukiPayload, env);
-    console.log(`Neuer Nuki-Code ${request.pinCode} gesetzt: ${formattedDateAsName}`);
+    console.log(`Neuer Nuki-Code ${request.pinCode} gesetzt: ${formattedDateAsNameWithInitials}`);
+    const guestMail = await getMailOfGuest(request, env);
+    await sendBookingConfirmationEmail(
+        guestMail,
+        `${request.firstName} ${request.lastName}`,
+        formattedDateAsName,
+        request.pinCode,
+        env,
+        request.language
+    );
     return "OK";
 }
 
 export async function handler(event: LambdaLikeEvent,
                               env: Env): Promise<LambdaLikeResponse> {
+    let payload;
     try {
-        const payload = parseAndValidateDefineKeypadCodeRequest(event.body);
+        payload = parseAndValidateDefineKeypadCodeRequest(event.body);
         const result = await defineKeypadCode(payload, env);
 
         return {
@@ -221,6 +291,8 @@ export async function handler(event: LambdaLikeEvent,
         const message =
             error instanceof Error ? error.message : "Unbekannter Fehler im Keypad-Code Prozess.";
         console.log(`Fehler im Keypad-Code Prozess: ${message}`);
+        await sendErrorNotificationEmail(`Fehler im Keypad-Code Prozess: ${message}`,
+            payload?.firstName + " " + payload?.lastName, `${payload?.checkInDate} - ${payload?.checkOutDate}`, env, payload?.pinCode);
         return {
             statusCode: 400,
             headers: jsonHeaders,

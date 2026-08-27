@@ -5,4 +5,5 @@ export type DefineKeypadCodeRequest = {
     checkInDate: string;
     checkOutDate: string;
     pinCode: string;
+    language?: string;
 };

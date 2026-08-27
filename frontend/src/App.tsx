@@ -105,7 +105,8 @@ function App() {
       const formData = getFormDataForSubmission();
       const result = await defineKeypadCode({
         ...formData,
-        pinCode
+        pinCode,
+        language
       });
 
       if (result === "validationError") {
@@ -119,6 +120,7 @@ function App() {
       setSubmitError(null);
       setSubmitResult(result);
       setDialogPhoneNumber("");
+      window.confirm(t.codeCreatedSuccess);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : t.unknownPinError;
       setSubmitError(errorMessage);
