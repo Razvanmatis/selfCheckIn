@@ -11,6 +11,7 @@ selfCheckIn/
 │   ├── README.md               # Backend-spezifische Hinweise
 │   ├── package.json            # Scripts für local dev / typecheck
 │   ├── server.ts               # Express-Server
+│   ├── mailService.ts          # Mail-Service für Express-Server
 │   ├── defineKeypadCode.ts     # API-Logik
 │   ├── getCheckInInformation.ts
 │   ├── initiateCheckInProcess.ts
@@ -53,6 +54,8 @@ SMOOBU_API_KEY=""
 NUKI_API_TOKEN=""
 NUKI_SMARTLOCK_ID=""
 ADMIN_NAME=""
+BREVO_API_KEY=""
+EMAIL_FROM=""
 ```
 
 ### 2) Frontend starten
@@ -139,3 +142,4 @@ npx wrangler deploy
 ```
 
 Damit bleibt das Deployment reproduzierbar und leicht nachvollziehbar.
+Die UI ist aktuell erreichbar unter: https://ui.raz-check-in.workers.dev
