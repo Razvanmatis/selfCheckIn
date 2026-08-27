@@ -1,8 +1,6 @@
-import {
-  parseAndValidateCheckInLookupPayload,
-  type CheckInLookupPayload, isAdminRequest
-} from "./validation";
-import type { Env } from "./env";
+import {isAdminRequest, parseAndValidateCheckInLookupPayload} from "./validation";
+import type {Env} from "./env";
+import {CheckInLookupPayload} from "./types/checkInLookupPayload";
 
 type SmoobuBooking = {
   id: number;
@@ -41,17 +39,7 @@ const textHeaders = {
 
 const smoobuReservationsUrl = "https://login.smoobu.com/api/reservations?pageSize=100";
 
-export async function initiateCheckInProcess(
-    request: CheckInLookupPayload,
-    env: Env
-): Promise<string> {
-  if (isAdminRequest(request, env)) {
-    return "OK";
-  }
-  const normalizePhone = (value: string | null | undefined): string => {
-    return (value ?? "").replace(/\D/g, "");
-  };
-
+async function getAllOpenBookings(env: Env) {
   const response = await fetch(smoobuReservationsUrl, {
     method: "GET",
     headers: {
@@ -64,7 +52,21 @@ export async function initiateCheckInProcess(
     throw new Error("Smoobu-Reservierungen konnten nicht geladen werden.");
   }
 
-  const data = (await response.json()) as SmoobuReservationsResponse;
+  return (await response.json()) as SmoobuReservationsResponse;
+}
+
+export async function initiateCheckInProcess(
+    request: CheckInLookupPayload,
+    env: Env
+): Promise<string> {
+  if (isAdminRequest(request, env)) {
+    return "OK";
+  }
+  const normalizePhone = (value: string | null | undefined): string => {
+    return (value ?? "").replace(/\D/g, "");
+  };
+
+  const data = await getAllOpenBookings(env);
 
   // Determine search mode: by name or by phone
   const hasName = request.firstName.trim().length && request.lastName.trim().length;
