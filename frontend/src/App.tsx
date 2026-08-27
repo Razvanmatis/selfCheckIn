@@ -335,16 +335,16 @@ function App() {
             </p>
           ) : null}
 
-          <button type="submit" disabled={isFormActionDisabled}>
-            {isSubmitting ? t.submitting : t.submitButton}
-          </button>
-
           <button
-            type="button"
-            onClick={handleGetCheckInInstructions}
-            disabled={isFormActionDisabled}
+              type="button"
+              onClick={handleGetCheckInInstructions}
+              disabled={isFormActionDisabled}
           >
             {isLoadingInstructions ? t.loadingInstructions : t.getInstructionsButton}
+          </button>
+
+          <button type="submit" disabled={isFormActionDisabled}>
+            {isSubmitting ? t.submitting : t.submitButton}
           </button>
 
           {submitError ? (
