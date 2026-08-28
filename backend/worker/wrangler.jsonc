@@ -1,12 +1,22 @@
 {
-  "name": "selfcheckin",
-  "main": "src/index.ts",
-  "compatibility_date": "2026-08-21",
-  "observability": {
-    "enabled": true
-  },
-  "assets": {
-    "directory": "./assets",
-    "binding": "ASSETS"
-  }
+	"name": "selfcheckin",
+	"main": "src/index.ts",
+	"compatibility_date": "2026-08-21",
+	"observability": {
+		"enabled": true
+	},
+	"assets": {
+		"directory": "./assets",
+		"binding": "ASSETS"
+	},
+	"ai": {
+		"binding": "AI"
+	},
+	"vectorize": [
+		{
+			"binding": "APARTMENT_KNOWLEDGE",
+			"index_name": "apartment-knowledge",
+			"remote": true
+		}
+	]
 }

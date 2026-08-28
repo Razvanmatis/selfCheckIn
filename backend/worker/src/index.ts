@@ -5,6 +5,8 @@ import { parseAndValidateCheckInLookupPayload } from "./validation";
 import { defineKeypadCode } from "./defineKeypadCode";
 import { getCheckInInformation } from "./getCheckInInformation";
 import { cors } from "hono/cors";
+import { seedKnowledge } from "./seedKnowledge";
+import { askKnowledge } from "./askKnowledge";
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -88,6 +90,55 @@ app.post("/api/getCheckInInformation", async (c) => {
 				: "Unbekannter Fehler beim Laden der Check-In Instruktionen.";
 
 		return c.json({ message }, 400);
+	}
+});
+
+app.post("/api/ai/seed-knowledge", async (c) => {
+	try {
+		await seedKnowledge(c.env);
+
+		return c.json({
+			success: true,
+			message: "Knowledge Base erfolgreich in Vectorize gespeichert."
+		});
+	} catch (error) {
+		const message =
+			error instanceof Error
+				? error.message
+				: "Unbekannter Fehler beim Seeding der Knowledge Base.";
+
+		return c.json({ message }, 500);
+	}
+});
+
+app.post("/api/ai/ask", async (c) => {
+	try {
+		const body = await c.req.json();
+
+		const question = String(body?.question ?? "").trim();
+
+		if (!question) {
+			return c.json(
+				{ message: "Keine Frage übergeben." },
+				400
+			);
+		}
+
+		const answer = await askKnowledge(
+			question,
+			c.env
+		);
+
+		return c.json({
+			answer
+		});
+	} catch (error) {
+		const message =
+			error instanceof Error
+				? error.message
+				: "Unbekannter Fehler beim Beantworten der Frage.";
+
+		return c.json({ message }, 500);
 	}
 });
 

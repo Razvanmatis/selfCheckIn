@@ -141,5 +141,12 @@ npm run build
 npx wrangler deploy
 ```
 
+## Lokal Wrangler testen
+
+```bash
+cd backend/worker
+npx wrangler dev
+```
+
 Damit bleibt das Deployment reproduzierbar und leicht nachvollziehbar.
 Die UI ist aktuell erreichbar unter: https://ui.raz-check-in.workers.dev
