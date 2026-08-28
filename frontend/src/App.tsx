@@ -262,7 +262,7 @@ function App() {
             </button>
           </div>
         </section>
-        <ChatbotWidget />
+        <ChatbotWidget language={language} />
       </main>
     );
   }
@@ -485,7 +485,7 @@ function App() {
         />
       ) : null}
 
-      <ChatbotWidget />
+      <ChatbotWidget language={language} />
     </main>
   );
 }

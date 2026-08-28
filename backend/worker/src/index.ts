@@ -125,7 +125,7 @@ app.post("/api/ai/ask", async (c) => {
 		}
 
 		const answer = await askKnowledge(
-			question,
+			body,
 			c.env
 		);
 

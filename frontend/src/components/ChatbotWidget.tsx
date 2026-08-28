@@ -51,7 +51,11 @@ const getDefaultPosition = (): Position => {
   });
 };
 
-export function ChatbotWidget() {
+type ChatbotWidgetProps = {
+  language: string;
+};
+
+export function ChatbotWidget({ language }: ChatbotWidgetProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [question, setQuestion] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -184,7 +188,10 @@ export function ChatbotWidget() {
     setIsLoading(true);
 
     try {
-      const answer = await askKnowledge({ question: trimmedQuestion });
+      const answer = await askKnowledge({
+        question: trimmedQuestion,
+        language
+      });
       setMessages((prev) => [
         ...prev,
         {

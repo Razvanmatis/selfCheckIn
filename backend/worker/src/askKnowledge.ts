@@ -1,14 +1,59 @@
-import type { Env } from "./env";
+import type {Env} from "./env";
+
+type AskKnowledgeRequest = { question: string; language?: string; };
+
+function getLanguageString(language: string | undefined): string {
+    switch (language?.trim().toLowerCase()) {
+        case "de":
+            return "Deutsch";
+        case "en":
+            return "Englisch";
+        case "ru":
+            return "Russisch";
+        case "zh":
+            return "Chinesisch";
+        case "hi":
+            return "Hindi";
+        case "it":
+            return "Italienisch";
+        case "es":
+            return "Spanisch";
+        case "el":
+            return "Griechisch";
+        case "pt":
+            return "Portugiesisch";
+        case "ja":
+            return "Japanisch";
+        case "th":
+            return "Thailändisch";
+        case "vi":
+            return "Vietnamesisch";
+        case "cs":
+            return "Tschechisch";
+        case "pl":
+            return "Polnisch";
+        case "ro":
+            return "Rumänisch";
+        case "sr":
+            return "Serbisch";
+        case "fr":
+            return "Französisch";
+        default:
+            return "Deutsch";
+    }
+}
 
 export async function askKnowledge(
-    question: string,
+    payload: AskKnowledgeRequest,
     env: Env
 ): Promise<string> {
+    console.log("sprache: " + getLanguageString(payload.language));
+    const languageString = getLanguageString(payload.language);
     // 1. Frage in einen Vektor umwandeln
     const embedding = await env.AI.run(
         "@cf/qwen/qwen3-embedding-0.6b",
         {
-            text: [question]
+            text: [payload.question]
         }
     );
 
@@ -43,7 +88,22 @@ export async function askKnowledge(
         })
         .filter(Boolean)
         .join("\n\n");
+    const content = `
+Du bist ein Assistent für Gäste einer Ferienwohnung.
 
+DEINE AUFGABE:
+Beantworte die Frage des Gastes ausschließlich anhand des bereitgestellten Kontexts.
+
+WICHTIGE REGELN:
+- Erfinde keine Informationen.
+- Wenn der Kontext die Frage nicht beantwortet, sage dies ehrlich.
+- Die gewünschte Antwortsprache ist: ${languageString}
+- Die Antwort MUSS vollständig in ${languageString} sein.
+- Die Sprache der Frage spielt für die Antwortsprache keine Rolle.
+- Die Sprache des Kontexts spielt für die Antwortsprache keine Rolle.
+- Wenn Frage und Kontext auf Deutsch sind, antworte trotzdem auf ${languageString}.
+- Gib ausschließlich die Antwort an den Gast zurück.
+`;
     // 4. LLM mit Frage + Kontext aufrufen
     const response = await env.AI.run(
         "@cf/meta/llama-3.1-8b-instruct-fast",
@@ -51,17 +111,13 @@ export async function askKnowledge(
             messages: [
                 {
                     role: "system",
-                    content:
-                        "Du bist ein freundlicher Assistent für Gäste einer Ferienwohnung. " +
-                        "Beantworte Fragen ausschließlich anhand der bereitgestellten Informationen. " +
-                        "Wenn die Informationen keine Antwort enthalten, sage ehrlich, dass du es nicht weißt. " +
-                        "Erfinde niemals Informationen."
+                    content: content
                 },
                 {
                     role: "user",
                     content:
                         `Informationen zur Wohnung:\n\n${context}\n\n` +
-                        `Frage des Gastes:\n${question}`
+                        `Frage des Gastes:\n${payload.question}`
                 }
             ]
         }
