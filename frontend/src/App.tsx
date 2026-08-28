@@ -4,11 +4,12 @@ import { getCheckInInformation } from "./api/getCheckInInformation";
 import { initiateCheckInProcess } from "./api/initiateCheckInProcess";
 import { LanguageSelector } from "./components/LanguageSelector";
 import { PinDialog } from "./components/PinDialog";
+import { PreCheckInDialog } from "./components/PreCheckInDialog";
 import { legalContent, type LegalPage } from "./content/legalContent";
 import type { Language } from "./i18n/translations";
 import { translations } from "./i18n/translations";
 import type { GuestLookupForm } from "./types/forms";
-import type { LoginMode } from "./types/ui";
+import type { DialogStep, LoginMode } from "./types/ui";
 import {
   buildSubmissionForm,
   getDateBounds,
@@ -32,6 +33,7 @@ function App() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitResult, setSubmitResult] = useState<string | null>(null);
   const [isPinDialogOpen, setIsPinDialogOpen] = useState(false);
+  const [activeDialogStep, setActiveDialogStep] = useState<DialogStep | null>(null);
   const [pinCode, setPinCode] = useState("");
   const [isDefiningPin, setIsDefiningPin] = useState(false);
   const [dialogPhoneNumber, setDialogPhoneNumber] = useState("");
@@ -159,7 +161,7 @@ function App() {
       if (result === "OK") {
         setPinCode("");
         setDialogPhoneNumber(loginMode === "phone" ? form.phone : "");
-        setIsPinDialogOpen(true);
+        openPreCheckInFlow();
         return;
       }
 
@@ -195,8 +197,52 @@ function App() {
 
   const closePinDialog = () => {
     setIsPinDialogOpen(false);
+    setActiveDialogStep(null);
     setDialogPhoneNumber("");
   };
+
+  const openPreCheckInFlow = () => {
+    setIsPinDialogOpen(true);
+    setActiveDialogStep("timing");
+  };
+
+  const handlePreCheckInConfirm = () => {
+    if (activeDialogStep === "timing") {
+      setActiveDialogStep("houseRules");
+      return;
+    }
+
+    if (activeDialogStep === "houseRules") {
+      setActiveDialogStep("wifiRules");
+      return;
+    }
+
+    if (activeDialogStep === "wifiRules") {
+      setActiveDialogStep("pin");
+    }
+  };
+
+  const timingItems = [
+    { icon: "🕒", text: t.dialogCheckInTimeRule },
+    { icon: "🌤️", text: t.dialogCheckInTimingHint },
+    { icon: "🌙", text: t.dialogCheckOutTimeRule }
+  ];
+
+  const houseRuleItems = [
+    { icon: "🚽", text: t.houseRuleToilet },
+    { icon: "👟", text: t.houseRuleShoes },
+    { icon: "🚿", text: t.houseRuleShower },
+    { icon: "🥤", text: t.houseRulePrivateFood },
+    { icon: "🍳", text: t.houseRuleKitchen },
+    { icon: "🎉", text: t.houseRuleNoParties },
+    { icon: "🛏️", text: t.houseRuleSingleGuest }
+  ];
+
+  const wifiRuleItems = [
+    { icon: "📶", text: t.wifiRuleReadDocument },
+    { icon: "🧠", text: t.wifiRuleFollowInstructions },
+    { icon: "🔒", text: t.wifiRuleRespectfulUse }
+  ];
 
   if (pageView !== "main") {
     return (
@@ -377,7 +423,45 @@ function App() {
         </div>
       </section>
 
-      {isPinDialogOpen ? (
+      {isPinDialogOpen && activeDialogStep === "timing" ? (
+        <PreCheckInDialog
+          t={t}
+          title={t.dialogTimingTitle}
+          description={t.dialogTimingDescription}
+          items={timingItems}
+          confirmLabel={t.dialogConfirmAndContinue}
+          onConfirm={handlePreCheckInConfirm}
+          onClose={closePinDialog}
+        />
+      ) : null}
+
+      {isPinDialogOpen && activeDialogStep === "houseRules" ? (
+        <PreCheckInDialog
+          t={t}
+          title={t.dialogHouseRulesTitle}
+          description={t.dialogHouseRulesDescription}
+          items={houseRuleItems}
+          confirmLabel={t.dialogAgreeHouseRules}
+          onConfirm={handlePreCheckInConfirm}
+          onClose={closePinDialog}
+        />
+      ) : null}
+
+      {isPinDialogOpen && activeDialogStep === "wifiRules" ? (
+        <PreCheckInDialog
+          t={t}
+          title={t.dialogWifiTitle}
+          description={t.dialogWifiDescription}
+          items={wifiRuleItems}
+          confirmLabel={t.dialogAgreeWifiRules}
+          onConfirm={handlePreCheckInConfirm}
+          onClose={closePinDialog}
+          linkHref="https://drive.google.com/file/d/1AhXA0wJXzeJ2PmL7-x2BlUUx6Yl9CEw6/view?usp=sharing"
+          linkLabel={t.dialogWifiLinkLabel}
+        />
+      ) : null}
+
+      {isPinDialogOpen && activeDialogStep === "pin" ? (
         <PinDialog
           t={t}
           pinCode={pinCode}
