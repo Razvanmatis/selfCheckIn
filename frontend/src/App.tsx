@@ -3,6 +3,7 @@ import appPackage from "../package.json";
 import { defineKeypadCode } from "./api/defineKeypadCode";
 import { getCheckInInformation } from "./api/getCheckInInformation";
 import { initiateCheckInProcess } from "./api/initiateCheckInProcess";
+import { ChatbotWidget } from "./components/ChatbotWidget";
 import { LanguageSelector } from "./components/LanguageSelector";
 import { PinDialog } from "./components/PinDialog";
 import { PreCheckInDialog } from "./components/PreCheckInDialog";
@@ -261,6 +262,7 @@ function App() {
             </button>
           </div>
         </section>
+        <ChatbotWidget />
       </main>
     );
   }
@@ -482,6 +484,8 @@ function App() {
           onClose={closePinDialog}
         />
       ) : null}
+
+      <ChatbotWidget />
     </main>
   );
 }

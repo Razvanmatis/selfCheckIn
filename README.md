@@ -147,6 +147,26 @@ npx wrangler deploy
 cd backend/worker
 npx wrangler dev
 ```
-
 Damit bleibt das Deployment reproduzierbar und leicht nachvollziehbar.
+
+## Für lokales Testen des Projekts ohne AI
+frontend/.env:
+
+```env
+VITE_API_BASE_URL=http://localhost:7071
+```
+Frontend und backend lokal starten
+
+## Für lokales testen des Projekts mit AI
+im backend/worker Verzeichnis:
+```bash
+npx wrangler dev
+```
+frontend/.env: (Die Adresse vom backend worker dev übernehmen)
+```env
+VITE_API_BASE_URL=http://127.0.0.1:8787
+```
+frontend lokal starten
+
+## Erreichbarkeit der Produktiv-UI
 Die UI ist aktuell erreichbar unter: https://ui.raz-check-in.workers.dev
