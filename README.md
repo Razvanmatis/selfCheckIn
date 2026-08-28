@@ -168,5 +168,13 @@ VITE_API_BASE_URL=http://127.0.0.1:8787
 ```
 frontend lokal starten
 
+## AI
+Erstellen aller Embeddings als vektorisierte Daten für die Datei backend/worker/src/knowledge.ts über folgenden Befehl:
+```bash
+npx wrangler dev
+Invoke-RestMethod -Method Post -Uri "http://localhost:8787/api/ai/seed-knowledge"
+```
+Danach befinden sich alle Daten direkt auf Cloudflare
+
 ## Erreichbarkeit der Produktiv-UI
 Die UI ist aktuell erreichbar unter: https://ui.raz-check-in.workers.dev
