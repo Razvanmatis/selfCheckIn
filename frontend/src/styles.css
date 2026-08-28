@@ -25,6 +25,30 @@ body {
   padding: 2rem;
 }
 
+.card-header__title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.app-version {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 1.5rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  background: #f2f4f7;
+  border: 1px solid #d0d5dd;
+  color: #475467;
+  font-size: 0.72rem;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+  text-transform: lowercase;
+}
+
 @supports (min-height: 100dvh) {
   .layout {
     min-height: 100dvh;

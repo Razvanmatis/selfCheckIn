@@ -1,4 +1,5 @@
 import { useMemo, useState, type FormEvent } from "react";
+import appPackage from "../package.json";
 import { defineKeypadCode } from "./api/defineKeypadCode";
 import { getCheckInInformation } from "./api/getCheckInInformation";
 import { initiateCheckInProcess } from "./api/initiateCheckInProcess";
@@ -39,6 +40,7 @@ function App() {
   const [dialogPhoneNumber, setDialogPhoneNumber] = useState("");
 
   const t = translations[language];
+  const appVersion = appPackage.version;
   const { today, maxDate, maxCheckInDate } = useMemo(() => getDateBounds(), []);
 
   const isReady = useMemo(() => isFormReady(form, loginMode), [form, loginMode]);
@@ -267,7 +269,10 @@ function App() {
     <main className="layout">
       <section className="card">
         <div className="card-header">
-          <h1>{t.title}</h1>
+          <div className="card-header__title">
+            <h1>{t.title}</h1>
+            <span className="app-version">v{appVersion}</span>
+          </div>
           <LanguageSelector language={language} onLanguageChange={setLanguage} />
         </div>
         <p className="hint">{t.hint}</p>
