@@ -112,7 +112,7 @@ Hinweis: Vor dem Build in der Produktion muss die API-URL in `frontend/.env.prod
 Inhalt von `frontend/.env.production`:
 
 ```env
-VITE_API_BASE_URL=https://raz-check-in.workers.dev
+VITE_API_BASE_URL=https://selfcheckin.raz-check-in.workers.dev
 ```
 
 ## Wichtige Deployment-Checks
