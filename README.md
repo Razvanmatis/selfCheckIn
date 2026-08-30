@@ -169,6 +169,12 @@ VITE_API_BASE_URL=http://127.0.0.1:8787
 frontend lokal starten
 
 ## AI
+Alle vorhanden Embeddings löschen:
+```bash
+$vectors = npx wrangler vectorize list-vectors apartment-knowledge --count=1000 --json | ConvertFrom-Json
+$ids = $vectors.vectors.id
+npx wrangler vectorize delete-vectors apartment-knowledge --ids $ids
+```
 Erstellen aller Embeddings als vektorisierte Daten für die Datei backend/worker/src/knowledge.ts über folgenden Befehl:
 ```bash
 npx wrangler dev
