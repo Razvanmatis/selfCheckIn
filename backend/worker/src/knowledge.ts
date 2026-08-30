@@ -4,8 +4,14 @@ export const knowledge = [
         text: `
       Die früheste Check-in-Zeit ist 15 Uhr.
       Die späteste Check-out-Zeit ist 11 Uhr.
-      Bitte stelle sicher, dass du alleine im Zimmer schläfst. Kein zusätzliches Baby und auch keine Ehefrau.
-      Bitte verspeise nicht das Essen des Gastgebers und trinke nicht seine Getränkeflaschen.
+    `,
+        language: "de",
+    },
+    {
+        id: "no-additional-guests",
+        text: `
+      Im gebuchten Gästezimmer darf ausschließlich die gebuchte Person übernachten.
+      Weitere Personen oder Babys dürfen dort nicht übernachten.
     `,
         language: "de",
     },
@@ -20,20 +26,29 @@ export const knowledge = [
         language: "de",
     },
     {
-        id: "main-entrance",
+        id: "main-entrance-normal",
+        text: "Die Hauseingangstür ist normalerweise nicht abgeschlossen. Zum Öffnen muss kräftig gegen die Tür gedrückt werden.",
+        language: "de",
+    },
+    {
+        id: "main-entrance-key",
         text: `
-      Der Haupteingang des Hauses befindet sich an der Straße.
-      Um die Hauseingangstür zu öffnen, muss man stark gegen die Tür drücken, da sie im Regelfall nicht abgeschlossen ist.
-      Sollte sich die Tür nicht öffnen lassen, erneut richtig stark gegen die Tür drücken.
-      Sollte sie sich weiterhin nicht öffnen lassen, befindet sich der Schlüssel auf dem Torpfosten des Garagentores welches 10m links vom Gebäude angebracht ist.
-      Bitte bei keinem einzigen Nachbarn klingeln.
+      Falls die Hauseingangstür ausnahmsweise abgeschlossen ist, befindet sich der Schlüssel am rechten oberen Ende des Garagentors etwa 10 Meter links vom Gebäude.
+      Auf der vorletzten Seite der Check-In-Instruktionen wird ebenfalls erklärt, wie die Haustür geöffnet werden kann.
+      Der Schlüssel für die äußere Haustür darf niemals beim Gast behalten oder mitgenommen werden.
+      Nach der Nutzung muss der Schlüssel direkt wieder an seinen ursprünglichen Platz zurückgelegt werden.
     `,
+        language: "de",
+    },
+    {
+        id: "main-entrance-neighbours",
+        text: "Bitte bei Problemen mit der Hauseingangstür nicht bei Nachbarn klingeln. Stattdessen soll der dafür vorgesehene Schlüssel verwendet werden.",
         language: "de",
     },
     {
         id: "flat-door",
         text: `
-      Die Wohnung befindet sich im 4. Stockwerk.
+      Die Wohnung befindet sich im 4. Stockwerk. Es gibt keinen Fahrstuhl.
       Im 4. Stockwerk befindet sich ein Zahlenpad in der Box des Schuhregals.
       Auf der Box steht "Open" drauf.
       Mit diesem Zahlenpad kann die Wohnungstür geöffnet werden.
@@ -44,7 +59,7 @@ export const knowledge = [
     {
         id: "check-in-video",
         text: `
-      Es gibt ein Video, das zeigt, wie die Haustür geöffnet wird und wo das Zahlenpad zu finden ist.
+      Zusätzlich gibt es ein Video, das zeigt, wie die Haustür geöffnet wird und wo das Zahlenpad zu finden ist.
       Video: https://drive.google.com/file/d/1elE96Q8n45N8QuWyeMksSBqzV3tT6wi/view?usp=share_link
     `,
         language: "de",
@@ -58,44 +73,41 @@ export const knowledge = [
         language: "de",
     },
     {
-        id: "shower",
-        text: `
-      Nach jedem Duschen soll der Handwischer benutzt werden.
-      Bitte den Handwischer nach jedem Duschvorgang nutzen.
-    `,
-        language: "de",
-    },
-    {
         id: "house-rules",
         text: `
-      Die Toilette darf nur im Sitzen benutzt werden.
-      Die Schuhe sollen außerhalb der Wohnung ausgezogen werden, bevor die Wohnung betreten wird.
-      Die Küche soll so sauber hinterlassen werden, wie sie vorgefunden wurde.
+        Die allgemeinen Hausregeln sind wie folgt:
+      - Die Toilette darf nur im Sitzen benutzt werden.
+      - Die Schuhe sollen außerhalb der Wohnung ausgezogen werden, bevor die Wohnung betreten wird.
+      - Die Küche soll so sauber hinterlassen werden, wie sie vorgefunden wurde.
+      - Nach jedem Duschen soll der Handwischer benutzt werden.
+      - Im Zimmer darf nur allein geschlafen werden. Kein zusätzliches Baby und auch keine Ehefrau.
+      - Lebensmittel und Getränke des Gastgebers dürfen nicht ohne vorherige Erlaubnis konsumiert werden.
     `,
         language: "de",
     },
     {
-        id: "outer-door-key",
-        text: `
-      Der Schlüssel für die äußere Haustür darf niemals beim Gast behalten werden.
-      Der Schlüssel muss direkt nach der Nutzung wieder zurückgelegt werden.
-      Normalerweise ist die Haustür nicht abgeschlossen.
-      Falls die Haustür ausnahmsweise doch abgeschlossen ist, befindet sich der Schlüssel am rechten oberen Ende des Tores.
-      Der Schlüssel darf nicht mitgenommen oder behalten werden.
-      Nach der Nutzung muss der Schlüssel direkt wieder an seinen ursprünglichen Platz zurückgelegt werden.
-    `,
+        id: "washing-machine-location",
+        text: "Die Waschmaschine befindet sich in der Küche.",
         language: "de",
     },
     {
-        id: "washing-machine",
-        text: `
-      Die Waschmaschine befindet sich in der Küche.
-      Bitte ausschließlich Kurzwaschprogramme mit maximal 30 Minuten oder 1 Stunde nutzen.
-      Bitte auch sicherstellen, dass nicht zu wenig Wäsche gewaschen wird.
-      Wenn nur wenig Wäsche vorhanden ist, kann der Gast gerne den Gastgeber fragen, ob er etwas mitwaschen möchte.
-      Als Waschmittel stehen links neben der Maschine Ariel Pods bereit, welche gerne verwendet werden dürfen.
-      Zusätzlich befindet sich hinten links an der Maschine Weichspüler, welcher ebenfalls gerne verwendet werden darf.
-    `,
+        id: "washing-machine-programs",
+        text: "Für die Waschmaschine dürfen ausschließlich die Kurzwaschprogramme „powerspeed 59“ oder „super 15/30“ verwendet werden.",
+        language: "de",
+    },
+    {
+        id: "washing-machine-start",
+        text: "Zum Einschalten der Waschmaschine den schwarzen Knopf drücken. Anschließend das gewünschte Programm durch Drehen des Knopfes auswählen.",
+        language: "de",
+    },
+    {
+        id: "washing-machine-finish",
+        text: "Nach dem Waschvorgang die Waschmaschine ausschalten, indem der schwarze Knopf etwa 3 Sekunden gedrückt wird. Die Trommel danach leicht geöffnet lassen, damit die Maschine trocknen kann.",
+        language: "de",
+    },
+    {
+        id: "washing-machine-detergent",
+        text: "Links neben der Waschmaschine stehen Ariel Pods, die Gäste verwenden dürfen. Hinten links an der Waschmaschine befindet sich Weichspüler, der ebenfalls verwendet werden darf.",
         language: "de",
     },
     {
@@ -105,6 +117,7 @@ export const knowledge = [
       Die notwendigen Müllcontainer befinden sich draußen im Außenhof.
       Der Außenhof ist über die untere Tür des Hauses erreichbar.
       Die Müllcontainer können auch vom Balkon des Gastgebers aus gesehen werden.
+      Zusätzliche Müllbeutel findest du im Schrank direkt unter der Spüle.
     `,
         language: "de",
     },
@@ -128,19 +141,13 @@ export const knowledge = [
         language: "de",
     },
     {
-        id: "stay-thanks",
-        text: `
-      Der Gastgeber bedankt sich für den Aufenthalt und wünscht dem Gast einen angenehmen Aufenthalt.
-      Vielen Dank und einen angenehmen Aufenthalt wünsche ich dir!
-    `,
-        language: "de",
-    },
-    {
         id: "dryer",
         text: `
       Der Trockner befindet sich in der Küche.
-      Bitte ausschließlich das ECO-Programm nutzen, welches 2x nach rechts gedreht vorliegt. Ausgehend von der Wäschemenge und dem Feuchtigkeitsgrad wird die Laufzeit automatisch so angepasst dass die Wäsche Schranktrocken wird.
-      Bitte auch sicherstellen, dass nicht zu wenig Wäsche getrocknet wird.
+      Bitte ausschließlich das ECO-Programm verwenden.
+      Das ECO-Programm befindet sich am Programmwahlschalter zwei Positionen rechts von der Ausgangsposition.
+      Die Laufzeit wird automatisch anhand der Wäschemenge und des Feuchtigkeitsgrades angepasst, sodass die Wäsche schranktrocken wird.
+      Bitte darauf achten, den Trockner nicht mit einer zu kleinen Wäschemenge zu verwenden.
     `,
         language: "de",
     },
@@ -148,29 +155,31 @@ export const knowledge = [
         id: "cooking-plates",
         text: `
       Die Kochplatten befinden sich in der Küche.
-      Durch drücken auf die Taste (I) mit ca. 10 Sekunden dauer, werden sie eingeschaltet. Danach einfach die jeweilige Platte auswählen und durch + bzw. - die Temperatur einstellen.
+      Durch drücken auf die Taste (I) mit ca. 10 Sekunden dauer, werden sie eingeschaltet. Danach einfach die jeweilige Platte auswählen und durch + bzw. - die Temperatur einstellen. Bitte durch erneutes Drücken auf die Taste (I) die Kochplatten wieder ausschalten nachdem das Kochen beendet wurde.
     `,
         language: "de",
     },
     {
         id: "sandwich-toaster",
         text: `
-    Der Sandwich-Toaster befindet sich in der Küche direkt im Fach über dem Kühlschrank.
-    
+      Der Sandwich-Toaster bzw. Sandwichmaker befindet sich in der Küche im Fach direkt über dem Kühlschrank.
+      Der Sandwich-Toaster kann von Gästen verwendet werden.
     `,
         language: "de",
     },
     {
         id: "freezer",
         text: `
-    Es gibt ein Gefrierfach welches sich direkt über dem Tockner bzw. direkt unter der Mikrowelle befindet. Es ist leider ein ziemlich kleines Fach.
+      Es gibt ein kleines Gefrierfach bzw. Tiefkühlfach bzw. einen kleinen Tiefkühler.
+      Es befindet sich direkt über dem Trockner und direkt unter der Mikrowelle.
+      Das Gefrierfach ist relativ klein.
     `,
         language: "de",
     },
     {
         id: "additional-blankets",
         text: `
-    Falls dir kalt sein sollte, gibt es direkt im Bettkasten zusätzliche Decken. Diese können gerne genutzt werden.
+    Falls dir kalt bzw. kühl sein sollte, gibt es direkt im Bettkasten zusätzliche Decken. Diese können gerne genutzt werden.
     `,
         language: "de",
     },
@@ -189,9 +198,9 @@ export const knowledge = [
         language: "de",
     },
     {
-        id: "be-quite",
+        id: "be-quiet",
         text: `
-    Bitte sei nach 22Uhr generell leise in der Wohnung. Ich habe leider einen empfindlichen Schlaf.
+    Bitte sei nach 22 Uhr generell leise in der Wohnung. Ich habe leider einen empfindlichen Schlaf.
     `,
         language: "de",
     },
@@ -217,16 +226,9 @@ export const knowledge = [
         language: "de",
     },
     {
-        id: "positve-rating",
-        text: `
-    Solltest du dich bei mir wohl gefühlt haben, so wäre ich dir über eine positive Bewertung sehr dankbar.
-    `,
-        language: "de",
-    },
-    {
         id: "cooling",
         text: `
-    In deinem Zimmer befindet sich in der Ecke rechts neben dem TV Board ein Turmventilator. Dessen Fernbedienung sollte sich direkt auf dem Ventilator befinden und er kann gerne bei wärmeren Tagen genutzt werden um sich etwas abzukühlen.
+    In deinem Zimmer befindet sich in der Ecke rechts neben dem TV Board ein Turmventilator. Dieser Ventilator kann gerne genutzt werden falls es zu warm bzw. heiß ist. Dessen Fernbedienung sollte sich direkt auf dem Ventilator befinden und er kann gerne bei wärmeren Tagen genutzt werden um sich etwas abzukühlen.
     `,
         language: "de",
     },
@@ -247,7 +249,7 @@ export const knowledge = [
     {
         id: "open-door",
         text: `
-    Zum Öffnen der Wohnungstür darf nur der Code genutzt werden. Es darf bzw. soll auch nicht manuell von Innen die Wohnungstür abgeschlossen werden. Es ist völlig ausreichend das der Riegel in der Halterung drin ist. Die Tür muss und darf nicht richtig abgeschlossen werden.
+    Zum Öffnen der Wohnungstür darf nur der Code genutzt werden. Es darf bzw. soll auch nicht manuell von Innen die Wohnungstür abgeschlossen werden. Es ist völlig ausreichend das der Riegel in der Halterung drin ist. Die Tür muss und soll nicht vollständig abgeschlossen werden.
     `,
         language: "de",
     },
@@ -264,6 +266,21 @@ export const knowledge = [
         text: `
     Solltest du auf irgendwelche Nachbarn von mir im Treppenhaus stoßen, kannst du sie natürlich begrüßen. Sollte dich irgendjemand meiner Nachbarn nach deiner Herkunft fragen bzw. wo du genau untergebracht bist, wäre es super wenn du antworten würdest dass du ein Freund von mir bist. Bitte nicht mit der Aussage antworten dass du nur ein Gast von mir bist.
     Bitte niemals bei einem Nachbarn klingeln. Dafür kannst du den Schlüssel draußen nehmen.
+    `,
+        language: "de",
+    },
+    {
+        id: "toilet",
+        text: `
+    Die Toilette ist bitte nur sitzend zu benutzen. Nach einem großen Geschäft bitte die Toilette mit der Bürste reinigen. Die Bürste befindet sich direkt neben der Toilette. Zusätzlich bitte noch nach jedem großen Geschäft den Duftsprüher benutzen, welcher direkt rechts neben dem WC auf ca. 1,5 m Höhe angebracht ist.
+    Gerne darf auch nach einem großen Geschäft das Fenster geöffnet werden. Bitte aber auch wieder schließen im Winter, vor allem wenn ich selber nicht vor Ort bin.
+    `,
+        language: "de",
+    },
+    {
+        id: "contact-to-host",
+        text: `
+    Bei Fragen oder Problemen kannst du dich jederzeit an mich wenden. Ich stehe dir gerne zur Verfügung und werde versuchen, dir so schnell wie möglich zu helfen. Gerne gehe ich auch ein Bier mit dir trinken oder ein wenig durch die Stadt spazieren. Ich bin immer offen für ein nettes Gespräch und freue mich, dich kennenzulernen.
     `,
         language: "de",
     },
