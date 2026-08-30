@@ -6,3 +6,5 @@ dist/
 .env
 .env.production
 vite.config.d.ts
+tsconfig.app.tsbuildinfo
+tsconfig.node.tsbuildinfo
