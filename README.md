@@ -154,6 +154,22 @@ npx wrangler dev
 ```
 Damit bleibt das Deployment reproduzierbar und leicht nachvollziehbar.
 
+## .dev.vars Datei für Wrangler Dev
+
+```bash
+cd backend/worker
+```
+Dort muss auch eine .dev.vars Datei liegen, die die Secrets enthält, damit Wrangler Dev lokal die Secrets kennt. Beispiel:
+
+```env
+SMOOBU_API_KEY=...
+NUKI_API_TOKEN=...
+NUKI_SMARTLOCK_ID=...
+ADMIN_NAME=...
+BREVO_API_KEY=...
+EMAIL_FROM=...
+```
+
 ## Für lokales Testen des Projekts ohne AI
 frontend/.env:
 
@@ -179,6 +195,11 @@ Alle vorhanden Embeddings löschen:
 $vectors = npx wrangler vectorize list-vectors apartment-knowledge --count=1000 --json | ConvertFrom-Json
 $ids = $vectors.vectors.id
 npx wrangler vectorize delete-vectors apartment-knowledge --ids $ids
+```
+Prüfen ob auch wirklich alle Embeddings gelöscht wurden:
+```bash
+$vectors = npx wrangler vectorize list-vectors apartment-knowledge --count=1000 --json | ConvertFrom-Json
+$vectors.count
 ```
 Erstellen aller Embeddings als vektorisierte Daten für die Datei backend/worker/src/knowledge.ts über folgenden Befehl:
 ```bash

@@ -261,3 +261,19 @@ export async function sendErrorNotificationEmail(errorMessage: string, fullName:
       env
   );
 }
+
+export async function sendGeneralErrorMail(errorMessage: string, env: Env): Promise<void> {
+  const now = new Date();
+  const timestamp = now.toLocaleString("de-DE", {
+    dateStyle: "short",
+    timeStyle: "medium"
+  });
+  await sendMail(
+      {
+        to: [{ email: env.EMAIL_FROM, name: 'Razvan Matis' }],
+        subject: "Warnung: Problem mit der AI-Antwort",
+        text: `Eine Warnung wurde in der Anwendung am ${timestamp}Uhr ausgelöst:\n\n${errorMessage}`
+      },
+      env
+  );
+}

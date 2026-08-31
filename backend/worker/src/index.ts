@@ -7,6 +7,7 @@ import { getCheckInInformation } from "./getCheckInInformation";
 import { cors } from "hono/cors";
 import { seedKnowledge } from "./seedKnowledge";
 import { askKnowledge } from "./askKnowledge";
+import {sendGeneralErrorMail} from "./mailService";
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -39,7 +40,10 @@ app.post("/api/initiateCheckInProcess", async (c) => {
 			error instanceof Error
 				? error.message
 				: "Unbekannter Fehler im Check-In Prozess.";
-
+		await sendGeneralErrorMail(
+			`Fehler im Check-In Prozess: ${message}`,
+			c.env
+		);
 		return c.json({ message }, 400);
 	}
 });
@@ -56,7 +60,10 @@ app.post("/api/defineKeypadCode", async (c) => {
 			error instanceof Error
 				? error.message
 				: "Unbekannter Fehler im Keypad-Code Prozess.";
-
+		await sendGeneralErrorMail(
+			`Fehler im Keypad-Code Prozess: ${message}`,
+			c.env
+		);
 		return c.json({ message }, 400);
 	}
 });
@@ -88,7 +95,10 @@ app.post("/api/getCheckInInformation", async (c) => {
 			error instanceof Error
 				? error.message
 				: "Unbekannter Fehler beim Laden der Check-In Instruktionen.";
-
+		await sendGeneralErrorMail(
+			`Fehler beim Laden der Check-In Instruktionen: ${message}`,
+			c.env
+		);
 		return c.json({ message }, 400);
 	}
 });
@@ -106,7 +116,10 @@ app.post("/api/ai/seed-knowledge", async (c) => {
 			error instanceof Error
 				? error.message
 				: "Unbekannter Fehler beim Seeding der Knowledge Base.";
-
+		await sendGeneralErrorMail(
+			`Fehler beim Seeding der Knowledge Base: ${message}`,
+			c.env
+		);
 		return c.json({ message }, 500);
 	}
 });
@@ -137,7 +150,10 @@ app.post("/api/ai/ask", async (c) => {
 			error instanceof Error
 				? error.message
 				: "Unbekannter Fehler beim Beantworten der Frage.";
-
+		await sendGeneralErrorMail(
+			`Fehler beim Beantworten der Frage: ${message}`,
+			c.env
+		);
 		return c.json({ message }, 500);
 	}
 });
