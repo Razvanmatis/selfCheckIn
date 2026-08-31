@@ -34,7 +34,12 @@ export async function getAllOpenBookings(env: Env) {
   });
 
   if (!response.ok) {
-    throw new Error("Smoobu-Reservierungen konnten nicht geladen werden.");
+    const rawBody = await response.text();
+    throw new Error(
+        `Smoobu-Reservierungen konnten nicht geladen werden. ` +
+        `HTTP ${response.status} ${response.statusText}. ` +
+        `Antwort: ${rawBody || "<leer>"}`
+    );
   }
 
   return (await response.json()) as SmoobuReservationsResponse;
