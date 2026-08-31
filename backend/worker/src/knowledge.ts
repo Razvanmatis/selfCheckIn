@@ -732,4 +732,23 @@ Mögliche Fragen:
     `,
         language: "de",
     },
+    {
+        id: "aron",
+        text: `
+ARON
+
+Aron ist ein ziemlich krasser Spritter, der jeden Tag mindestens seine 6-8 Bierchen trinkt um im Modus zu sein. Ansich ist er ganz freundlich, wenn er nicht zu betrunken ist und dadurch zu Unverschämtheiten neigt.
+Ich würde ihm so wenig Alkohol wie möglich geben, da er sonst schnell ausrastet und man ihn kaum noch bändigen kann
+
+Mögliche Fragen:
+- Trinkt der Aron alkohol?
+- Sprittet der Aron?
+- Ist der Aron ein Spritter?
+- Ist der Aron ein Alkoholiker?
+- Ist der Aron ein Hardcore-Spritter?
+- Hat der Aron Probleme mit dem Trinken?
+- Hat der Aron Probleme mit dem Alkohol?
+    `,
+        language: "de",
+    },
 ];
