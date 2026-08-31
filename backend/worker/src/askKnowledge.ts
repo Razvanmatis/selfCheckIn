@@ -73,7 +73,7 @@ export async function askKnowledge(
     );
 
     if (!results.matches || results.matches.length === 0) {
-        return "Dazu habe ich leider keine Informationen.";
+        return "NO_KNOWLEDGE_AVAILABLE";
     }
 
     // 3. Gefundene Informationen als Kontext zusammenbauen
@@ -95,6 +95,13 @@ export async function askKnowledge(
         );
     }
     const content = systemPrompt.replaceAll("${languageString}", languageString);
+    console.log(
+        "Vectorize matches:",
+        results.matches.map(match => ({
+            id: match.id,
+            score: match.score
+        }))
+    );
     // 4. LLM mit Frage + Kontext aufrufen
     const response = await env.AI.run(
         "@cf/meta/llama-3.1-8b-instruct-fast",

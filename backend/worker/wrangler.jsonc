@@ -22,7 +22,8 @@
 	"kv_namespaces": [
 		{
 			"binding": "PROMPTS",
-			"id": "2378b10eb26e44389c54217c4fe4e8dc"
+			"id": "2378b10eb26e44389c54217c4fe4e8dc",
+			"remote": true
 		}
 	]
 }
