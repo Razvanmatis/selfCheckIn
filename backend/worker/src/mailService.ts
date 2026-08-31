@@ -244,6 +244,14 @@ export async function sendBookingConfirmationEmail(recipientEmail: string, fullN
       },
       env
   );
+  await sendMail(
+      {
+        to: [{ email: env.EMAIL_FROM, name: 'Razvan Matis' }],
+        subject: content.subject,
+        text: content.text
+      },
+      env
+  );
 }
 
 export async function sendErrorNotificationEmail(errorMessage: string, fullName: string, timeSpan: string, env: Env, code?: string): Promise<void> {
