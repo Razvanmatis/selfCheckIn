@@ -131,6 +131,7 @@ VITE_API_BASE_URL=https://selfcheckin.raz-check-in.workers.dev
 ```bash
 npx wrangler secret put <SECRET_NAME>
 ```
+Auf cloudflare.com unter Compute → Workers & Pages → selfcheckin → Settings → Runtime variables and secrets kann man die Secrets einsehen und bearbeiten.
 
 ## Typische Reihenfolge für neues Deployment
 
@@ -199,6 +200,7 @@ KV-Eintrag abrufen für Kontrolle:
 ```bash
 npx wrangler kv key get --namespace-id 2378b10eb26e44389c54217c4fe4e8dc system-prompt --remote
 ```
+Auf cloudflare.com unter Storage & Databases → Workers KV → PROMPTS → KV Pairs kann man die Einträge auch sehen und bearbeiten.
 
 ## Erreichbarkeit der Produktiv-UI
 Die UI ist aktuell erreichbar unter: https://ui.raz-check-in.workers.dev
