@@ -67,7 +67,7 @@ export async function askKnowledge(
     const results = await env.APARTMENT_KNOWLEDGE.query(
         embedding.data[0],
         {
-            topK: 3,
+            topK: 8,
             returnMetadata: "all"
         }
     );
