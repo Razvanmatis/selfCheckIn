@@ -69,7 +69,11 @@ npm run dev
 Die Frontend-Umgebung erwartet in `frontend/.env` eine passende URL:
 
 ```env
-VITE_API_BASE_URL=http://localhost:7071
+// Mit wrangler DEV aktiv:
+//VITE_API_BASE_URL=http://127.0.0.1:8787
+
+//Nur lokal:
+VITE_API_BASE_URL=http://127.0.0.1:7071
 ```
 
 Wichtig: Wenn das Frontend an das lokale Backend koppelt, muss die URL mit dem Backend-Port übereinstimmen. Das Frontend verwendet `import.meta.env.VITE_API_BASE_URL`.

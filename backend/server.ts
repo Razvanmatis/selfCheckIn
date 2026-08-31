@@ -10,6 +10,8 @@ import {
   handler as initiateCheckInProcessHandler
 } from "./initiateCheckInProcess.js";
 import {sendErrorNotificationEmail} from "./worker/src/mailService.js";
+import {seedKnowledge} from "./seedKnowledge.js";
+import {askKnowledge} from "./askKnowledge.js";
 
 const app = express();
 const port = Number(process.env.PORT ?? 7071);
@@ -75,6 +77,16 @@ app.post("/api/getCheckInInformation", async (req, res) => {
         : "Unbekannter Fehler beim Laden der Check-In Instruktionen.";
     res.status(400).json({ message });
   }
+});
+
+app.post("/api/ai/seed-knowledge", async (req, res) => {
+  const result = await seedKnowledge(env);
+  res.status(200).send(result);
+});
+
+app.post("/api/ai/ask", async (req, res) => {
+  const result = await askKnowledge(req.body, env);
+  res.status(200).send(result);
 });
 
 app.get("/health", (_req, res) => {
