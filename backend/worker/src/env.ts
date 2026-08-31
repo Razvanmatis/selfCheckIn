@@ -6,7 +6,7 @@ export interface Env {
     BREVO_API_KEY: string;
     EMAIL_FROM: string;
     ASSETS: Fetcher;
-
     AI: Ai;
     APARTMENT_KNOWLEDGE: VectorizeIndex;
+    PROMPTS: KVNamespace;
 }

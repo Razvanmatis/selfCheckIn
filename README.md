@@ -186,5 +186,19 @@ Invoke-RestMethod -Method Post -Uri "http://localhost:8787/api/ai/seed-knowledge
 ```
 Danach befinden sich alle Daten direkt auf Cloudflare
 
+## KV Erzeugen
+Nur einmalig ausführen:
+```bash
+npx wrangler kv namespace create PROMPTS
+```
+KV Eintrag hinzufügen:
+```bash
+npx wrangler kv key put --namespace-id 2378b10eb26e44389c54217c4fe4e8dc system-prompt --remote --path system-prompt.txt
+```
+KV-Eintrag abrufen für Kontrolle:
+```bash
+npx wrangler kv key get --namespace-id 2378b10eb26e44389c54217c4fe4e8dc system-prompt --remote
+```
+
 ## Erreichbarkeit der Produktiv-UI
 Die UI ist aktuell erreichbar unter: https://ui.raz-check-in.workers.dev
