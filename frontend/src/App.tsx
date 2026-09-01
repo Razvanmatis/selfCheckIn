@@ -1,8 +1,10 @@
 import { useMemo, useState, type FormEvent } from "react";
 import appPackage from "../package.json";
+import { deleteOldCodes } from "./api/deleteOldCodes";
 import { defineKeypadCode } from "./api/defineKeypadCode";
 import { getCheckInInformation } from "./api/getCheckInInformation";
 import { initiateCheckInProcess } from "./api/initiateCheckInProcess";
+import { AdminDeleteDialog } from "./components/AdminDeleteDialog";
 import { ChatbotWidget } from "./components/ChatbotWidget";
 import { LanguageSelector } from "./components/LanguageSelector";
 import { PinDialog } from "./components/PinDialog";
@@ -39,6 +41,9 @@ function App() {
   const [pinCode, setPinCode] = useState("");
   const [isDefiningPin, setIsDefiningPin] = useState(false);
   const [dialogPhoneNumber, setDialogPhoneNumber] = useState("");
+  const [isAdminDeleteOpen, setIsAdminDeleteOpen] = useState(false);
+  const [adminUser, setAdminUser] = useState("");
+  const [isDeletingOldCodes, setIsDeletingOldCodes] = useState(false);
 
   const t = translations[language];
   const appVersion = appPackage.version;
@@ -198,6 +203,37 @@ function App() {
     }
   };
 
+  const handleAdminDeleteSubmit = async () => {
+    if (!adminUser.trim()) {
+      return;
+    }
+
+    setIsDeletingOldCodes(true);
+    setSubmitError(null);
+    setSubmitResult(null);
+
+    try {
+      const result = await deleteOldCodes(adminUser.trim());
+      window.alert(result);
+      setSubmitResult(result);
+      setIsAdminDeleteOpen(false);
+      setAdminUser("");
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Die alten Codes konnten nicht geloescht werden.";
+      window.alert(errorMessage);
+      setSubmitError(errorMessage);
+      setIsAdminDeleteOpen(false);
+      setAdminUser("");
+    } finally {
+      setIsDeletingOldCodes(false);
+    }
+  };
+
+  const handleAdminDeleteCancel = () => {
+    setIsAdminDeleteOpen(false);
+    setAdminUser("");
+  };
+
   const closePinDialog = () => {
     setIsPinDialogOpen(false);
     setActiveDialogStep(null);
@@ -272,10 +308,15 @@ function App() {
       <section className="card">
         <div className="card-header">
           <div className="card-header__title">
-            <h1>{t.title}</h1>
-            <span className="app-version">v{appVersion}</span>
-          </div>
-          <LanguageSelector language={language} onLanguageChange={setLanguage} />
+          <h1
+            className="card-header__title-button"
+            onClick={() => setIsAdminDeleteOpen((prev) => !prev)}
+          >
+            {t.title}
+          </h1>
+          <span className="app-version">v{appVersion}</span>
+        </div>
+        <LanguageSelector language={language} onLanguageChange={setLanguage} />
         </div>
         <p className="hint">{t.hint}</p>
 
@@ -439,6 +480,17 @@ function App() {
           confirmLabel={t.dialogConfirmAndContinue}
           onConfirm={handlePreCheckInConfirm}
           onClose={closePinDialog}
+        />
+      ) : null}
+
+      {isAdminDeleteOpen ? (
+        <AdminDeleteDialog
+          t={t}
+          adminUser={adminUser}
+          isDeletingOldCodes={isDeletingOldCodes}
+          onAdminUserChange={setAdminUser}
+          onConfirm={handleAdminDeleteSubmit}
+          onClose={handleAdminDeleteCancel}
         />
       ) : null}
 

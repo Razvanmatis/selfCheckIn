@@ -47,7 +47,7 @@ async function wait(ms: number): Promise<void> {
     }
 }
 
-async function forceNukiSync(env: Env): Promise<void> {
+export async function forceNukiSync(env: Env): Promise<void> {
     for (let attempt = 0; attempt < 6; attempt += 1) {
         const response = await fetch(`${nukiBaseUrl}/smartlock/${env.NUKI_SMARTLOCK_ID}/sync`, {
             method: "POST",
@@ -67,7 +67,7 @@ async function forceNukiSync(env: Env): Promise<void> {
     }
 }
 
-async function getAllKeypadCodes(env: Env): Promise<NukiAuthEntry[]> {
+export async function getAllKeypadCodes(env: Env): Promise<NukiAuthEntry[]> {
     const response = await fetch(
         `${nukiBaseUrl}/smartlock/${env.NUKI_SMARTLOCK_ID}/auth?types=13`,
         {
@@ -86,7 +86,7 @@ async function getAllKeypadCodes(env: Env): Promise<NukiAuthEntry[]> {
     return (await response.json()) as NukiAuthEntry[];
 }
 
-async function deleteKeypadCode(entryId: string, env: Env): Promise<void> {
+export async function deleteKeypadCode(entryId: string, env: Env): Promise<void> {
     for (let attempt = 0; attempt < 6; attempt += 1) {
         const response = await fetch(`${nukiBaseUrl}/smartlock/${env.NUKI_SMARTLOCK_ID}/auth/${entryId}`, {
             method: "DELETE",
@@ -110,7 +110,7 @@ async function deleteKeypadCode(entryId: string, env: Env): Promise<void> {
     }
 }
 
-async function createKeypadCode(payload: NukiCreateAuthPayload, env: Env): Promise<void> {
+export async function createKeypadCode(payload: NukiCreateAuthPayload, env: Env): Promise<void> {
     const expectedCode = String(payload.code);
     const expectedName = payload.name;
 

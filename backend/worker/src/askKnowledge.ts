@@ -1,5 +1,5 @@
 import type {Env} from "./env";
-import {sendGeneralErrorMail} from "./mailService";
+import {sendGeneralMessageToAdmin} from "./mailService";
 
 type AskKnowledgeRequest = { question: string; language?: string; };
 
@@ -74,7 +74,7 @@ export async function askKnowledge(
     );
 
     if (!results.matches || results.matches.length === 0) {
-        await sendGeneralErrorMail(`Keine passenden Informationen zur Frage "${payload.question}" gefunden.`, env);
+        await sendGeneralMessageToAdmin(`Keine passenden Informationen zur Frage "${payload.question}" gefunden.`, env);
         return "NO_KNOWLEDGE_AVAILABLE";
     }
 
@@ -109,7 +109,7 @@ export async function askKnowledge(
         results.matches.length === 0 ||
         results.matches[0].score <= 0.44
     ) {
-        await sendGeneralErrorMail(`Nur niedrigen Max-Score: ${results.matches[0]?.score} zur Frage "${payload.question}" gefunden.`, env);
+        await sendGeneralMessageToAdmin(`Nur niedrigen Max-Score: ${results.matches[0]?.score} zur Frage "${payload.question}" gefunden.`, env);
     }
     // 4. LLM mit Frage + Kontext aufrufen
     const response = await env.AI.run(

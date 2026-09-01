@@ -1059,3 +1059,224 @@ export const translations: Record<Language, Record<string, string>> = {
     wifiRuleRespectfulUse: "Merci d'utiliser le WIFI de manière respectueuse, sûre et sans créer de problèmes."
   }
 };
+
+export const chatbotTranslations: Record<
+  Language,
+  {
+    title: string;
+    subtitle: string;
+    openLabel: string;
+    closeLabel: string;
+    empty: string;
+    placeholder: string;
+    send: string;
+    loading: string;
+    tooltip: string;
+    inputAriaLabel: string;
+  }
+> = {
+  en: {
+    title: "AI Assistant",
+    subtitle: "Ask questions about the check-in",
+    openLabel: "Open AI assistant",
+    closeLabel: "Close AI assistant",
+    empty: "Ask me a question about the check-in.",
+    placeholder: "Type your question...",
+    send: "Send",
+    loading: "Thinking...",
+    tooltip: "AI assistant – ask questions about the check-in",
+    inputAriaLabel: "Question for the AI assistant"
+  },
+  de: {
+    title: "AI-Assistent",
+    subtitle: "Fragen zum Check-in stellen",
+    openLabel: "AI-Assistent öffnen",
+    closeLabel: "AI-Assistent schließen",
+    empty: "Stell mir eine Frage zum Check-in.",
+    placeholder: "Frage eingeben...",
+    send: "Senden",
+    loading: "Denkt nach...",
+    tooltip: "AI-Assistent – Fragen zum Check-in stellen",
+    inputAriaLabel: "Frage an den AI-Assistenten"
+  },
+  ru: {
+    title: "ИИ-помощник",
+    subtitle: "Задайте вопросы о заселении",
+    openLabel: "Открыть ИИ-помощника",
+    closeLabel: "Закрыть ИИ-помощника",
+    empty: "Задайте вопрос о заселении.",
+    placeholder: "Введите ваш вопрос...",
+    send: "Отправить",
+    loading: "Думает...",
+    tooltip: "ИИ-помощник – задайте вопросы о заселении",
+    inputAriaLabel: "Вопрос ИИ-помощнику"
+  },
+  zh: {
+    title: "AI 助手",
+    subtitle: "询问入住相关问题",
+    openLabel: "打开 AI 助手",
+    closeLabel: "关闭 AI 助手",
+    empty: "问我一个关于入住的问题。",
+    placeholder: "输入您的问题...",
+    send: "发送",
+    loading: "思考中...",
+    tooltip: "AI 助手 – 询问入住相关问题",
+    inputAriaLabel: "给 AI 助手提问"
+  },
+  hi: {
+    title: "AI सहायक",
+    subtitle: "चेक-इन के बारे में प्रश्न पूछें",
+    openLabel: "AI सहायक खोलें",
+    closeLabel: "AI सहायक बंद करें",
+    empty: "चेक-इन के बारे में मुझे कोई प्रश्न पूछें।",
+    placeholder: "अपना प्रश्न लिखें...",
+    send: "भेजें",
+    loading: "सोच रहा है...",
+    tooltip: "AI सहायक – चेक-इन के बारे में प्रश्न पूछें",
+    inputAriaLabel: "AI सहायक से प्रश्न"
+  },
+  it: {
+    title: "Assistente AI",
+    subtitle: "Fai domande sul check-in",
+    openLabel: "Apri assistente AI",
+    closeLabel: "Chiudi assistente AI",
+    empty: "Fai una domanda sul check-in.",
+    placeholder: "Scrivi la tua domanda...",
+    send: "Invia",
+    loading: "Sta pensando...",
+    tooltip: "Assistente AI – fai domande sul check-in",
+    inputAriaLabel: "Domanda all'assistente AI"
+  },
+  es: {
+    title: "Asistente IA",
+    subtitle: "Haz preguntas sobre el check-in",
+    openLabel: "Abrir asistente IA",
+    closeLabel: "Cerrar asistente IA",
+    empty: "Hazme una pregunta sobre el check-in.",
+    placeholder: "Escribe tu pregunta...",
+    send: "Enviar",
+    loading: "Pensando...",
+    tooltip: "Asistente IA – haz preguntas sobre el check-in",
+    inputAriaLabel: "Pregunta al asistente IA"
+  },
+  el: {
+    title: "Βοηθός AI",
+    subtitle: "Κάντε ερωτήσεις για το check-in",
+    openLabel: "Άνοιγμα βοηθού AI",
+    closeLabel: "Κλείσιμο βοηθού AI",
+    empty: "Ρωτήστε με κάτι για το check-in.",
+    placeholder: "Γράψτε την ερώτησή σας...",
+    send: "Αποστολή",
+    loading: "Σκέφτεται...",
+    tooltip: "Βοηθός AI – κάντε ερωτήσεις για το check-in",
+    inputAriaLabel: "Ερώτηση στον βοηθό AI"
+  },
+  pt: {
+    title: "Assistente IA",
+    subtitle: "Pergunte sobre o check-in",
+    openLabel: "Abrir assistente IA",
+    closeLabel: "Fechar assistente IA",
+    empty: "Faça uma pergunta sobre o check-in.",
+    placeholder: "Digite sua pergunta...",
+    send: "Enviar",
+    loading: "Pensando...",
+    tooltip: "Assistente IA – pergunte sobre o check-in",
+    inputAriaLabel: "Pergunta ao assistente IA"
+  },
+  ja: {
+    title: "AIアシスタント",
+    subtitle: "チェックインについて質問する",
+    openLabel: "AIアシスタントを開く",
+    closeLabel: "AIアシスタントを閉じる",
+    empty: "チェックインについて質問してください。",
+    placeholder: "質問を入力...",
+    send: "送信",
+    loading: "考え中...",
+    tooltip: "AIアシスタント – チェックインについて質問する",
+    inputAriaLabel: "AIアシスタントへの質問"
+  },
+  th: {
+    title: "ผู้ช่วย AI",
+    subtitle: "ถามเกี่ยวกับการเช็คอิน",
+    openLabel: "เปิดผู้ช่วย AI",
+    closeLabel: "ปิดผู้ช่วย AI",
+    empty: "ถามฉันเกี่ยวกับการเช็คอินได้",
+    placeholder: "พิมพ์คำถามของคุณ...",
+    send: "ส่ง",
+    loading: "กำลังคิด...",
+    tooltip: "ผู้ช่วย AI – ถามเกี่ยวกับการเช็คอิน",
+    inputAriaLabel: "คำถามถึงผู้ช่วย AI"
+  },
+  vi: {
+    title: "Trợ lý AI",
+    subtitle: "Hỏi về check-in",
+    openLabel: "Mở trợ lý AI",
+    closeLabel: "Đóng trợ lý AI",
+    empty: "Hỏi tôi về check-in.",
+    placeholder: "Nhập câu hỏi của bạn...",
+    send: "Gửi",
+    loading: "Đang suy nghĩ...",
+    tooltip: "Trợ lý AI – hỏi về check-in",
+    inputAriaLabel: "Câu hỏi cho trợ lý AI"
+  },
+  cs: {
+    title: "AI Asistent",
+    subtitle: "Ptejte se na check-in",
+    openLabel: "Otevřít AI asistenta",
+    closeLabel: "Zavřít AI asistenta",
+    empty: "Zeptejte se mě na check-in.",
+    placeholder: "Napište svou otázku...",
+    send: "Odeslat",
+    loading: "Přemýšlí...",
+    tooltip: "AI Asistent – ptejte se na check-in",
+    inputAriaLabel: "Otázka pro AI asistenta"
+  },
+  pl: {
+    title: "Asystent AI",
+    subtitle: "Zadaj pytania o check-in",
+    openLabel: "Otwórz asystenta AI",
+    closeLabel: "Zamknij asystenta AI",
+    empty: "Zadaj mi pytanie o check-in.",
+    placeholder: "Wpisz pytanie...",
+    send: "Wyślij",
+    loading: "Myśli...",
+    tooltip: "Asystent AI – zadaj pytania o check-in",
+    inputAriaLabel: "Pytanie do asystenta AI"
+  },
+  ro: {
+    title: "Asistent AI",
+    subtitle: "Puneți întrebări despre check-in",
+    openLabel: "Deschide asistentul AI",
+    closeLabel: "Închide asistentul AI",
+    empty: "Puneți-mi o întrebare despre check-in.",
+    placeholder: "Introduceți întrebarea...",
+    send: "Trimite",
+    loading: "Se gândește...",
+    tooltip: "Asistent AI – puneți întrebări despre check-in",
+    inputAriaLabel: "Întrebare pentru asistentul AI"
+  },
+  sr: {
+    title: "AI pomoćnik",
+    subtitle: "Postavite pitanja o check-in-u",
+    openLabel: "Otvorite AI pomoćnika",
+    closeLabel: "Zatvorite AI pomoćnika",
+    empty: "Postavite pitanje o check-in-u.",
+    placeholder: "Unesite pitanje...",
+    send: "Pošalji",
+    loading: "Razmišlja...",
+    tooltip: "AI pomoćnik – postavite pitanja o check-in-u",
+    inputAriaLabel: "Pitanje za AI pomoćnika"
+  },
+  fr: {
+    title: "Assistant IA",
+    subtitle: "Posez des questions sur le check-in",
+    openLabel: "Ouvrir l'assistant IA",
+    closeLabel: "Fermer l'assistant IA",
+    empty: "Posez-moi une question sur le check-in.",
+    placeholder: "Saisissez votre question...",
+    send: "Envoyer",
+    loading: "Réflexion...",
+    tooltip: "Assistant IA – posez des questions sur le check-in",
+    inputAriaLabel: "Question pour l'assistant IA"
+  }
+};

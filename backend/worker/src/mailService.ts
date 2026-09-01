@@ -270,7 +270,7 @@ export async function sendErrorNotificationEmail(errorMessage: string, fullName:
   );
 }
 
-export async function sendGeneralErrorMail(errorMessage: string, env: Env): Promise<void> {
+export async function sendGeneralMessageToAdmin(message: string, env: Env, useAsWarning = true): Promise<void> {
   const now = new Date();
   const timestamp = now.toLocaleString("de-DE", {
     dateStyle: "short",
@@ -279,8 +279,9 @@ export async function sendGeneralErrorMail(errorMessage: string, env: Env): Prom
   await sendMail(
       {
         to: [{ email: env.EMAIL_FROM, name: 'Razvan Matis' }],
-        subject: "Warnung: Problem mit der AI-Antwort",
-        text: `Eine Warnung wurde in der Anwendung am ${timestamp}Uhr ausgelöst:\n\n${errorMessage}`
+        subject: useAsWarning ? "Warnung: Problem mit der AI-Antwort" : "Info von der Anwendung",
+        text: useAsWarning ? `Eine Warnung wurde in der Anwendung am ${timestamp}Uhr ausgelöst:\n\n${message}`
+            : `Eine Info wurde in der Anwendung am ${timestamp}Uhr ausgelöst:\n\n${message}`
       },
       env
   );

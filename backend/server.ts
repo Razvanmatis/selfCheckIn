@@ -9,9 +9,10 @@ import { getCheckInInformation } from "./getCheckInInformation.js";
 import {
   handler as initiateCheckInProcessHandler
 } from "./initiateCheckInProcess.js";
-import {sendErrorNotificationEmail} from "./worker/src/mailService.js";
+import {sendErrorNotificationEmail} from "./mailService.js";
 import {seedKnowledge} from "./seedKnowledge.js";
 import {askKnowledge} from "./askKnowledge.js";
+import {deleteOldCodesHandler} from "./deleteOldCodes.js";
 
 const app = express();
 const port = Number(process.env.PORT ?? 7071);
@@ -93,8 +94,17 @@ app.get("/health", (_req, res) => {
   res.status(200).json({ status: "ok" });
 });
 
+app.post("/api/deleteOldCodes", async (req, res) => {
+  const result = await deleteOldCodesHandler({ body: String(req.body?.adminUser ?? null) }, env);
+
+  for (const [name, value] of Object.entries(result.headers)) {
+    res.setHeader(name, value);
+  }
+
+  res.status(result.statusCode).send(result.body);
+});
+
 app.listen(port, () => {
   // Keep startup log minimal and explicit for local testing.
   console.log(`Backend is running on http://localhost:${port}`);
 });
-
