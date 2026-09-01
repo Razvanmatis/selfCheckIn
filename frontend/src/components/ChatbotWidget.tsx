@@ -229,8 +229,9 @@ export function ChatbotWidget({ language }: ChatbotWidgetProps) {
       <button
         type="button"
         className="chatbot__launcher"
-        aria-label={isOpen ? "Chatfenster schließen" : "Chatfenster öffnen"}
+        aria-label={isOpen ? "Chatfenster schließen" : "AI-Assistent öffnen"}
         aria-expanded={isOpen}
+        title="AI-Assistent – Questions regarding the check-in and complete household"
         onPointerDown={handleLauncherPointerDown}
         onPointerMove={handleLauncherPointerMove}
         onPointerUp={handleLauncherPointerUp}
@@ -245,7 +246,7 @@ export function ChatbotWidget({ language }: ChatbotWidgetProps) {
           setIsOpen((prev) => !prev);
         }}
       >
-        <span aria-hidden="true">💬</span>
+        <span aria-hidden="true">🤖</span>
       </button>
 
       {isOpen ? (
@@ -253,6 +254,9 @@ export function ChatbotWidget({ language }: ChatbotWidgetProps) {
           <div className="chatbot__header">
             <div>
               <strong>AI-Assistent</strong>
+              <div style={{ fontSize: "0.72rem", opacity: 0.85, marginTop: "0.15rem" }}>
+                Questions regarding raz place
+              </div>
             </div>
             <button
               type="button"
@@ -266,7 +270,7 @@ export function ChatbotWidget({ language }: ChatbotWidgetProps) {
 
           <div className="chatbot__messages" ref={messagesRef}>
             {messages.length === 0 ? (
-              <p className="chatbot__empty">Stell mir eine Frage zum Check-in.</p>
+              <p className="chatbot__empty">Type in a question please..</p>
             ) : (
               messages.map((message) => (
                 <div
@@ -280,7 +284,7 @@ export function ChatbotWidget({ language }: ChatbotWidgetProps) {
 
             {isLoading ? (
               <div className="chatbot__message chatbot__message--assistant">
-                <div className="chatbot__bubble chatbot__bubble--loading">Denkt nach…</div>
+                <div className="chatbot__bubble chatbot__bubble--loading">Is thinking…</div>
               </div>
             ) : null}
           </div>
@@ -290,7 +294,7 @@ export function ChatbotWidget({ language }: ChatbotWidgetProps) {
               value={question}
               onChange={(event) => setQuestion(event.target.value)}
               rows={1}
-              placeholder="Frage eingeben..."
+              placeholder="Question..."
               aria-label="Frage an den Chatbot"
               onKeyDown={(event) => {
                 if (event.key === "Enter" && !event.shiftKey) {
@@ -300,7 +304,7 @@ export function ChatbotWidget({ language }: ChatbotWidgetProps) {
               }}
             />
             <button type="submit" disabled={isLoading || !question.trim()}>
-              Senden
+              Send
             </button>
           </form>
         </section>

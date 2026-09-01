@@ -57,24 +57,44 @@ body {
 }
 
 .chatbot__launcher {
-  width: 3.5rem;
-  height: 3.5rem;
-  border: none;
-  border-radius: 999px;
-  background: linear-gradient(135deg, #101828, #344054);
+  width: 4rem;
+  height: 4rem;
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  border-radius: 1.25rem;
+  background: linear-gradient(135deg, #1d4ed8 0%, #7c3aed 45%, #0f172a 100%);
   color: #fff;
-  box-shadow: 0 18px 30px rgba(16, 24, 40, 0.22);
+  box-shadow: 0 20px 40px rgba(59, 130, 246, 0.45), 0 8px 18px rgba(15, 23, 42, 0.22);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
+  font-size: 1.65rem;
   cursor: grab;
   touch-action: none;
   user-select: none;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.chatbot__launcher::before {
+  content: "AI";
+  position: absolute;
+  inset: auto auto 0.25rem 0.35rem;
+  font-size: 0.5rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.85);
+  text-transform: uppercase;
+}
+
+.chatbot__launcher:hover {
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 24px 44px rgba(59, 130, 246, 0.5), 0 8px 18px rgba(15, 23, 42, 0.26);
 }
 
 .chatbot__launcher:active {
   cursor: grabbing;
+  transform: scale(0.98);
 }
 
 .chatbot__panel {
@@ -166,6 +186,12 @@ body {
 .chatbot__bubble--loading {
   font-style: italic;
   color: #475467;
+}
+
+.chatbot__bubble--error {
+  background: #fef3f2;
+  color: #b42318;
+  border: 1px solid #fecdca;
 }
 
 .chatbot__composer {
