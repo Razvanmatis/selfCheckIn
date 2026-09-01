@@ -27,5 +27,32 @@ export async function deleteOldCodes(payload: string): Promise<string> {
         throw new Error(errorMessage);
     }
 
-    return (await response.text()).trim();
+    const responseText = (await response.text()).trim();
+
+    try {
+        const parsed = JSON.parse(responseText) as {
+            message?: string;
+            answer?: { body?: string };
+        };
+
+        const nestedAnswerBody = parsed.answer?.body;
+        if (typeof nestedAnswerBody === "string" && nestedAnswerBody.trim()) {
+            try {
+                const nested = JSON.parse(nestedAnswerBody) as { message?: string };
+                if (typeof nested.message === "string" && nested.message.trim()) {
+                    return nested.message.trim();
+                }
+            } catch {
+                return nestedAnswerBody.trim();
+            }
+        }
+
+        if (typeof parsed.message === "string" && parsed.message.trim()) {
+            return parsed.message.trim();
+        }
+    } catch {
+        // Keep plain text responses unchanged.
+    }
+
+    return responseText;
 }

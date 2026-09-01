@@ -214,12 +214,16 @@ function App() {
 
     try {
       const result = await deleteOldCodes(adminUser.trim());
+      window.alert(result);
       setSubmitResult(result);
       setIsAdminDeleteOpen(false);
       setAdminUser("");
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Die alten Codes konnten nicht geloescht werden.";
+      window.alert(errorMessage);
       setSubmitError(errorMessage);
+      setIsAdminDeleteOpen(false);
+      setAdminUser("");
     } finally {
       setIsDeletingOldCodes(false);
     }

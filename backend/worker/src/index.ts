@@ -8,6 +8,7 @@ import { cors } from "hono/cors";
 import { seedKnowledge } from "./seedKnowledge";
 import { askKnowledge } from "./askKnowledge";
 import {sendGeneralMessageToAdmin} from "./mailService";
+import {deleteOldCodesHandler} from "./deleteOldCodes";
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -152,6 +153,39 @@ app.post("/api/ai/ask", async (c) => {
 				: "Unbekannter Fehler beim Beantworten der Frage.";
 		await sendGeneralMessageToAdmin(
 			`Fehler beim Beantworten der Frage: ${message}`,
+			c.env
+		);
+		return c.json({ message }, 500);
+	}
+});
+
+app.post("/api/deleteOldCodes", async (c) => {
+	try {
+		const body = await c.req.json();
+		const adminUser = String(body?.adminUser ?? "").trim();
+
+		if (!adminUser) {
+			return c.json(
+				{ message: "Kein Admin-Benutzer übergeben." },
+				400
+			);
+		}
+
+		const answer = await deleteOldCodesHandler(
+			{ body: adminUser },
+			c.env
+		);
+
+		return c.json({
+			answer
+		});
+	} catch (error) {
+		const message =
+			error instanceof Error
+				? error.message
+				: "Unbekannter Fehler beim Löschen der alten Codes.";
+		await sendGeneralMessageToAdmin(
+			`Fehler beim Löschen der alten Codes: ${message}`,
 			c.env
 		);
 		return c.json({ message }, 500);
