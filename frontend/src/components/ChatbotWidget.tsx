@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { askKnowledge } from "../api/askKnowledge";
+import { chatbotTranslations, type Language } from "../i18n/translations";
 
 type ChatRole = "user" | "assistant";
 
@@ -7,6 +8,7 @@ type ChatMessage = {
   id: string;
   role: ChatRole;
   text: string;
+  isError?: boolean;
 };
 
 const STORAGE_KEY = "selfcheckin-chatbot-messages";
@@ -52,10 +54,11 @@ const getDefaultPosition = (): Position => {
 };
 
 type ChatbotWidgetProps = {
-  language: string;
+  language: Language;
 };
 
 export function ChatbotWidget({ language }: ChatbotWidgetProps) {
+  const chatbotT = chatbotTranslations[language];
   const [isOpen, setIsOpen] = useState(false);
   const [question, setQuestion] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -204,14 +207,15 @@ export function ChatbotWidget({ language }: ChatbotWidgetProps) {
       const errorText =
         error instanceof Error
           ? error.message
-          : "Es ist ein Fehler aufgetreten. Bitte versuche es erneut.";
+          : "Something went wrong. Please try again.";
 
       setMessages((prev) => [
         ...prev,
         {
           id: makeMessageId(),
           role: "assistant",
-          text: errorText
+          text: errorText,
+          isError: true
         }
       ]);
     } finally {
@@ -229,9 +233,9 @@ export function ChatbotWidget({ language }: ChatbotWidgetProps) {
       <button
         type="button"
         className="chatbot__launcher"
-        aria-label={isOpen ? "Chatfenster schließen" : "AI-Assistent öffnen"}
+        aria-label={isOpen ? chatbotT.closeLabel : chatbotT.openLabel}
         aria-expanded={isOpen}
-        title="AI-Assistent – Questions regarding the check-in and complete household"
+        title={chatbotT.tooltip}
         onPointerDown={handleLauncherPointerDown}
         onPointerMove={handleLauncherPointerMove}
         onPointerUp={handleLauncherPointerUp}
@@ -250,18 +254,18 @@ export function ChatbotWidget({ language }: ChatbotWidgetProps) {
       </button>
 
       {isOpen ? (
-        <section className="chatbot__panel" aria-label="Chatbot">
+        <section className="chatbot__panel" aria-label={chatbotT.title}>
           <div className="chatbot__header">
             <div>
-              <strong>AI-Assistent</strong>
+              <strong>{chatbotT.title}</strong>
               <div style={{ fontSize: "0.72rem", opacity: 0.85, marginTop: "0.15rem" }}>
-                Questions regarding raz place
+                {chatbotT.subtitle}
               </div>
             </div>
             <button
               type="button"
               className="chatbot__close"
-              aria-label="Chat schließen"
+              aria-label={chatbotT.closeLabel}
               onClick={() => setIsOpen(false)}
             >
               ×
@@ -270,21 +274,26 @@ export function ChatbotWidget({ language }: ChatbotWidgetProps) {
 
           <div className="chatbot__messages" ref={messagesRef}>
             {messages.length === 0 ? (
-              <p className="chatbot__empty">Type in a question please..</p>
+              <p className="chatbot__empty">{chatbotT.empty}</p>
             ) : (
               messages.map((message) => (
                 <div
                   key={message.id}
                   className={`chatbot__message chatbot__message--${message.role}`}
                 >
-                  <div className="chatbot__bubble">{message.text}</div>
+                  <div
+                    className={`chatbot__bubble${message.isError ? " chatbot__bubble--error" : ""}`}
+                    role={message.isError ? "alert" : undefined}
+                  >
+                    {message.text}
+                  </div>
                 </div>
               ))
             )}
 
             {isLoading ? (
               <div className="chatbot__message chatbot__message--assistant">
-                <div className="chatbot__bubble chatbot__bubble--loading">Is thinking…</div>
+                <div className="chatbot__bubble chatbot__bubble--loading">{chatbotT.loading}</div>
               </div>
             ) : null}
           </div>
@@ -294,8 +303,8 @@ export function ChatbotWidget({ language }: ChatbotWidgetProps) {
               value={question}
               onChange={(event) => setQuestion(event.target.value)}
               rows={1}
-              placeholder="Question..."
-              aria-label="Frage an den Chatbot"
+              placeholder={chatbotT.placeholder}
+              aria-label={chatbotT.inputAriaLabel}
               onKeyDown={(event) => {
                 if (event.key === "Enter" && !event.shiftKey) {
                   event.preventDefault();
@@ -304,7 +313,7 @@ export function ChatbotWidget({ language }: ChatbotWidgetProps) {
               }}
             />
             <button type="submit" disabled={isLoading || !question.trim()}>
-              Send
+              {chatbotT.send}
             </button>
           </form>
         </section>
