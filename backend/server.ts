@@ -9,7 +9,7 @@ import { getCheckInInformation } from "./getCheckInInformation.js";
 import {
   handler as initiateCheckInProcessHandler
 } from "./initiateCheckInProcess.js";
-import {sendErrorNotificationEmail} from "./worker/src/mailService.js";
+import {sendErrorNotificationEmail} from "./mailService.js";
 import {seedKnowledge} from "./seedKnowledge.js";
 import {askKnowledge} from "./askKnowledge.js";
 
