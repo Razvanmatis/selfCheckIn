@@ -270,7 +270,7 @@ export async function sendErrorNotificationEmail(errorMessage: string, fullName:
   );
 }
 
-export async function sendGeneralErrorMail(errorMessage: string, env: Env): Promise<void> {
+export async function sendGeneralMessageToAdmin(errorMessage: string, env: Env): Promise<void> {
   const now = new Date();
   const timestamp = now.toLocaleString("de-DE", {
     dateStyle: "short",

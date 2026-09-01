@@ -1,5 +1,5 @@
 import type {Env} from "./env.js";
-import {sendGeneralErrorMail} from "./mailService.js";
+import {sendGeneralMessageToAdmin} from "./mailService.js";
 import {createKeypadCode, deleteKeypadCode, forceNukiSync, getAllKeypadCodes} from "./defineKeypadCode.js";
 import {getAllOpenBookings} from "./initiateCheckInProcess.js";
 import {SmoobuBooking} from "./types/smoobuBooking.js";
@@ -126,7 +126,7 @@ async function deleteAllOldCodes(env: Env) {
         if (codeNameSplittedByComma.length == 2) {
             if (dateSplittedByDash.length !== 2) {
                 console.log(`Ungueltiges Datum im Code-Namen: ${code.name}`);
-                await sendGeneralErrorMail(`Ungueltiges Datum im Code-Namen: ${code.name}`, env);
+                await sendGeneralMessageToAdmin(`Ungueltiges Datum im Code-Namen: ${code.name}`, env);
                 continue;
             }
             let endDate = new Date(dateSplittedByDash[1].trim() + "." + now.getFullYear());
@@ -164,10 +164,11 @@ async function deleteAllOldCodes(env: Env) {
     await handleDeletionOfCodes(listWithIdsToDelete, env);
     await forceNukiSync(env);
     await createNewCodesForRemainingUsers(listWithNewCodesToCreate, env);
-    return `Es wurden ${listWithIdsToDelete.length} alte Codes gefunden, die geloescht wurden.`;
+    await sendGeneralMessageToAdmin(`Es wurden ${listWithIdsToDelete.length} alte Codes gefunden, die geloescht wurden. Und es wurden ${listWithNewCodesToCreate.length} neue Codes fuer die verbleibenden Nutzer erstellt.`, env);
+    return `Es wurden ${listWithIdsToDelete.length} alte Codes gefunden, die geloescht wurden. Und es wurden ${listWithNewCodesToCreate.length} neue Codes fuer die verbleibenden Nutzer erstellt.`;
 }
 
-export async function handler(event: LambdaLikeEvent,
+export async function deleteOldCodesHandler(event: LambdaLikeEvent,
                               env: Env): Promise<LambdaLikeResponse> {
     let payload;
     try {
@@ -183,7 +184,7 @@ export async function handler(event: LambdaLikeEvent,
         const message =
             error instanceof Error ? error.message : "Unbekannter Fehler im Lösche alle alten Codes Prozess.";
         console.log(`Fehler im Lösche alle alten Codes Prozess: ${message}`);
-        await sendGeneralErrorMail(`Fehler im Lösche alle alten Codes Prozess: ${message}`, env);
+        await sendGeneralMessageToAdmin(`Fehler im Lösche alle alten Codes Prozess: ${message}`, env);
         return {
             statusCode: 400,
             headers: jsonHeaders,

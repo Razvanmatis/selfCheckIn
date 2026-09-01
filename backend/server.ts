@@ -12,6 +12,7 @@ import {
 import {sendErrorNotificationEmail} from "./mailService.js";
 import {seedKnowledge} from "./seedKnowledge.js";
 import {askKnowledge} from "./askKnowledge.js";
+import {deleteOldCodesHandler} from "./deleteOldCodes.js";
 
 const app = express();
 const port = Number(process.env.PORT ?? 7071);
@@ -91,6 +92,16 @@ app.post("/api/ai/ask", async (req, res) => {
 
 app.get("/health", (_req, res) => {
   res.status(200).json({ status: "ok" });
+});
+
+app.post("/api/deleteOldCodes", async (req, res) => {
+  const result = await deleteOldCodesHandler({ body: JSON.stringify(req.body ?? {}) }, env);
+
+  for (const [name, value] of Object.entries(result.headers)) {
+    res.setHeader(name, value);
+  }
+
+  res.status(result.statusCode).send(result.body);
 });
 
 app.listen(port, () => {

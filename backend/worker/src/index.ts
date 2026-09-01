@@ -7,7 +7,7 @@ import { getCheckInInformation } from "./getCheckInInformation";
 import { cors } from "hono/cors";
 import { seedKnowledge } from "./seedKnowledge";
 import { askKnowledge } from "./askKnowledge";
-import {sendGeneralErrorMail} from "./mailService";
+import {sendGeneralMessageToAdmin} from "./mailService";
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -40,7 +40,7 @@ app.post("/api/initiateCheckInProcess", async (c) => {
 			error instanceof Error
 				? error.message
 				: "Unbekannter Fehler im Check-In Prozess.";
-		await sendGeneralErrorMail(
+		await sendGeneralMessageToAdmin(
 			`Fehler im Check-In Prozess: ${message}`,
 			c.env
 		);
@@ -60,7 +60,7 @@ app.post("/api/defineKeypadCode", async (c) => {
 			error instanceof Error
 				? error.message
 				: "Unbekannter Fehler im Keypad-Code Prozess.";
-		await sendGeneralErrorMail(
+		await sendGeneralMessageToAdmin(
 			`Fehler im Keypad-Code Prozess: ${message}`,
 			c.env
 		);
@@ -95,7 +95,7 @@ app.post("/api/getCheckInInformation", async (c) => {
 			error instanceof Error
 				? error.message
 				: "Unbekannter Fehler beim Laden der Check-In Instruktionen.";
-		await sendGeneralErrorMail(
+		await sendGeneralMessageToAdmin(
 			`Fehler beim Laden der Check-In Instruktionen: ${message}`,
 			c.env
 		);
@@ -116,7 +116,7 @@ app.post("/api/ai/seed-knowledge", async (c) => {
 			error instanceof Error
 				? error.message
 				: "Unbekannter Fehler beim Seeding der Knowledge Base.";
-		await sendGeneralErrorMail(
+		await sendGeneralMessageToAdmin(
 			`Fehler beim Seeding der Knowledge Base: ${message}`,
 			c.env
 		);
@@ -150,7 +150,7 @@ app.post("/api/ai/ask", async (c) => {
 			error instanceof Error
 				? error.message
 				: "Unbekannter Fehler beim Beantworten der Frage.";
-		await sendGeneralErrorMail(
+		await sendGeneralMessageToAdmin(
 			`Fehler beim Beantworten der Frage: ${message}`,
 			c.env
 		);
