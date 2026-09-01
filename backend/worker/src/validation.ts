@@ -240,3 +240,7 @@ export function getExistingNameInitialsOfNukiAuthEntry(nukiAuthEntry: NukiAuthEn
   }
   return existingNameInitials;
 }
+
+export function normalizePhone(value: string | null | undefined): string {
+  return (value ?? "").replace(/\D/g, "");
+}

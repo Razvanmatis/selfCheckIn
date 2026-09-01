@@ -1,4 +1,4 @@
-import {isAdminRequest, parseAndValidateCheckInLookupPayload} from "./validation.js";
+import {isAdminRequest, normalizePhone, parseAndValidateCheckInLookupPayload} from "./validation.js";
 import type {Env} from "./env.js";
 import {CheckInLookupPayload} from "./types/checkInLookupPayload.js";
 import {sendErrorNotificationEmail} from "./mailService.js";
@@ -53,9 +53,6 @@ export async function initiateCheckInProcess(
   if (isAdminRequest(request, env)) {
     return "OK";
   }
-  const normalizePhone = (value: string | null | undefined): string => {
-    return (value ?? "").replace(/\D/g, "");
-  };
 
   let data;
   try {

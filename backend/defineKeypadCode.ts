@@ -5,7 +5,7 @@ import {
     getFormattedDateAsName,
     getNewerDate,
     getOlderDate,
-    isAdminRequest,
+    isAdminRequest, normalizePhone,
     parseAndValidateDefineKeypadCodeRequest,
 } from "./validation.js";
 import type {Env} from "./env.js";
@@ -166,7 +166,7 @@ function getMatchedBookingOfList(allBookings: SmoobuReservationsResponse, reques
             booking.departure === request.checkOutDate &&
             (booking.firstname.trim().toLowerCase() === request.firstName.trim().toLowerCase() &&
                 booking.lastname.trim().toLowerCase() === request.lastName.trim().toLowerCase() ||
-                booking.phone?.trim() === request.phone.trim())
+                normalizePhone(booking.phone) === normalizePhone(request.phone))
         );
     });
 }
