@@ -4,6 +4,7 @@ import {createKeypadCode, deleteKeypadCode, forceNukiSync, getAllKeypadCodes} fr
 import {getAllOpenBookings} from "./initiateCheckInProcess.js";
 import {SmoobuBooking} from "./types/smoobuBooking.js";
 import {NukiCreateAuthPayload} from "./types/nukiCreateAuthPayload.js";
+import {formatDateToDayMonth} from "./validation.js";
 
 type LambdaLikeEvent = {
     body: string | null;
@@ -36,8 +37,12 @@ function validateDeleteOldCodesRequest(body: string | null, env: Env) {
     throw new Error("Ungueltige Anfrage: Admin-Name stimmt nicht ueberein.");
 }
 
-function getFormattedDate(dateString: string) {
-    return new Date().getFullYear() + "-" + dateString.substring(3) + "-" + dateString.substring(0, 2);
+function getFormattedDate(dateString: string, olderDate: string | undefined = undefined) {
+    let fullYear = new Date().getFullYear();
+    if (olderDate && Number(olderDate.substring(3)) < Number(dateString.substring(3))) {
+        fullYear++;
+    }
+    return fullYear + "-" + dateString.substring(3) + "-" + dateString.substring(0, 2);
 }
 
 function codeIsInBookingListMatchingAllCriteria(arrivalDate: string, departureDate: string, nameInitials: string, allActiveBookings: SmoobuBooking[]) {
@@ -84,7 +89,7 @@ function getNewCodeToCreateForMultipleUsers(remainingDatesAndInitialsAfterCheck:
         }
     }
     return {
-        name: getFormattedDate(arrivalDate.substring(5) + "-" + departureDate.substring(5)) + ", " + nameInitialsString.slice(0, -1),
+        name: formatDateToDayMonth(arrivalDate) + "-" + formatDateToDayMonth(departureDate) + "," + nameInitialsString.slice(0, -1),
         allowedFromDate: arrivalDate + "T13:00:00.000Z",
         allowedUntilDate: departureDate + "T09:00:00.000Z",
         allowedWeekDays: 127,
@@ -124,12 +129,16 @@ async function deleteAllOldCodes(env: Env) {
                 await sendGeneralErrorMail(`Ungueltiges Datum im Code-Namen: ${code.name}`, env);
                 continue;
             }
-            const endDate = new Date(dateSplittedByDash[1].trim() + "." + now.getFullYear());
+            let endDate = new Date(dateSplittedByDash[1].trim() + "." + now.getFullYear());
+            if (dateSplittedByDash[1].trim().substring(3) < dateSplittedByDash[0].trim().substring(3)) {
+                endDate.setFullYear(endDate.getFullYear() + 1);
+            }
             if (endDate < now) {
                 listWithIdsToDelete.push(code.id);
+                continue;
             }
             const nameInitials = codeNameSplittedByComma[1].trim();
-            if (!codeIsInBookingListMatchingAllCriteria(getFormattedDate(dateSplittedByDash[0]), getFormattedDate(dateSplittedByDash[1]), nameInitials, allActiveBookings.bookings)) {
+            if (!codeIsInBookingListMatchingAllCriteria(getFormattedDate(dateSplittedByDash[0]), getFormattedDate(dateSplittedByDash[1], dateSplittedByDash[0]), nameInitials, allActiveBookings.bookings)) {
                 listWithIdsToDelete.push(code.id);
             }
         } else {
@@ -139,7 +148,7 @@ async function deleteAllOldCodes(env: Env) {
                 remainingInitialsBeforeCheck.push(codeNameSplittedByComma[i].trim());
             }
             for (const nameInitials of remainingInitialsBeforeCheck) {
-                const entryInTimespan = getEntryOfBookingListInTimespan(getFormattedDate(dateSplittedByDash[0]), getFormattedDate(dateSplittedByDash[1]), nameInitials, allActiveBookings.bookings);
+                const entryInTimespan = getEntryOfBookingListInTimespan(getFormattedDate(dateSplittedByDash[0]), getFormattedDate(dateSplittedByDash[1], dateSplittedByDash[0]), nameInitials, allActiveBookings.bookings);
                 if (entryInTimespan) {
                     remainingDatesAndInitialsAfterCheck.push(entryInTimespan);
                 }
