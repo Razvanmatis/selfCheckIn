@@ -234,16 +234,19 @@ function getBookingConfirmationText(language: string | undefined, fullName: stri
 }
 
 export async function sendBookingConfirmationEmail(recipientEmail: string, fullName: string, timeSpan: string, code: string, env: Env, language?: string): Promise<void> {
-  const content = getBookingConfirmationText(language, fullName, timeSpan, code);
+  let content = getBookingConfirmationText(language, fullName, timeSpan, code);
 
-  await sendMail(
-      {
-        to: [{ email: recipientEmail, name: fullName }],
-        subject: content.subject,
-        text: content.text
-      },
-      env
-  );
+  if (recipientEmail !== null && recipientEmail !== undefined) {
+    await sendMail(
+        {
+          to: [{ email: recipientEmail, name: fullName }],
+          subject: content.subject,
+          text: content.text
+        },
+        env
+    );
+  }
+  content = getBookingConfirmationText("de", fullName, timeSpan, code);
   await sendMail(
       {
         to: [{ email: env.EMAIL_FROM, name: 'Razvan Matis' }],
