@@ -72,19 +72,35 @@ body {
   touch-action: none;
   user-select: none;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.chatbot__launcher::before {
-  content: "AI";
+.chatbot__launcher-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+}
+
+.chatbot__launcher-label {
   position: absolute;
-  inset: auto auto 0.25rem 0.35rem;
-  font-size: 0.5rem;
-  font-weight: 800;
+  left: 50%;
+  bottom: -0.55rem;
+  transform: translateX(-50%);
+  background: rgba(15, 23, 42, 0.95);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  padding: 0.18rem 0.45rem;
+  font-size: 0.56rem;
+  line-height: 1;
   letter-spacing: 0.08em;
-  color: rgba(255, 255, 255, 0.85);
+  font-weight: 800;
   text-transform: uppercase;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.25);
+  animation: chatbot-pulse 2s ease-in-out infinite;
 }
 
 .chatbot__launcher:hover {
@@ -95,6 +111,17 @@ body {
 .chatbot__launcher:active {
   cursor: grabbing;
   transform: scale(0.98);
+}
+
+@keyframes chatbot-pulse {
+  0%, 100% {
+    transform: translateX(-50%) scale(1);
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.25);
+  }
+  50% {
+    transform: translateX(-50%) scale(1.06);
+    box-shadow: 0 10px 20px rgba(59, 130, 246, 0.4);
+  }
 }
 
 .chatbot__panel {

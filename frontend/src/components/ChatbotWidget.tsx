@@ -250,7 +250,8 @@ export function ChatbotWidget({ language }: ChatbotWidgetProps) {
           setIsOpen((prev) => !prev);
         }}
       >
-        <span aria-hidden="true">🤖</span>
+        <span aria-hidden="true" className="chatbot__launcher-icon">🤖</span>
+        <span aria-hidden="true" className="chatbot__launcher-label">AI</span>
       </button>
 
       {isOpen ? (
