@@ -3,6 +3,7 @@ import type {Env} from "./env.js";
 import {CheckInLookupPayload} from "./types/checkInLookupPayload.js";
 import {sendErrorNotificationEmail} from "./mailService.js";
 import {SmoobuReservationsResponse} from "./types/smoobuReservationsResponse.js";
+import {createSmoobuSignature} from "./smoobuSignature.js";
 
 type LambdaLikeEvent = {
   body: string | null;
@@ -22,9 +23,10 @@ const textHeaders = {
   "Content-Type": "text/plain; charset=utf-8"
 };
 
-const smoobuReservationsUrl = "https://login.smoobu.com/api/reservations?pageSize=100";
+const smoobuReservationsUrl =
+    "https://login.smoobu.com/api/reservations?pageSize=100";
 
-export async function getAllOpenBookings(env: Env) {
+export async function getAllOpenBookings_with_legacy_token(env: Env) {
   const response = await fetch(smoobuReservationsUrl, {
     method: "GET",
     headers: {
@@ -42,6 +44,44 @@ export async function getAllOpenBookings(env: Env) {
     );
   }
 
+  return (await response.json()) as SmoobuReservationsResponse;
+}
+
+export async function getAllOpenBookings(env: Env) {
+  const url = new URL(smoobuReservationsUrl);
+  const timestamp = new Date().toISOString();
+  const nonce = crypto.randomUUID();
+  const queryString = Array.from(url.searchParams.entries())
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([key, value]) => `${key}=${value}`)
+      .join("&");
+  const signature = await createSmoobuSignature(
+      "GET",
+      url.pathname,
+      queryString,
+      timestamp,
+      nonce,
+      env.SMOOBU_API_KEY,
+      env.SMOOBU_API_SECRET
+  );
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "X-API-Key": env.SMOOBU_API_KEY,
+      "X-Timestamp": timestamp,
+      "X-Nonce": nonce,
+      "X-Signature": signature,
+      "Accept": "application/json"
+    }
+  });
+  if (!response.ok) {
+    const rawBody = await response.text();
+    throw new Error(
+        `Smoobu-Reservierungen konnten nicht geladen werden. ` +
+        `HTTP ${response.status} ${response.statusText}. ` +
+        `Antwort: ${rawBody || "<leer>"}`
+    );
+  }
   return (await response.json()) as SmoobuReservationsResponse;
 }
 

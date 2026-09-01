@@ -19,6 +19,7 @@ const port = Number(process.env.PORT ?? 7071);
 
 const env: Env = {
   SMOOBU_API_KEY: process.env.SMOOBU_API_KEY!,
+  SMOOBU_API_SECRET: process.env.SMOOBU_API_SECRET!,
   NUKI_API_TOKEN: process.env.NUKI_API_TOKEN!,
   NUKI_SMARTLOCK_ID: process.env.NUKI_SMARTLOCK_ID!,
   ADMIN_NAME: process.env.ADMIN_NAME!,
