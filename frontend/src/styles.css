@@ -245,6 +245,10 @@ h1 {
   margin-bottom: 0;
 }
 
+.card-header__title-button {
+  cursor: pointer;
+}
+
 .card-header {
   display: flex;
   justify-content: space-between;
@@ -320,6 +324,10 @@ h1 {
     #ffffff;
 }
 
+.dialog--compact {
+  width: min(420px, 100%);
+}
+
 .dialog-hero {
   display: flex;
   gap: 0.85rem;
@@ -386,6 +394,16 @@ h1 {
 .dialog-actions {
   display: grid;
   gap: 0.75rem;
+}
+
+.dialog-actions--inline {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.dialog-actions--inline > button {
+  flex: 1 1 0;
+  margin: 0;
 }
 
 .rule-list {

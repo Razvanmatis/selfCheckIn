@@ -31,15 +31,13 @@ const textHeaders = {
 };
 
 function validateDeleteOldCodesRequest(body: string | null, env: Env) {
-    if (body !== null && body.trim() === env.ADMIN_NAME) {
-        return;
-    }
-    throw new Error("Ungueltige Anfrage: Admin-Name stimmt nicht ueberein.");
+    return body !== null && body.trim() === env.ADMIN_NAME;
+
 }
 
 function getFormattedDate(dateString: string, olderDate: string | undefined = undefined) {
     let fullYear = new Date().getFullYear();
-    if (olderDate && Number(olderDate.substring(3)) < Number(dateString.substring(3))) {
+    if (olderDate && Number(dateString.substring(3)) < Number(olderDate.substring(3))) {
         fullYear++;
     }
     return fullYear + "-" + dateString.substring(3) + "-" + dateString.substring(0, 2);
@@ -129,7 +127,7 @@ async function deleteAllOldCodes(env: Env) {
                 await sendGeneralMessageToAdmin(`Ungueltiges Datum im Code-Namen: ${code.name}`, env);
                 continue;
             }
-            let endDate = new Date(dateSplittedByDash[1].trim() + "." + now.getFullYear());
+            let endDate = new Date(now.getFullYear() + "-" + dateSplittedByDash[1].substring(3) + "-" + dateSplittedByDash[1].substring(0, 2));
             if (dateSplittedByDash[1].trim().substring(3) < dateSplittedByDash[0].trim().substring(3)) {
                 endDate.setFullYear(endDate.getFullYear() + 1);
             }
@@ -162,17 +160,24 @@ async function deleteAllOldCodes(env: Env) {
         }
     }
     await handleDeletionOfCodes(listWithIdsToDelete, env);
-    await forceNukiSync(env);
-    await createNewCodesForRemainingUsers(listWithNewCodesToCreate, env);
-    await sendGeneralMessageToAdmin(`Es wurden ${listWithIdsToDelete.length} alte Codes gefunden, die geloescht wurden. Und es wurden ${listWithNewCodesToCreate.length} neue Codes fuer die verbleibenden Nutzer erstellt.`, env);
-    return `Es wurden ${listWithIdsToDelete.length} alte Codes gefunden, die geloescht wurden. Und es wurden ${listWithNewCodesToCreate.length} neue Codes fuer die verbleibenden Nutzer erstellt.`;
+    if (listWithNewCodesToCreate.length > 0) {
+        await forceNukiSync(env);
+        await createNewCodesForRemainingUsers(listWithNewCodesToCreate, env);
+    }
+    await sendGeneralMessageToAdmin(`Es wurden ${listWithIdsToDelete.length} alte Codes gefunden, die gelöscht wurden. Und es wurden ${listWithNewCodesToCreate.length} neue Codes für die verbleibenden Nutzer erstellt.`, env);
+    return `Es wurden ${listWithIdsToDelete.length} alte Codes gefunden, die gelöscht wurden. Und es wurden ${listWithNewCodesToCreate.length} neue Codes für die verbleibenden Nutzer erstellt.`;
 }
 
 export async function deleteOldCodesHandler(event: LambdaLikeEvent,
                               env: Env): Promise<LambdaLikeResponse> {
-    let payload;
     try {
-        validateDeleteOldCodesRequest(event.body, env);
+        if (!validateDeleteOldCodesRequest(event.body, env)) {
+            return {
+                statusCode: 400,
+                headers: jsonHeaders,
+                body: JSON.stringify({message: "Ungueltige Anfrage: Admin-Name stimmt nicht überein."})
+            };
+        }
         const result = await deleteAllOldCodes(env);
 
         return {

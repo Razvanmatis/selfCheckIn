@@ -7,7 +7,7 @@ export async function deleteOldCodes(payload: string): Promise<string> {
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({ adminUser: payload })
     });
 
     if (!response.ok) {

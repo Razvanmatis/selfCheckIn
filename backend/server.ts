@@ -95,7 +95,7 @@ app.get("/health", (_req, res) => {
 });
 
 app.post("/api/deleteOldCodes", async (req, res) => {
-  const result = await deleteOldCodesHandler({ body: JSON.stringify(req.body ?? {}) }, env);
+  const result = await deleteOldCodesHandler({ body: String(req.body?.adminUser ?? null) }, env);
 
   for (const [name, value] of Object.entries(result.headers)) {
     res.setHeader(name, value);
@@ -108,4 +108,3 @@ app.listen(port, () => {
   // Keep startup log minimal and explicit for local testing.
   console.log(`Backend is running on http://localhost:${port}`);
 });
-
