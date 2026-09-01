@@ -32,7 +32,6 @@ const textHeaders = {
 
 function validateDeleteOldCodesRequest(body: string | null, env: Env) {
     return body !== null && body.trim() === env.ADMIN_NAME;
-
 }
 
 function getFormattedDate(dateString: string, olderDate: string | undefined = undefined) {
@@ -164,7 +163,7 @@ async function deleteAllOldCodes(env: Env) {
         await forceNukiSync(env);
         await createNewCodesForRemainingUsers(listWithNewCodesToCreate, env);
     }
-    await sendGeneralMessageToAdmin(`Es wurden ${listWithIdsToDelete.length} alte Codes gefunden, die gelöscht wurden. Und es wurden ${listWithNewCodesToCreate.length} neue Codes für die verbleibenden Nutzer erstellt.`, env);
+    await sendGeneralMessageToAdmin(`Es wurden ${listWithIdsToDelete.length} alte Codes gefunden, die gelöscht wurden. Und es wurden ${listWithNewCodesToCreate.length} neue Codes für die verbleibenden Nutzer erstellt.`, env, false);
     return `Es wurden ${listWithIdsToDelete.length} alte Codes gefunden, die gelöscht wurden. Und es wurden ${listWithNewCodesToCreate.length} neue Codes für die verbleibenden Nutzer erstellt.`;
 }
 
