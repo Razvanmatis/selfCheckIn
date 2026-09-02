@@ -51,11 +51,11 @@ export function validateCheckInLookupPayload(
   const checkOutDate = requireNonEmptyString(payload.checkOutDate, "checkOutDate").trim();
 
   if (!isIsoDate(checkInDate)) {
-    throw new Error("Ungueltiges Datumsformat fuer checkInDate. Erwartet: YYYY-MM-DD.");
+    throw new Error("Ungültiges Datumsformat für checkInDate. Erwartet: YYYY-MM-DD.");
   }
 
   if (!isIsoDate(checkOutDate)) {
-    throw new Error("Ungueltiges Datumsformat fuer checkOutDate. Erwartet: YYYY-MM-DD.");
+    throw new Error("Ungültiges Datumsformat für checkOutDate. Erwartet: YYYY-MM-DD.");
   }
 
   const today = new Date();
@@ -163,7 +163,7 @@ export function normalizeDateString(value: string): string {
 
   const parsed = new Date(trimmed);
   if (Number.isNaN(parsed.getTime())) {
-    throw new Error(`Ungueltiges Datumsformat: ${value}`);
+    throw new Error(`Ungültiges Datumsformat: ${value}`);
   }
 
   return parsed.toISOString();
@@ -198,7 +198,7 @@ export function formatDateToDayMonth(value: string): string {
   const datePart = getDateOnly(value);
   const match = datePart.match(/^(\d{4})[-.](\d{2})[-.](\d{2})$/);
   if (!match) {
-    throw new Error(`Ungueltiges Datumsformat: ${value}`);
+    throw new Error(`Ungültiges Datumsformat: ${value}`);
   }
 
   const [, , month, day] = match;

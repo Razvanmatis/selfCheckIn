@@ -63,7 +63,7 @@ app.post("/api/getCheckInInformation", async (req, res) => {
     const result = await getCheckInInformation(payload, env);
 
     if (result === "validationError") {
-      res.status(400).json({ message: "Ungueltige Daten eingegeben!" });
+      res.status(400).json({ message: "Ungültige Daten eingegeben!" });
       return;
     }
 

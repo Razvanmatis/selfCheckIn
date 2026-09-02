@@ -124,8 +124,8 @@ async function deleteAllOldCodes(env: EnvBoth) {
         const dateSplittedByDash = codeNameSplittedByComma[0].trim().split("-");
         if (codeNameSplittedByComma.length == 2) {
             if (dateSplittedByDash.length !== 2) {
-                console.log(`Ungueltiges Datum im Code-Namen: ${code.name}`);
-                await sendGeneralMessageToAdmin(`Ungueltiges Datum im Code-Namen: ${code.name}`, env);
+                console.log(`Ungültiges Datum im Code-Namen: ${code.name}`);
+                await sendGeneralMessageToAdmin(`Ungültiges Datum im Code-Namen: ${code.name}`, env);
                 continue;
             }
             let endDate = new Date(now.getFullYear() + "-" + dateSplittedByDash[1].substring(3) + "-" + dateSplittedByDash[1].substring(0, 2));
