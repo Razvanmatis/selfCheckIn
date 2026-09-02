@@ -1,10 +1,10 @@
-import type {Env} from "./env.js";
 import {sendGeneralMessageToAdmin} from "./mailService.js";
 import {createKeypadCode, deleteKeypadCode, forceNukiSync, getAllKeypadCodes} from "./defineKeypadCode.js";
 import {getAllOpenBookings} from "./initiateCheckInProcess.js";
 import {SmoobuBooking} from "./types/smoobuBooking.js";
 import {NukiCreateAuthPayload} from "./types/nukiCreateAuthPayload.js";
 import {formatDateToDayMonth} from "./validation.js";
+import {EnvBoth} from "./envBoth";
 
 type LambdaLikeEvent = {
     body: string | null;
@@ -30,7 +30,7 @@ const textHeaders = {
     "Content-Type": "text/plain; charset=utf-8"
 };
 
-function validateDeleteOldCodesRequest(body: string | null, env: Env) {
+function validateDeleteOldCodesRequest(body: string | null, env: EnvBoth) {
     if (body == null || body.trim() !== env.ADMIN_NAME) {
         throw new Error("Ungültige Anfrage: Admin-Name stimmt nicht überein.");
     }
@@ -64,13 +64,13 @@ function getEntryOfBookingListInTimespan(arrivalDate: string, departureDate: str
     return undefined;
 }
 
-async function handleDeletionOfCodes(listWithIdsToDelete: string[], env: Env) {
+async function handleDeletionOfCodes(listWithIdsToDelete: string[], env: EnvBoth) {
     for (const id of listWithIdsToDelete) {
         await deleteKeypadCode(id, env);
     }
 }
 
-function getNewCodeToCreateForMultipleUsers(remainingDatesAndInitialsAfterCheck: BookingMatchEntry[], code: string, env: Env): NukiCreateAuthPayload {
+function getNewCodeToCreateForMultipleUsers(remainingDatesAndInitialsAfterCheck: BookingMatchEntry[], code: string, env: EnvBoth): NukiCreateAuthPayload {
     let nameInitialsString = "";
     let arrivalDate = "";
     let departureDate = "";
@@ -103,13 +103,13 @@ function getNewCodeToCreateForMultipleUsers(remainingDatesAndInitialsAfterCheck:
     }
 }
 
-async function createNewCodesForRemainingUsers(listWithNewCodesToCreate: NukiCreateAuthPayload[], env: Env) {
+async function createNewCodesForRemainingUsers(listWithNewCodesToCreate: NukiCreateAuthPayload[], env: EnvBoth) {
     for (const newCode of listWithNewCodesToCreate) {
         await createKeypadCode(newCode, env);
     }
 }
 
-async function deleteAllOldCodes(env: Env) {
+async function deleteAllOldCodes(env: EnvBoth) {
     const allActiveBookings = await getAllOpenBookings(env);
     await forceNukiSync(env);
     const allActiveCodes = await getAllKeypadCodes(env);
@@ -170,7 +170,7 @@ async function deleteAllOldCodes(env: Env) {
 }
 
 export async function deleteOldCodesHandler(event: LambdaLikeEvent,
-                              env: Env): Promise<LambdaLikeResponse> {
+                              env: EnvBoth): Promise<LambdaLikeResponse> {
     try {
         validateDeleteOldCodesRequest(event.body, env);
         const result = await deleteAllOldCodes(env);

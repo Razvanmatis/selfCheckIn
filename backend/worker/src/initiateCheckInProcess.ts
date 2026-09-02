@@ -1,9 +1,9 @@
 import {isAdminRequest, normalizePhone, parseAndValidateCheckInLookupPayload} from "./validation.js";
-import type {Env} from "./env.js";
 import {CheckInLookupPayload} from "./types/checkInLookupPayload.js";
-import {sendErrorNotificationEmail} from "./mailService.js";
+import {sendErrorNotificationEmail, sendGeneralMessageToAdmin} from "./mailService.js";
 import {SmoobuReservationsResponse} from "./types/smoobuReservationsResponse.js";
-import {createSmoobuSignature} from "./smoobuSignature.js";
+import {getSmoobuHeaders} from "./smoobuSignature.js";
+import {EnvBoth} from "./envBoth";
 
 type LambdaLikeEvent = {
   body: string | null;
@@ -26,7 +26,9 @@ const textHeaders = {
 const smoobuReservationsUrl =
     "https://login.smoobu.com/api/reservations?pageSize=100";
 
-export async function getAllOpenBookings_with_legacy_token(env: Env) {
+const smoobuSendMessageUrl = "https://login.smoobu.com/api/reservations/{reservationId}/messages/send-message-to-guest";
+
+export async function getAllOpenBookings_with_legacy_token(env: EnvBoth) {
   const response = await fetch(smoobuReservationsUrl, {
     method: "GET",
     headers: {
@@ -47,32 +49,31 @@ export async function getAllOpenBookings_with_legacy_token(env: Env) {
   return (await response.json()) as SmoobuReservationsResponse;
 }
 
-export async function getAllOpenBookings(env: Env) {
-  const url = new URL(smoobuReservationsUrl);
-  const timestamp = new Date().toISOString();
-  const nonce = crypto.randomUUID();
-  const queryString = Array.from(url.searchParams.entries())
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([key, value]) => `${key}=${value}`)
-      .join("&");
-  const signature = await createSmoobuSignature(
-      "GET",
-      url.pathname,
-      queryString,
-      timestamp,
-      nonce,
-      env.SMOOBU_API_KEY,
-      env.SMOOBU_API_SECRET
+export async function sendMessageToGuest(reservationId: number, header: string, message: string, env: EnvBoth) {
+  const url = smoobuSendMessageUrl.replace("{reservationId}", reservationId.toString());
+  const body = JSON.stringify({
+    subject: header,
+    messageBody: `<p>${message}</p>`,
+  });
+  const response = await fetch(
+      url,
+      {
+        method: "POST",
+        headers: await getSmoobuHeaders(env, "POST", url, body),
+        body: body,
+      }
   );
-  const response = await fetch(url, {
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`Smoobu Benachrichtigung eines Gasts fehlgeschlagen: ${response.status}: ${error}`);
+  }
+}
+
+export async function getAllOpenBookings(env: EnvBoth) {
+  const response = await fetch(smoobuReservationsUrl, {
     method: "GET",
-    headers: {
-      "X-API-Key": env.SMOOBU_API_KEY,
-      "X-Timestamp": timestamp,
-      "X-Nonce": nonce,
-      "X-Signature": signature,
-      "Accept": "application/json"
-    }
+    headers: await getSmoobuHeaders(env, "GET", smoobuReservationsUrl),
   });
   if (!response.ok) {
     const rawBody = await response.text();
@@ -87,7 +88,7 @@ export async function getAllOpenBookings(env: Env) {
 
 export async function initiateCheckInProcess(
   request: CheckInLookupPayload,
-  env: Env
+  env: EnvBoth
 ): Promise<string> {
 
   if (isAdminRequest(request, env)) {
@@ -112,9 +113,7 @@ export async function initiateCheckInProcess(
   // Determine search mode: by name or by phone
   const hasName = request.firstName.trim().length && request.lastName.trim().length;
   const hasPhone = request.phone.trim().length;
-
   let matchingBooking;
-
   if (hasName) {
     // Search by name
     const normalizedFirstName = request.firstName.trim().toLowerCase();
@@ -141,12 +140,11 @@ export async function initiateCheckInProcess(
       );
     });
   }
-
   return matchingBooking ? "OK" : "validationError";
 }
 
 export async function handler(event: LambdaLikeEvent,
-                              env: Env): Promise<LambdaLikeResponse> {
+                              env: EnvBoth): Promise<LambdaLikeResponse> {
   let payload;
   try {
     payload = parseAndValidateCheckInLookupPayload(event.body);

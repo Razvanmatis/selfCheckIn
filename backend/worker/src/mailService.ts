@@ -1,4 +1,4 @@
-import type { Env } from "./env.js";
+import {EnvBoth} from "./envBoth";
 
 export type MailRecipient =
     | string
@@ -46,7 +46,7 @@ function normalizeRecipients(recipients: MailRecipient[]) {
 
 async function sendMail(
     input: SendMailInput,
-    env: Env
+    env: EnvBoth
 ): Promise<{ messageId?: string; status: "sent" }> {
   const apiKey = env.BREVO_API_KEY?.trim();
   const from = env.EMAIL_FROM?.trim();
@@ -222,7 +222,7 @@ const bookingConfirmationTemplates: Record<string, { subject: string; greeting: 
   }
 };
 
-function getBookingConfirmationText(language: string | undefined, fullName: string, timeSpan: string, code: string): { subject: string; text: string } {
+export function getBookingConfirmationText(language: string | undefined, fullName: string, timeSpan: string, code: string): { subject: string; text: string } {
   const normalizedLanguage = (language ?? "de").trim().toLowerCase();
   const template = bookingConfirmationTemplates[normalizedLanguage] ?? bookingConfirmationTemplates.de;
   const codeLine = template.codeLine.replace("{timeSpan}", timeSpan).replace("{code}", code);
@@ -233,19 +233,8 @@ function getBookingConfirmationText(language: string | undefined, fullName: stri
   };
 }
 
-export async function sendBookingConfirmationEmail(recipientEmail: string | null | undefined, fullName: string, timeSpan: string, code: string, env: Env, language?: string): Promise<void> {
-  let content = getBookingConfirmationText(language, fullName, timeSpan, code);
-  if (recipientEmail !== null && recipientEmail !== undefined && recipientEmail.trim() !== "") {
-    await sendMail(
-        {
-          to: [{ email: recipientEmail, name: fullName }],
-          subject: content.subject,
-          text: content.text
-        },
-        env
-    );
-  }
-  content = getBookingConfirmationText("de", fullName, timeSpan, code);
+export async function sendBookingConfirmationEmail(fullName: string, timeSpan: string, code: string, env: EnvBoth): Promise<void> {
+  const content = getBookingConfirmationText("de", fullName, timeSpan, code);
   await sendMail(
       {
         to: [{ email: env.EMAIL_FROM, name: 'Razvan Matis' }],
@@ -256,7 +245,7 @@ export async function sendBookingConfirmationEmail(recipientEmail: string | null
   );
 }
 
-export async function sendErrorNotificationEmail(errorMessage: string, fullName: string, timeSpan: string, env: Env, code?: string): Promise<void> {
+export async function sendErrorNotificationEmail(errorMessage: string, fullName: string, timeSpan: string, env: EnvBoth, code?: string): Promise<void> {
   const now = new Date();
   const timestamp = now.toLocaleString("de-DE", {
     dateStyle: "short",
@@ -272,7 +261,7 @@ export async function sendErrorNotificationEmail(errorMessage: string, fullName:
   );
 }
 
-export async function sendGeneralMessageToAdmin(message: string, env: Env, useAsWarning = true): Promise<void> {
+export async function sendGeneralMessageToAdmin(message: string, env: EnvBoth, useAsWarning = true): Promise<void> {
   const now = new Date();
   const timestamp = now.toLocaleString("de-DE", {
     dateStyle: "short",

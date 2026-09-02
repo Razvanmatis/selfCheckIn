@@ -4,15 +4,15 @@ import "dotenv/config";
 import type { Env } from "./env.js";
 import {
   handler as defineKeypadCodeHandler
-} from "./defineKeypadCode.js";
+} from "./worker/src/defineKeypadCode.js";
 import { getCheckInInformation } from "./getCheckInInformation.js";
 import {
   handler as initiateCheckInProcessHandler
-} from "./initiateCheckInProcess.js";
-import {sendErrorNotificationEmail} from "./mailService.js";
+} from "./worker/src/initiateCheckInProcess.js";
+import {sendErrorNotificationEmail} from "./worker/src/mailService.js";
 import {seedKnowledge} from "./seedKnowledge.js";
 import {askKnowledge} from "./askKnowledge.js";
-import {deleteOldCodesHandler} from "./deleteOldCodes.js";
+import {deleteOldCodesHandler} from "./worker/src/deleteOldCodes.js";
 
 const app = express();
 const port = Number(process.env.PORT ?? 7071);

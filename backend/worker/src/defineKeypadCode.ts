@@ -1,4 +1,4 @@
-import {getAllOpenBookings, initiateCheckInProcess} from "./initiateCheckInProcess.js";
+import {getAllOpenBookings, initiateCheckInProcess, sendMessageToGuest} from "./initiateCheckInProcess.js";
 import {
     buildNukiCreatePayload,
     getExistingNameInitialsOfNukiAuthEntry,
@@ -8,12 +8,17 @@ import {
     isAdminRequest, normalizePhone,
     parseAndValidateDefineKeypadCodeRequest,
 } from "./validation.js";
-import type {Env} from "./env.js";
 import {NukiAuthEntry} from "./types/nukiAuthEntry.js";
 import {NukiCreateAuthPayload} from "./types/nukiCreateAuthPayload.js";
 import {DefineKeypadCodeRequest} from "./types/defineKeypadCodeRequest.js";
-import {sendBookingConfirmationEmail, sendErrorNotificationEmail} from "./mailService.js";
+import {
+    getBookingConfirmationText,
+    sendBookingConfirmationEmail,
+    sendErrorNotificationEmail,
+    sendGeneralMessageToAdmin
+} from "./mailService.js";
 import {SmoobuReservationsResponse} from "./types/smoobuReservationsResponse.js";
+import {EnvBoth} from "./envBoth";
 
 type LambdaLikeEvent = {
     body: string | null;
@@ -35,6 +40,7 @@ const textHeaders = {
 
 const retryDelayMs = 3000;
 const nukiBaseUrl = "https://api.nuki.io";
+const IS_ADMIN_NUMBER = 0;
 
 async function wait(ms: number): Promise<void> {
     const start = Date.now();
@@ -47,7 +53,7 @@ async function wait(ms: number): Promise<void> {
     }
 }
 
-export async function forceNukiSync(env: Env): Promise<void> {
+export async function forceNukiSync(env: EnvBoth): Promise<void> {
     for (let attempt = 0; attempt < 6; attempt += 1) {
         const response = await fetch(`${nukiBaseUrl}/smartlock/${env.NUKI_SMARTLOCK_ID}/sync`, {
             method: "POST",
@@ -67,7 +73,7 @@ export async function forceNukiSync(env: Env): Promise<void> {
     }
 }
 
-export async function getAllKeypadCodes(env: Env): Promise<NukiAuthEntry[]> {
+export async function getAllKeypadCodes(env: EnvBoth): Promise<NukiAuthEntry[]> {
     const response = await fetch(
         `${nukiBaseUrl}/smartlock/${env.NUKI_SMARTLOCK_ID}/auth?types=13`,
         {
@@ -86,7 +92,7 @@ export async function getAllKeypadCodes(env: Env): Promise<NukiAuthEntry[]> {
     return (await response.json()) as NukiAuthEntry[];
 }
 
-export async function deleteKeypadCode(entryId: string, env: Env): Promise<void> {
+export async function deleteKeypadCode(entryId: string, env: EnvBoth): Promise<void> {
     for (let attempt = 0; attempt < 6; attempt += 1) {
         const response = await fetch(`${nukiBaseUrl}/smartlock/${env.NUKI_SMARTLOCK_ID}/auth/${entryId}`, {
             method: "DELETE",
@@ -110,7 +116,7 @@ export async function deleteKeypadCode(entryId: string, env: Env): Promise<void>
     }
 }
 
-export async function createKeypadCode(payload: NukiCreateAuthPayload, env: Env): Promise<void> {
+export async function createKeypadCode(payload: NukiCreateAuthPayload, env: EnvBoth): Promise<void> {
     const expectedCode = String(payload.code);
     const expectedName = payload.name;
 
@@ -149,7 +155,7 @@ export async function createKeypadCode(payload: NukiCreateAuthPayload, env: Env)
     }
 }
 
-async function handleDeletionOfEntries(existingEntriesToDelete: NukiAuthEntry[], env: Env) {
+async function handleDeletionOfEntries(existingEntriesToDelete: NukiAuthEntry[], env: EnvBoth) {
     for (const entry of existingEntriesToDelete) {
         await deleteKeypadCode(entry.id, env);
         console.log(`Nuki-Code ${entry.code} entfernt: ${entry.name}`);
@@ -171,7 +177,7 @@ function getMatchedBookingOfList(allBookings: SmoobuReservationsResponse, reques
     });
 }
 
-async function getNameInitialsOfRequest(request: DefineKeypadCodeRequest, allBookings: SmoobuReservationsResponse, env: Env) {
+async function getNameInitialsOfRequest(request: DefineKeypadCodeRequest, allBookings: SmoobuReservationsResponse, env: EnvBoth) {
     const hasName = request.firstName.trim().length && request.lastName.trim().length;
     let nameCharacters = "";
     if (hasName) {
@@ -191,21 +197,21 @@ async function getNameInitialsOfRequest(request: DefineKeypadCodeRequest, allBoo
     return nameCharacters;
 }
 
-async function getMailOfGuest(request: DefineKeypadCodeRequest, allBookings: SmoobuReservationsResponse, env: Env) {
+async function getIdOfGuestBooking(request: DefineKeypadCodeRequest, allBookings: SmoobuReservationsResponse, env: EnvBoth) {
     if (isAdminRequest(request, env)) {
-        return env.EMAIL_FROM;
+        return 0;
     }
     const bookingMatch = getMatchedBookingOfList(allBookings, request);
     if (bookingMatch === undefined) {
-        console.log("Keine Buchung gefunden, um E-Mail-Adresse zu ermitteln.");
-        await sendErrorNotificationEmail(`Keine Buchung gefunden, um E-Mail-Adresse zu ermitteln. Ankunft: ${request.checkInDate},
+        console.log("Keine Buchung gefunden, um Buchungs-ID zu ermitteln.");
+        await sendErrorNotificationEmail(`Keine Buchung gefunden, um Buchungs-ID zu ermitteln. Ankunft: ${request.checkInDate},
              Abreise: ${request.checkOutDate}`, request.firstName + " " + request.lastName,
             `${request.checkInDate} - ${request.checkOutDate}`, env, request.pinCode);
     }
-    return bookingMatch?.email ?? "";
+    return bookingMatch?.id ?? 0;
 }
 
-async function getGuestName(request: DefineKeypadCodeRequest, allBookings: SmoobuReservationsResponse, env: Env) {
+async function getGuestName(request: DefineKeypadCodeRequest, allBookings: SmoobuReservationsResponse, env: EnvBoth) {
     if (isAdminRequest(request, env)) {
         return env.ADMIN_NAME;
     }
@@ -222,48 +228,42 @@ async function getGuestName(request: DefineKeypadCodeRequest, allBookings: Smoob
     return bookingMatch ? `${bookingMatch.firstname} ${bookingMatch.lastname}` : "NAME_NOT_FOUND";
 }
 
-async function sendConfirmationMail(request: DefineKeypadCodeRequest, allBookings: SmoobuReservationsResponse, env: Env, formattedDateAsName: string) {
-    const guestMail = await getMailOfGuest(request, allBookings, env);
+async function sendConfirmationMail(request: DefineKeypadCodeRequest, allBookings: SmoobuReservationsResponse, env: EnvBoth, formattedDateAsName: string) {
+    const bookingId = await getIdOfGuestBooking(request, allBookings, env);
     const guestName = await getGuestName(request, allBookings, env);
+    let content = getBookingConfirmationText(request.language, guestName, formattedDateAsName, request.pinCode);
+    if (bookingId !== IS_ADMIN_NUMBER) {
+        await sendMessageToGuest(bookingId, content.subject, content.text, env);
+    }
     await sendBookingConfirmationEmail(
-        guestMail,
         guestName,
         formattedDateAsName,
         request.pinCode,
         env,
-        request.language
     );
 }
 
 export async function defineKeypadCode(request: DefineKeypadCodeRequest,
-                                       env: Env): Promise<string> {
+                                       env: EnvBoth): Promise<string> {
     const checkInValidationResult = await initiateCheckInProcess(request, env);
-
     if (checkInValidationResult !== "OK") {
         return "validationError";
     }
-
     await forceNukiSync(env);
     console.log("Nuki-Sync erfolgreich durchgeführt.");
-
     const allCurrentKeypadCodes = await getAllKeypadCodes(env);
-
     let formattedDateAsName = getFormattedDateAsName(request.checkInDate, request.checkOutDate);
     const allBookings = await getAllOpenBookings(env);
     const requestNameInitials = "," + await getNameInitialsOfRequest(request, allBookings, env);
     let formattedDateAsNameWithInitials = `${formattedDateAsName}${requestNameInitials}`;
-
     const existingEntriesWithSameCodeAndName = allCurrentKeypadCodes.filter(
         (entry) => String(entry.code) === request.pinCode && entry.name === formattedDateAsNameWithInitials
     );
-
     if (existingEntriesWithSameCodeAndName.length > 0) {
         console.log(`Nuki-Code ${request.pinCode} bereits vorhanden: ${existingEntriesWithSameCodeAndName[0].name}`);
         return "OK";
     }
-
     const nukiPayload = buildNukiCreatePayload(request, env);
-
     const entriesToDeleteBecauseOfSameCode = allCurrentKeypadCodes.filter(
         (entry) => (String(entry.code) === request.pinCode && entry.name !== formattedDateAsNameWithInitials)
     );
@@ -290,16 +290,21 @@ export async function defineKeypadCode(request: DefineKeypadCodeRequest,
             await handleDeletionOfEntries(entriesToDeleteBecauseOfSameNameButDifferentCode, env);
         }
     }
-
     nukiPayload.name = formattedDateAsNameWithInitials;
     await createKeypadCode(nukiPayload, env);
     console.log(`Neuer Nuki-Code ${request.pinCode} gesetzt: ${formattedDateAsNameWithInitials}`);
-    await sendConfirmationMail(request, allBookings, env, formattedDateAsName);
+    try {
+        await sendConfirmationMail(request, allBookings, env, formattedDateAsName);
+    } catch (error) {
+        console.log(`Fehler beim Senden der Bestätigungs-E-Mail: ${error}`);
+        await sendGeneralMessageToAdmin(`Fehler beim Senden der Bestätigungs-E-Mail: ${error}`, env);
+        return "OK, aber Bestätigungs-E-Mail konnte nicht gesendet werden.";
+    }
     return "OK";
 }
 
 export async function handler(event: LambdaLikeEvent,
-                              env: Env): Promise<LambdaLikeResponse> {
+                              env: EnvBoth): Promise<LambdaLikeResponse> {
     let payload;
     try {
         payload = parseAndValidateDefineKeypadCodeRequest(event.body);

@@ -1,8 +1,8 @@
-import type { Env } from "./env.js";
 import {DefineKeypadCodeRequest} from "./types/defineKeypadCodeRequest.js";
 import {CheckInLookupPayload} from "./types/checkInLookupPayload.js";
 import {NukiCreateAuthPayload} from "./types/nukiCreateAuthPayload.js";
 import {NukiAuthEntry} from "./types/nukiAuthEntry.js";
+import {EnvBoth} from "./envBoth";
 
 function toLocalInputDate(date: Date): string {
   const localTime = new Date(date.getTime() - date.getTimezoneOffset() * 60_000);
@@ -109,7 +109,7 @@ export function parseAndValidateCheckInLookupPayload(body: string | null): Check
   return validateCheckInLookupPayload(parsed);
 }
 
-export function isAdminRequest(request: CheckInLookupPayload | DefineKeypadCodeRequest, env: Env) {
+export function isAdminRequest(request: CheckInLookupPayload | DefineKeypadCodeRequest, env: EnvBoth) {
   return request.firstName === env.ADMIN_NAME && request.lastName === env.ADMIN_NAME;
 }
 
@@ -210,7 +210,7 @@ export function getFormattedDateAsName(checkInDate: string, checkOutDate: string
 }
 
 export function buildNukiCreatePayload(payload: DefineKeypadCodeRequest,
-                                env: Env): NukiCreateAuthPayload {
+                                env: EnvBoth): NukiCreateAuthPayload {
   return {
     name: "WILL BE DEFINED!",
     allowedFromDate: `${payload.checkInDate}T13:00:00.000Z`,
