@@ -25,5 +25,13 @@
 			"id": "2378b10eb26e44389c54217c4fe4e8dc",
 			"remote": true
 		}
+	],
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "selfcheckin-db",
+			"database_id": "f2c370a6-4019-4c94-8b8e-40c03f015ed5",
+			"remote": true
+		}
 	]
 }

@@ -1,11 +1,9 @@
-import {isAdminRequest, normalizePhone, parseAndValidateCheckInLookupPayload} from "./validation.js";
 import {CheckInLookupPayload} from "./types/checkInLookupPayload.js";
-import {sendErrorNotificationEmail} from "./mailService.js";
 import {SmoobuReservationsResponse} from "./types/smoobuReservationsResponse.js";
-import {getSmoobuHeaders} from "./smoobuSignature.js";
-import {EnvBoth} from "./envBoth";
-import {getAllReservationsFromDb} from "./dbService";
-import {Env} from "./env";
+import {EnvBoth} from "./worker/src/envBoth.js";
+import {getSmoobuHeaders} from "./worker/src/smoobuSignature.js";
+import {isAdminRequest, normalizePhone, parseAndValidateCheckInLookupPayload} from "./worker/src/validation.js";
+import {sendErrorNotificationEmail} from "./worker/src/mailService.js";
 
 type LambdaLikeEvent = {
   body: string | null;
@@ -73,18 +71,6 @@ export async function sendMessageToGuest(reservationId: number, header: string, 
 }
 
 export async function getAllOpenBookings(env: EnvBoth) {
-  try {
-    const result = await getAllBookingsBySmoobu(env);
-    if (!result || !result.bookings || result.bookings.length === 0) {
-      throw new Error("Keine offenen Buchungen gefunden!");
-    }
-    return result;
-  } catch (error) {
-    return await getAllReservationsFromDb(env as Env);
-  }
-}
-
-export async function getAllBookingsBySmoobu(env: EnvBoth) {
   const response = await fetch(smoobuReservationsUrl, {
     method: "GET",
     headers: await getSmoobuHeaders(env, "GET", smoobuReservationsUrl),
@@ -102,7 +88,7 @@ export async function getAllBookingsBySmoobu(env: EnvBoth) {
 
 export async function initiateCheckInProcess(
   request: CheckInLookupPayload,
-  env: EnvBoth | Env,
+  env: EnvBoth
 ): Promise<string> {
 
   if (isAdminRequest(request, env)) {
@@ -111,14 +97,14 @@ export async function initiateCheckInProcess(
 
   let data;
   try {
-    data = await getAllOpenBookings(env as Env);
+    data = await getAllOpenBookings(env);
   } catch (error) {
     await sendErrorNotificationEmail(error instanceof Error ? error.message : String(error),
         request.firstName + " " + request.lastName, `${request.checkInDate} - ${request.checkOutDate}`, env);
     throw error;
   }
 
-  if (!data || !data.bookings || data.bookings.length === 0) {
+  if (data.bookings.length === 0) {
     await sendErrorNotificationEmail("Keine offenen Buchungen gefunden!",
         request.firstName + " " + request.lastName, `${request.checkInDate} - ${request.checkOutDate}`, env);
     return "validationError";

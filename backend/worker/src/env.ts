@@ -6,8 +6,10 @@ export interface Env {
     ADMIN_NAME: string;
     BREVO_API_KEY: string;
     EMAIL_FROM: string;
+    SMOOBU_WEBHOOK_TOKEN: string;
     ASSETS: Fetcher;
     AI: Ai;
     APARTMENT_KNOWLEDGE: VectorizeIndex;
     PROMPTS: KVNamespace;
+    DB: D1Database;
 }

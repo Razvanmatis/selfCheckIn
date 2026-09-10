@@ -9,6 +9,9 @@ import { seedKnowledge } from "./seedKnowledge";
 import { askKnowledge } from "./askKnowledge";
 import {sendGeneralMessageToAdmin} from "./mailService";
 import {deleteOldCodesHandler} from "./deleteOldCodes";
+import {handleSmoobuWebhook} from "./smoobuWebhookService";
+import {timingSafeEqual} from "node:crypto";
+import {deleteExpiredReservations, initWholeDatabase} from "./dbService";
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -171,6 +174,7 @@ app.post("/api/deleteOldCodes", async (c) => {
 			);
 		}
 
+		await deleteExpiredReservations(c.env);
 		const answer = await deleteOldCodesHandler(
 			{ body: adminUser },
 			c.env
@@ -186,6 +190,62 @@ app.post("/api/deleteOldCodes", async (c) => {
 				: "Unbekannter Fehler beim Löschen der alten Codes.";
 		await sendGeneralMessageToAdmin(
 			`Fehler beim Löschen der alten Codes: ${message}`,
+			c.env
+		);
+		return c.json({ message }, 500);
+	}
+});
+
+app.post("/api/smoobu/webhook", async (c) => {
+	try {
+		const token = c.req.query("token");
+		if (token !== c.env.SMOOBU_WEBHOOK_TOKEN) {
+			return c.json({ error: "Unauthorized" }, 401);
+		}
+
+		const body = await c.req.json();
+		const answer = await handleSmoobuWebhook(
+			c.env,
+			body
+		);
+
+		return c.json({
+			answer
+		});
+	} catch (error) {
+		const message =
+			error instanceof Error
+				? error.message
+				: "Unbekannter Fehler beim Bearbeiten des Smoobu-Webhooks.";
+		await sendGeneralMessageToAdmin(
+			`Fehler beim Bearbeiten des Smoobu-Webhooks: ${message}`,
+			c.env
+		);
+		return c.json({ message }, 500);
+	}
+});
+
+app.post("/api/smoobu/initWholeDatabase", async (c) => {
+	try {
+		const token = c.req.query("token");
+		if (token !== c.env.SMOOBU_WEBHOOK_TOKEN) {
+			return c.json({ error: "Unauthorized" }, 401);
+		}
+
+		const answer = await initWholeDatabase(
+			c.env
+		);
+
+		return c.json({
+			answer
+		});
+	} catch (error) {
+		const message =
+			error instanceof Error
+				? error.message
+				: "Unbekannter Fehler beim Initialisieren der Datenbank.";
+		await sendGeneralMessageToAdmin(
+			`Fehler beim Initialisieren der Datenbank: ${message}`,
 			c.env
 		);
 		return c.json({ message }, 500);

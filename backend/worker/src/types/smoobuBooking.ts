@@ -5,5 +5,4 @@ export type SmoobuBooking = {
     arrival: string;
     departure: string;
     phone: string | null;
-    email: string;
 };

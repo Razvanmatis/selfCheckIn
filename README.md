@@ -225,3 +225,24 @@ Auf cloudflare.com unter Storage & Databases → Workers KV → PROMPTS → KV P
 
 ## Erreichbarkeit der Produktiv-UI
 Die UI ist aktuell erreichbar unter: https://ui.raz-check-in.workers.dev
+
+## D1 Datenbank
+Migration lokal ausführen:
+```bash
+cd backend/worker
+npx wrangler d1 migrations apply selfcheckin-db --local
+```
+Prüfen ob Tabelle angelegt wurde:
+```bash
+npx wrangler d1 execute selfcheckin-db --local --command "SELECT name FROM sqlite_master WHERE type='table'"
+```
+Migration für PROD:
+```bash
+npx wrangler d1 migrations apply selfcheckin-db --remote
+```
+Ausgabe von der Tabelle in PROD:
+```bash
+npx wrangler d1 execute selfcheckin-db --remote --command "SELECT * FROM reservations"
+```
+## Komplette Datenbank neu befüllen
+Die Adresse https://selfcheckin.raz-check-in.workers.dev/api/smoobu/initWholeDatabase aufrufen und den SMOOBU_TOKEN als Query-Parameter `token` mitgeben, dann werden alle Daten aus Smoobu in die D1-Datenbank geschrieben.

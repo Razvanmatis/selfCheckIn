@@ -1,6 +1,6 @@
 import {sendGeneralMessageToAdmin} from "./mailService.js";
 import {createKeypadCode, deleteKeypadCode, forceNukiSync, getAllKeypadCodes} from "./defineKeypadCode.js";
-import {getAllOpenBookings} from "./initiateCheckInProcess.js";
+import {getAllBookingsBySmoobu, getAllOpenBookings} from "./initiateCheckInProcess.js";
 import {SmoobuBooking} from "./types/smoobuBooking.js";
 import {NukiCreateAuthPayload} from "./types/nukiCreateAuthPayload.js";
 import {formatDateToDayMonth} from "./validation.js";
@@ -110,7 +110,7 @@ async function createNewCodesForRemainingUsers(listWithNewCodesToCreate: NukiCre
 }
 
 async function deleteAllOldCodes(env: EnvBoth) {
-    const allActiveBookings = await getAllOpenBookings(env);
+    const allActiveBookings = await getAllBookingsBySmoobu(env);
     await forceNukiSync(env);
     const allActiveCodes = await getAllKeypadCodes(env);
     const now = new Date();

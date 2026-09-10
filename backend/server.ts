@@ -8,9 +8,8 @@ import {
 import { getCheckInInformation } from "./getCheckInInformation.js";
 import {
   handler as initiateCheckInProcessHandler
-} from "./worker/src/initiateCheckInProcess.js";
+} from "./initiateCheckInProcess.js";
 import {sendErrorNotificationEmail} from "./worker/src/mailService.js";
-import {seedKnowledge} from "./seedKnowledge.js";
 import {askKnowledge} from "./askKnowledge.js";
 import {deleteOldCodesHandler} from "./worker/src/deleteOldCodes.js";
 
@@ -24,7 +23,7 @@ const env: Env = {
   NUKI_SMARTLOCK_ID: process.env.NUKI_SMARTLOCK_ID!,
   ADMIN_NAME: process.env.ADMIN_NAME!,
   BREVO_API_KEY: process.env.BREVO_API_KEY!,
-  EMAIL_FROM: process.env.EMAIL_FROM!
+  EMAIL_FROM: process.env.EMAIL_FROM!,
 };
 
 app.use(cors());
@@ -79,11 +78,6 @@ app.post("/api/getCheckInInformation", async (req, res) => {
         : "Unbekannter Fehler beim Laden der Check-In Instruktionen.";
     res.status(400).json({ message });
   }
-});
-
-app.post("/api/ai/seed-knowledge", async (req, res) => {
-  const result = await seedKnowledge(env);
-  res.status(200).send(result);
 });
 
 app.post("/api/ai/ask", async (req, res) => {
