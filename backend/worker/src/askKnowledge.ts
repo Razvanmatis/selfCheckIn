@@ -104,12 +104,14 @@ export async function askKnowledge(
             score: match.score
         }))
     );
+    let alreadySentAdminMessage = false;
     if (
         !results.matches ||
         results.matches.length === 0 ||
         results.matches[0].score <= 0.44
     ) {
         await sendGeneralMessageToAdmin(`Nur niedrigen Max-Score: ${results.matches[0]?.score} zur Frage "${payload.question}" gefunden.`, env);
+        alreadySentAdminMessage = true;
     }
     // 4. LLM mit Frage + Kontext aufrufen
     const response = await env.AI.run(
@@ -134,7 +136,7 @@ export async function askKnowledge(
             "Das LLM hat keine gültige Textantwort zurückgegeben."
         );
     }
-    if (response.response.toLowerCase().trim() === "no_knowledge_available") {
+    if (response.response.toLowerCase().trim() === "no_knowledge_available" && !alreadySentAdminMessage) {
         await sendGeneralMessageToAdmin(`Keine passenden Informationen zur Frage "${payload.question}" gefunden.`, env);
     }
     return response.response;
