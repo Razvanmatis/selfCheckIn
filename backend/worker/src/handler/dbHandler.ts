@@ -1,9 +1,9 @@
-import {WebhookReservation} from "./types/webhookReservation";
-import {DbReservationEntry} from "./types/dbReservationEntry";
-import {sendGeneralMessageToAdmin} from "./mailService";
-import {Env} from "./env";
-import {getAllBookingsBySmoobu} from "./initiateCheckInProcess";
-import {SmoobuReservationsResponse} from "./types/smoobuReservationsResponse";
+import {WebhookReservation} from "../types/webhookReservation";
+import {DbReservationEntry} from "../types/dbReservationEntry";
+import {sendGeneralMessageToAdmin} from "../services/mailService";
+import {Env} from "../types/env";
+import {SmoobuReservationsResponse} from "../types/smoobuReservationsResponse";
+import {getAllBookingsBySmoobu} from "./smoobuHandler";
 
 export async function createReservation(
     env: Env,
@@ -94,58 +94,6 @@ export async function deleteReservation(
     }
     return entryDeleted;
 }
-
-// export async function existsReservation(
-//     env: Env,
-//     firstname: string,
-//     lastname: string,
-//     phone: string,
-//     checkInDate: string,
-//     checkOutDate: string
-// ): Promise<boolean> {
-//     const hasName = firstname.trim().length > 0 && lastname.trim().length > 0;
-//     const hasPhone = phone.trim().length > 0;
-//     if (hasName) {
-//         const result = await env.DB
-//             .prepare(`
-//                 SELECT 1
-//                 FROM reservations
-//                 WHERE LOWER(TRIM(firstname)) = LOWER(TRIM(?))
-//                   AND LOWER(TRIM(lastname)) = LOWER(TRIM(?))
-//                   AND arrival = ?
-//                   AND departure = ?
-//                     LIMIT 1
-//             `)
-//             .bind(
-//                 firstname,
-//                 lastname,
-//                 checkInDate,
-//                 checkOutDate
-//             )
-//             .first();
-//         return result !== null;
-//     }
-//     if (hasPhone) {
-//         const normalizedPhone = normalizePhone(phone);
-//         const result = await env.DB
-//             .prepare(`
-//                 SELECT 1
-//                 FROM reservations
-//                 WHERE arrival = ?
-//                   AND departure = ?
-//                   AND phone = ?
-//                     LIMIT 1
-//             `)
-//             .bind(
-//                 checkInDate,
-//                 checkOutDate,
-//                 normalizedPhone
-//             )
-//             .first();
-//         return result !== null;
-//     }
-//     return false;
-// }
 
 export async function initWholeDatabase(env: Env) {
     try {

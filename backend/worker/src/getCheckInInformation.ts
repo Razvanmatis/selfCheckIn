@@ -1,7 +1,7 @@
 import { initiateCheckInProcess } from "./initiateCheckInProcess";
-import type { Env } from "./env";
+import type { Env } from "./types/env";
 import {CheckInLookupPayload} from "./types/checkInLookupPayload";
-import {sendErrorNotificationEmail} from "./mailService";
+import {sendErrorNotificationEmail} from "./services/mailService";
 
 export async function getCheckInInformation(
     request: CheckInLookupPayload,

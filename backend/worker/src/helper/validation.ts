@@ -1,8 +1,9 @@
-import {DefineKeypadCodeRequest} from "./types/defineKeypadCodeRequest.js";
-import {CheckInLookupPayload} from "./types/checkInLookupPayload.js";
-import {NukiCreateAuthPayload} from "./types/nukiCreateAuthPayload.js";
-import {NukiAuthEntry} from "./types/nukiAuthEntry.js";
-import {EnvBoth} from "./envBoth";
+import {DefineKeypadCodeRequest} from "../types/defineKeypadCodeRequest.js";
+import {CheckInLookupPayload} from "../types/checkInLookupPayload.js";
+import {NukiCreateAuthPayload} from "../types/nukiCreateAuthPayload.js";
+import {NukiAuthEntry} from "../types/nukiAuthEntry.js";
+import {EnvBoth} from "../types/envBoth";
+import {SmoobuReservationsResponse} from "../types/smoobuReservationsResponse";
 
 function toLocalInputDate(date: Date): string {
   const localTime = new Date(date.getTime() - date.getTimezoneOffset() * 60_000);
@@ -109,7 +110,7 @@ export function parseAndValidateCheckInLookupPayload(body: string | null): Check
   return validateCheckInLookupPayload(parsed);
 }
 
-export function isAdminRequest(request: CheckInLookupPayload | DefineKeypadCodeRequest, env: EnvBoth) {
+export function isAdminRequest(request: CheckInLookupPayload | DefineKeypadCodeRequest, env: EnvBoth): boolean {
   return request.firstName === env.ADMIN_NAME && request.lastName === env.ADMIN_NAME;
 }
 
@@ -227,7 +228,7 @@ export function buildNukiCreatePayload(payload: DefineKeypadCodeRequest,
   };
 }
 
-export function getExistingNameInitialsOfNukiAuthEntry(nukiAuthEntry: NukiAuthEntry) {
+export function getExistingNameInitialsOfNukiAuthEntry(nukiAuthEntry: NukiAuthEntry): string {
   const nameParts = nukiAuthEntry.name.split(",");
   let existingNameInitials = ",XX";
   if (nameParts.length > 1) {
@@ -241,6 +242,57 @@ export function getExistingNameInitialsOfNukiAuthEntry(nukiAuthEntry: NukiAuthEn
   return existingNameInitials;
 }
 
-export function normalizePhone(value: string | null | undefined): string {
-  return (value ?? "").replace(/\D/g, "");
+export function normalizePhone(
+    value: string | null | undefined
+): string {
+  if (!value) {
+    return "";
+  }
+  let phone = value.replace(/\D/g, "");
+  // 00xx → +xx
+  if (phone.startsWith("00")) {
+    phone = phone.substring(2);
+  }
+  // Internationale Schreibweise: führende 49 entfernen
+  if (phone.startsWith("49")) {
+    phone = phone.substring(2);
+  }
+  // Nationale Schreibweise: führende 0 entfernen
+  if (phone.startsWith("0")) {
+    phone = phone.substring(1);
+  }
+  return phone;
+}
+
+export function checkForBookingMatchByNameOrPhone(request: CheckInLookupPayload, data: SmoobuReservationsResponse): boolean {
+  const hasName = request.firstName.trim().length && request.lastName.trim().length;
+  const hasPhone = request.phone.trim().length;
+  let matchingBooking;
+  if (hasName) {
+    // Search by name
+    const normalizedFirstName = request.firstName.trim().toLowerCase();
+    const normalizedLastName = request.lastName.trim().toLowerCase();
+
+    matchingBooking = data.bookings.find((booking) => {
+      return (
+          booking.firstname.trim().toLowerCase() === normalizedFirstName &&
+          booking.lastname.trim().toLowerCase() === normalizedLastName &&
+          booking.arrival === request.checkInDate &&
+          booking.departure === request.checkOutDate
+      );
+    });
+  } else if (hasPhone) {
+    // Search by phone number - normalize by keeping only digits
+    const normalizedPhone = normalizePhone(request.phone);
+
+    matchingBooking = data.bookings.find((booking) => {
+      const bookingPhone = normalizePhone(booking.phone);
+      return (
+          bookingPhone === normalizedPhone &&
+          booking.arrival === request.checkInDate &&
+          booking.departure === request.checkOutDate
+      );
+    });
+  }
+  return !!matchingBooking;
 }

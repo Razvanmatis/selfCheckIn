@@ -8,8 +8,8 @@ import {
 import { getCheckInInformation } from "./getCheckInInformation.js";
 import {
   handler as initiateCheckInProcessHandler
-} from "./initiateCheckInProcess.js";
-import {sendErrorNotificationEmail} from "./worker/src/mailService.js";
+} from "./worker/src/initiateCheckInProcess.js";
+import {sendErrorNotificationEmail} from "./worker/src/services/mailService";
 import {askKnowledge} from "./askKnowledge.js";
 import {deleteOldCodesHandler} from "./worker/src/deleteOldCodes.js";
 

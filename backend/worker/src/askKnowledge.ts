@@ -1,5 +1,5 @@
-import type {Env} from "./env";
-import {sendGeneralMessageToAdmin} from "./mailService";
+import type {Env} from "./types/env";
+import {sendGeneralMessageToAdmin} from "./services/mailService";
 
 type AskKnowledgeRequest = { question: string; language?: string; };
 

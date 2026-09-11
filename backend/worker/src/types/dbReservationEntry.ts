@@ -1,5 +1,5 @@
 import {WebhookReservation} from "./webhookReservation";
-import {normalizePhone} from "../validation";
+import {normalizePhone} from "../helper/validation";
 
 export class DbReservationEntry {
     created_at: string;

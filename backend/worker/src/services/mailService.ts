@@ -1,4 +1,5 @@
-import {EnvBoth} from "./envBoth";
+import {EnvBoth} from "../types/envBoth";
+import {sendMail} from "../handler/mailHandler";
 
 export type MailRecipient =
     | string
@@ -14,108 +15,6 @@ export type SendMailInput = {
     html?: string;
     replyTo?: string;
 };
-
-function normalizeRecipients(recipients: MailRecipient[]) {
-    if (!recipients.length) {
-        throw new Error("At least one recipient is required.");
-    }
-
-    return recipients.map((recipient) => {
-        if (typeof recipient === "string") {
-            const email = recipient.trim();
-
-            if (!email) {
-                throw new Error("Recipient email is required.");
-            }
-
-            return {email};
-        }
-
-        if (!recipient.email?.trim()) {
-            throw new Error("Recipient email is required.");
-        }
-
-        return {
-            email: recipient.email.trim(),
-            ...(recipient.name?.trim()
-                ? {name: recipient.name.trim()}
-                : {})
-        };
-    });
-}
-
-async function sendMail(
-    input: SendMailInput,
-    env: EnvBoth
-): Promise<{ messageId?: string; status: "sent" }> {
-    const apiKey = env.BREVO_API_KEY?.trim();
-    const from = env.EMAIL_FROM?.trim();
-
-    if (!apiKey) {
-        throw new Error("Missing Brevo configuration: BREVO_API_KEY is required.");
-    }
-
-    if (!from) {
-        throw new Error("Missing sender configuration: EMAIL_FROM is required.");
-    }
-
-    if (!input.subject?.trim()) {
-        throw new Error("Email subject is required.");
-    }
-
-    if (!input.text?.trim() && !input.html?.trim()) {
-        throw new Error("Email must contain either text or HTML content.");
-    }
-
-    const body = {
-        sender: {
-            email: from,
-            name: "Raz Check-In"
-        },
-        to: normalizeRecipients(input.to),
-        subject: input.subject.trim(),
-        ...(input.text?.trim()
-            ? {textContent: input.text.trim()}
-            : {}),
-        ...(input.html?.trim()
-            ? {htmlContent: input.html.trim()}
-            : {}),
-        ...(input.replyTo?.trim()
-            ? {
-                replyTo: {
-                    email: input.replyTo.trim()
-                }
-            }
-            : {})
-    };
-
-    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
-        method: "POST",
-        headers: {
-            accept: "application/json",
-            "api-key": apiKey,
-            "content-type": "application/json"
-        },
-        body: JSON.stringify(body)
-    });
-
-    if (!response.ok) {
-        const errorBody = await response.text();
-
-        throw new Error(
-            `Brevo API request failed (${response.status}): ${errorBody}`
-        );
-    }
-
-    const result = (await response.json()) as {
-        messageId?: string;
-    };
-
-    return {
-        messageId: result.messageId,
-        status: "sent"
-    };
-}
 
 const bookingConfirmationTemplates: Record<string, {
     subject: string;
@@ -245,7 +144,6 @@ const bookingConfirmationTemplates: Record<string, {
     }
 };
 
-
 export function getBookingConfirmationText(language: string | undefined, fullName: string, timeSpan: string, code: string): {
     subject: string;
     text: string
@@ -260,7 +158,7 @@ export function getBookingConfirmationText(language: string | undefined, fullNam
     };
 }
 
-export async function sendBookingConfirmationEmail(fullName: string, timeSpan: string, code: string, env: EnvBoth): Promise<void> {
+export async function sendBookingConfirmationEmailToAdmin(fullName: string, timeSpan: string, code: string, env: EnvBoth): Promise<void> {
     const content = getBookingConfirmationText("de", fullName, timeSpan, code);
     await sendMail(
         {

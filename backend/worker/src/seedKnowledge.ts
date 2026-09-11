@@ -1,5 +1,5 @@
-import type { Env } from "./env";
-import { knowledge } from "./knowledge";
+import type { Env } from "./types/env";
+import { knowledge } from "./aiknowledge/knowledge";
 
 export async function seedKnowledge(env: Env): Promise<void> {
     for (const entry of knowledge) {

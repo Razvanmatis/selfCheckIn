@@ -1,10 +1,10 @@
-import {sendGeneralMessageToAdmin} from "./mailService.js";
-import {createKeypadCode, deleteKeypadCode, forceNukiSync, getAllKeypadCodes} from "./defineKeypadCode.js";
-import {getAllBookingsBySmoobu, getAllOpenBookings} from "./initiateCheckInProcess.js";
+import {sendGeneralMessageToAdmin} from "./services/mailService.js";
 import {SmoobuBooking} from "./types/smoobuBooking.js";
 import {NukiCreateAuthPayload} from "./types/nukiCreateAuthPayload.js";
-import {formatDateToDayMonth} from "./validation.js";
-import {EnvBoth} from "./envBoth";
+import {formatDateToDayMonth} from "./helper/validation.js";
+import {EnvBoth} from "./types/envBoth";
+import {createKeypadCode, deleteKeypadCode, forceNukiSync, getAllKeypadCodes} from "./handler/nukiHandler";
+import {getAllBookingsBySmoobu} from "./handler/smoobuHandler";
 
 type LambdaLikeEvent = {
     body: string | null;

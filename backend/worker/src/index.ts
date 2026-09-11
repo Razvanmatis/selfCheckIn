@@ -1,17 +1,17 @@
 import { Hono } from "hono";
-import type { Env } from "./env";
+import type { Env } from "./types/env";
 import { initiateCheckInProcess } from "./initiateCheckInProcess";
-import { parseAndValidateCheckInLookupPayload } from "./validation";
+import { parseAndValidateCheckInLookupPayload } from "./helper/validation";
 import { defineKeypadCode } from "./defineKeypadCode";
 import { getCheckInInformation } from "./getCheckInInformation";
 import { cors } from "hono/cors";
 import { seedKnowledge } from "./seedKnowledge";
 import { askKnowledge } from "./askKnowledge";
-import {sendGeneralMessageToAdmin} from "./mailService";
+import {sendGeneralMessageToAdmin} from "./services/mailService";
 import {deleteOldCodesHandler} from "./deleteOldCodes";
-import {handleSmoobuWebhook} from "./smoobuWebhookService";
+import {handleSmoobuWebhook} from "./handleSmoobuWebhooks";
 import {timingSafeEqual} from "node:crypto";
-import {deleteExpiredReservations, initWholeDatabase} from "./dbService";
+import {deleteExpiredReservations, initWholeDatabase} from "./handler/dbHandler";
 
 const app = new Hono<{ Bindings: Env }>();
 

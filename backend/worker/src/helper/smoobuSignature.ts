@@ -1,4 +1,4 @@
-import {EnvBoth} from "./envBoth";
+import {EnvBoth} from "../types/envBoth";
 
 export async function getSmoobuHeaders(env: EnvBoth, method: string, path: string, body?: string) {
     const timestamp = new Date().toISOString();

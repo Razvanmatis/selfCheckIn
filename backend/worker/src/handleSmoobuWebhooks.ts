@@ -1,7 +1,7 @@
 import {WebhookReservation} from "./types/webhookReservation";
-import {Env} from "./env";
-import {createReservation, deleteReservation, updateReservation} from "./dbService";
-import {sendGeneralMessageToAdmin} from "./mailService";
+import {Env} from "./types/env";
+import {createReservation, deleteReservation, updateReservation} from "./handler/dbHandler";
+import {sendGeneralMessageToAdmin} from "./services/mailService";
 
 export async function handleSmoobuWebhook(env: Env, requestBody: any) {
     if (!isWebhookReservation(requestBody)) {
