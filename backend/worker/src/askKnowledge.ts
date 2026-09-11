@@ -134,5 +134,8 @@ export async function askKnowledge(
             "Das LLM hat keine gültige Textantwort zurückgegeben."
         );
     }
+    if (response.response.toLowerCase().trim() === "no_knowledge_available") {
+        await sendGeneralMessageToAdmin(`Keine passenden Informationen zur Frage "${payload.question}" gefunden.`, env);
+    }
     return response.response;
 }
