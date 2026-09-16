@@ -12,6 +12,11 @@ import {deleteOldCodesHandler} from "./deleteOldCodes";
 import {handleSmoobuWebhook} from "./handleSmoobuWebhooks";
 import {timingSafeEqual} from "node:crypto";
 import {deleteExpiredReservations, initWholeDatabase} from "./handler/dbHandler";
+import {informAllGuestsAboutCheckIn} from "./services/whatsappService";
+import {runScheduledTasks} from "./services/scheduledService";
+import {WhatsAppWebhookPayload} from "./types/whatsAppWebhookPayload";
+import {handleWhatsAppWebhookMessage} from "./services/whatsAppWebhookService";
+import {verifyWhatsAppSignature} from "./helper/whatsAppSignature";
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -226,6 +231,7 @@ app.post("/api/smoobu/webhook", async (c) => {
 });
 
 app.post("/api/smoobu/initWholeDatabase", async (c) => {
+	console.log("Received request to initialize the whole database");
 	try {
 		const token = c.req.query("token");
 		if (token !== c.env.SMOOBU_WEBHOOK_TOKEN) {
@@ -252,4 +258,69 @@ app.post("/api/smoobu/initWholeDatabase", async (c) => {
 	}
 });
 
-export default app;
+app.get("/api/whatsapp/webhook", async (c) => {
+	const mode = c.req.query("hub.mode");
+	const token = c.req.query("hub.verify_token");
+	const challenge = c.req.query("hub.challenge");
+	console.log("Received WhatsApp webhook verification request", { mode, token, challenge });
+	if (
+		mode === "subscribe" &&
+		token === c.env.SMOOBU_WEBHOOK_TOKEN
+	) {
+		return c.text(challenge ?? "", 200);
+	}
+
+	return c.text("Forbidden", 403);
+});
+
+app.post("/api/whatsapp/webhook", async (c) => {
+	try {
+		console.log("Received WhatsApp webhook event", await c.req.text());
+		const signature = c.req.header("X-Hub-Signature-256");
+		if (!signature) {
+			return c.text("Missing signature", 401);
+		}
+		const rawBody = await c.req.text();
+		const isValid = await verifyWhatsAppSignature(
+			rawBody,
+			signature,
+			c.env.WHATSAPP_SECRET
+		);
+		if (!isValid) {
+			return c.text("Invalid signature", 401);
+		}
+		const body = JSON.parse(rawBody);
+		const message = body.entry?.[0]?.changes?.[0]?.value?.messages?.[0];
+		if (message?.type === "text") {
+			const phone = message.from;
+			const text = message.text?.body;
+			await handleWhatsAppWebhookMessage(c.env, phone, text ?? "");
+		}
+		return c.text("EVENT_RECEIVED", 200);
+	} catch (error) {
+		const message =
+			error instanceof Error
+				? error.message
+				: "Unbekannter Fehler beim Verarbeiten des WhatsApp-Webhooks.";
+		await sendGeneralMessageToAdmin(
+			`Fehler beim Verarbeiten des WhatsApp-Webhooks: ${message}`,
+			c.env
+		);
+		return c.json({ message }, 500);
+	}
+});
+
+export default {
+	fetch: app.fetch,
+
+	async scheduled(
+		controller: ScheduledController,
+		env: Env,
+		ctx: ExecutionContext
+	) {
+		if (controller.cron !== "0 2 * * *") {
+			return;
+		}
+		await runScheduledTasks(env);
+	}
+} satisfies ExportedHandler<Env>;

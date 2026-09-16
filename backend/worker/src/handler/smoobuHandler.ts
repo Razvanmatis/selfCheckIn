@@ -4,7 +4,7 @@ import {SmoobuReservationsResponse} from "../types/smoobuReservationsResponse";
 
 const smoobuSendMessageUrl = "https://login.smoobu.com/api/reservations/{reservationId}/messages/send-message-to-guest";
 
-export async function sendMessageToGuest(reservationId: number, header: string, message: string, env: EnvBoth) {
+export async function sendMessageToGuestBySmoobu(reservationId: number, header: string, message: string, env: EnvBoth) {
     const url = smoobuSendMessageUrl.replace("{reservationId}", reservationId.toString());
     const body = JSON.stringify({
         subject: header,

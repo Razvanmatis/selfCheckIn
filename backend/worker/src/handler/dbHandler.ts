@@ -150,6 +150,42 @@ export async function deleteExpiredReservations(env: Env): Promise<number> {
         .bind(today)
         .run();
     const changes = result.meta.changes;
-    await sendGeneralMessageToAdmin(`Es wurden ${changes} abgelaufene Reservierungen gelöscht.`, env, false);
+    if (changes > 0) {
+        await sendGeneralMessageToAdmin(`Es wurden ${changes} abgelaufene Reservierungen gelöscht.`, env, false);
+    }
     return changes;
+}
+
+export async function getAllReservationsWithinNextFiveDays(env: Env): Promise<DbReservationEntry[]> {
+    const result = await env.DB.prepare(`
+        SELECT *
+        FROM reservations
+        WHERE arrival BETWEEN date('now') AND date('now', '+5 days')
+    `)
+    .all<DbReservationEntry>();
+    return result.results.map(row => ({
+        ...row,
+        whatsapp_status: row.whatsapp_status ?? "message_not_sent"
+    })).filter(entry => entry.whatsapp_status === "message_not_sent");
+}
+
+export async function markWhatsAppMessagesAsSent(
+    env: Env,
+    reservations: DbReservationEntry[]
+): Promise<void> {
+    await Promise.all(
+        reservations.map(reservation =>
+            env.DB.prepare(`
+                UPDATE reservations
+                SET whatsapp_status = 'message_sent',
+                    updated_at = ?
+                WHERE smoobu_booking_id = ?
+            `)
+                .bind(
+                    new Date().toISOString(),
+                    reservation.smoobu_booking_id
+                )
+                .run()
+        )
+    );
 }

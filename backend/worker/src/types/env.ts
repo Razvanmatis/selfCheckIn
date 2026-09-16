@@ -7,6 +7,9 @@ export interface Env {
     BREVO_API_KEY: string;
     EMAIL_FROM: string;
     SMOOBU_WEBHOOK_TOKEN: string;
+    WHATSAPP_API_TOKEN: string;
+    WHATSAPP_PHONE_NUMBER_ID: string;
+    WHATSAPP_SECRET: string;
     ASSETS: Fetcher;
     AI: Ai;
     APARTMENT_KNOWLEDGE: VectorizeIndex;

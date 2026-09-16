@@ -9,7 +9,7 @@ import { getCheckInInformation } from "./getCheckInInformation.js";
 import {
   handler as initiateCheckInProcessHandler
 } from "./worker/src/initiateCheckInProcess.js";
-import {sendErrorNotificationEmail} from "./worker/src/services/mailService";
+import {sendErrorNotificationEmail} from "./worker/src/services/mailService.js";
 import {askKnowledge} from "./askKnowledge.js";
 import {deleteOldCodesHandler} from "./worker/src/deleteOldCodes.js";
 
@@ -24,6 +24,9 @@ const env: Env = {
   ADMIN_NAME: process.env.ADMIN_NAME!,
   BREVO_API_KEY: process.env.BREVO_API_KEY!,
   EMAIL_FROM: process.env.EMAIL_FROM!,
+  WHATSAPP_API_TOKEN: process.env.WHATSAPP_API_TOKEN!,
+  WHATSAPP_PHONE_NUMBER_ID: process.env.WHATSAPP_PHONE_NUMBER_ID!,
+  WHATSAPP_SECRET: process.env.WHATSAPP_SECRET!
 };
 
 app.use(cors());

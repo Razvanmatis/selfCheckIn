@@ -165,7 +165,9 @@ async function deleteAllOldCodes(env: EnvBoth) {
         await forceNukiSync(env);
         await createNewCodesForRemainingUsers(listWithNewCodesToCreate, env);
     }
-    await sendGeneralMessageToAdmin(`Es wurden ${listWithIdsToDelete.length} alte Codes gefunden, die gelöscht wurden. Und es wurden ${listWithNewCodesToCreate.length} neue Codes für die verbleibenden Nutzer erstellt.`, env, false);
+    if (listWithIdsToDelete.length > 0 || listWithNewCodesToCreate.length > 0) {
+        await sendGeneralMessageToAdmin(`Es wurden ${listWithIdsToDelete.length} alte Codes gefunden, die gelöscht wurden. Und es wurden ${listWithNewCodesToCreate.length} neue Codes für die verbleibenden Nutzer erstellt.`, env, false);
+    }
     return `Es wurden ${listWithIdsToDelete.length} alte Codes gefunden, die gelöscht wurden. Und es wurden ${listWithNewCodesToCreate.length} neue Codes für die verbleibenden Nutzer erstellt.`;
 }
 

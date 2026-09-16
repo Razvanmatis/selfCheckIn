@@ -6,4 +6,7 @@ export interface Env {
     ADMIN_NAME: string;
     BREVO_API_KEY: string;
     EMAIL_FROM: string;
+    WHATSAPP_API_TOKEN: string;
+    WHATSAPP_PHONE_NUMBER_ID: string;
+    WHATSAPP_SECRET: string;
 }

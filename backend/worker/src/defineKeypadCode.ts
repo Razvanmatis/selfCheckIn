@@ -18,9 +18,11 @@ import {
 } from "./services/mailService.js";
 import {SmoobuReservationsResponse} from "./types/smoobuReservationsResponse.js";
 import {EnvBoth} from "./types/envBoth";
-import {sendMessageToGuest} from "./handler/smoobuHandler";
+import {sendMessageToGuestBySmoobu} from "./handler/smoobuHandler";
 import {createKeypadCode, forceNukiSync, getAllKeypadCodes, handleDeletionOfEntries} from "./handler/nukiHandler";
 import {SmoobuBooking} from "./types/smoobuBooking";
+import {sendCodeMessageToGuestByWhatsApp} from "./handler/whatsappHandler";
+import {Env} from "./types/env";
 
 const IS_ADMIN_NUMBER = 0;
 
@@ -87,12 +89,30 @@ async function getGuestName(request: DefineKeypadCodeRequest, allBookings: Smoob
     return bookingMatch ? `${bookingMatch.firstname} ${bookingMatch.lastname}` : "NAME_NOT_FOUND";
 }
 
+async function getGuestPhoneNumber(request: DefineKeypadCodeRequest, allBookings: SmoobuReservationsResponse, env: EnvBoth) {
+    if (isAdminRequest(request, env)) {
+        return "491729483597";
+    }
+    const bookingMatch = getMatchedBookingOfList(allBookings, request);
+    if (bookingMatch === undefined) {
+        console.log("Keine Buchung gefunden, um Telefonnummer zu ermitteln.");
+        await sendErrorNotificationEmail(`Keine Buchung gefunden, um Telefonnummer zu ermitteln. Ankunft: ${request.checkInDate},
+             Abreise: ${request.checkOutDate}`, request.firstName + " " + request.lastName,
+            `${request.checkInDate} - ${request.checkOutDate}`, env, request.pinCode);
+    }
+    return normalizePhone(bookingMatch?.phone);
+}
+
 async function sendConfirmationMail(request: DefineKeypadCodeRequest, allBookings: SmoobuReservationsResponse, env: EnvBoth, formattedDateAsName: string) {
     const bookingId = await getIdOfGuestBooking(request, allBookings, env);
     const guestName = await getGuestName(request, allBookings, env);
+    const phoneNumber = await getGuestPhoneNumber(request, allBookings, env);
     let content = getBookingConfirmationText(request.language, guestName, formattedDateAsName, request.pinCode);
     if (bookingId !== IS_ADMIN_NUMBER) {
-        await sendMessageToGuest(bookingId, content.subject, content.text, env);
+        await sendMessageToGuestBySmoobu(bookingId, content.subject, content.text, env);
+        if (phoneNumber) {
+            await sendCodeMessageToGuestByWhatsApp(env, phoneNumber, request.pinCode);
+        }
     }
     await sendBookingConfirmationEmailToAdmin(
         guestName,

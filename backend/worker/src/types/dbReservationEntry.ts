@@ -10,6 +10,7 @@ export class DbReservationEntry {
     phone?: string;
     arrival: string;
     departure: string;
+    whatsapp_status: "message_not_sent" | "message_sent" = "message_not_sent";
 
     constructor(webhookReservation: WebhookReservation) {
         this.created_at = new Date().toISOString();

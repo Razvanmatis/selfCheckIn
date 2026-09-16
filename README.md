@@ -249,3 +249,12 @@ npx wrangler d1 execute selfcheckin-db --remote --command "SELECT * FROM reserva
 ```
 ## Komplette Datenbank neu befüllen
 Die Adresse https://selfcheckin.raz-check-in.workers.dev/api/smoobu/initWholeDatabase aufrufen und den SMOOBU_TOKEN als Query-Parameter `token` mitgeben, dann werden alle Daten aus Smoobu in die D1-Datenbank geschrieben.
+## Scheduled Tasks testen
+```bash
+npx wrangler dev --test-scheduled
+curl "http://localhost:8787/cdn-cgi/local/scheduled?cron=0+2+*+*+*"
+```
+## Aktuellem Prod-Log folgen
+```bash
+npx wrangler tail
+```

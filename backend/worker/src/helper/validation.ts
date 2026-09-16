@@ -249,17 +249,13 @@ export function normalizePhone(
     return "";
   }
   let phone = value.replace(/\D/g, "");
-  // 00xx → +xx
+  // 00xx → xx
   if (phone.startsWith("00")) {
-    phone = phone.substring(2);
-  }
-  // Internationale Schreibweise: führende 49 entfernen
-  if (phone.startsWith("49")) {
     phone = phone.substring(2);
   }
   // Nationale Schreibweise: führende 0 entfernen
   if (phone.startsWith("0")) {
-    phone = phone.substring(1);
+    phone = "49" + phone.substring(1);
   }
   return phone;
 }
