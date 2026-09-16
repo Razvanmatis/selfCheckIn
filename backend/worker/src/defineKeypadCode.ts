@@ -110,9 +110,9 @@ async function sendConfirmationMail(request: DefineKeypadCodeRequest, allBooking
     let content = getBookingConfirmationText(request.language, guestName, formattedDateAsName, request.pinCode);
     if (bookingId !== IS_ADMIN_NUMBER) {
         await sendMessageToGuestBySmoobu(bookingId, content.subject, content.text, env);
-        if (phoneNumber) {
-            await sendCodeMessageToGuestByWhatsApp(env, phoneNumber, request.pinCode);
-        }
+    }
+    if (phoneNumber) {
+        await sendCodeMessageToGuestByWhatsApp(env, phoneNumber, request.pinCode);
     }
     await sendBookingConfirmationEmailToAdmin(
         guestName,
