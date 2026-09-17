@@ -1,5 +1,6 @@
 import type {Env} from "../types/env";
 import {sendGeneralMessageToAdmin} from "../services/mailService";
+import {ConversationHistory} from "../types/conversationHistory";
 
 type AskKnowledgeRequest = { question: string; language?: string; };
 
@@ -46,7 +47,8 @@ function getLanguageString(language: string | undefined): string {
 
 export async function askKnowledge(
     payload: AskKnowledgeRequest,
-    env: Env
+    env: Env,
+    conversationHistory?: ConversationHistory[],
 ): Promise<string> {
     const languageString = getLanguageString(payload.language);
     // 1. Frage in einen Vektor umwandeln
@@ -95,7 +97,7 @@ export async function askKnowledge(
             'Der Systemprompt "system-prompt" wurde im KV nicht gefunden.'
         );
     }
-    const content = systemPrompt.replaceAll("${languageString}", languageString);
+    const systemPromptContent = systemPrompt.replaceAll("${languageString}", languageString);
     let alreadySentAdminMessage = false;
     if (
         !results.matches ||
@@ -112,8 +114,9 @@ export async function askKnowledge(
             messages: [
                 {
                     role: "system",
-                    content: content
+                    content: systemPromptContent
                 },
+                ...(conversationHistory ?? []),
                 {
                     role: "user",
                     content:
