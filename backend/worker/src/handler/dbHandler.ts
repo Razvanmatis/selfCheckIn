@@ -4,6 +4,7 @@ import {sendGeneralMessageToAdmin} from "../services/mailService";
 import {Env} from "../types/env";
 import {SmoobuReservationsResponse} from "../types/smoobuReservationsResponse";
 import {getAllBookingsBySmoobu} from "./smoobuHandler";
+import {ConversationHistoryEntry} from "../types/conversationHistoryEntry";
 
 export async function createReservation(
     env: Env,
@@ -187,4 +188,55 @@ export async function markWhatsAppMessagesAsSent(
                 .run()
         )
     );
+}
+
+export async function createWhatsAppMessage(
+    env: Env,
+    phone: string,
+    content: string,
+    role : "user" | "assistant"
+) {
+    await env.DB
+        .prepare(`
+            INSERT INTO whatsapp_messages(phone, content, role, created_at)
+            VALUES (?, ?, ?, ?)
+        `)
+        .bind(
+            phone,
+            content,
+            role,
+            new Date().toISOString()
+        )
+        .run();
+}
+
+export async function getAllWhatsAppMessagesForPhone(
+    env: Env,
+    phone: string
+): Promise<ConversationHistoryEntry[]> {
+    const result = await env.DB
+        .prepare(`
+            SELECT content, role
+            FROM whatsapp_messages
+            WHERE phone = ?
+            ORDER BY created_at ASC
+        `)
+        .bind(phone)
+        .all<ConversationHistoryEntry>();
+    return result.results;
+}
+
+export async function deleteAllWhatsAppMessagesWhichAreOlderThan3Days(env: Env): Promise<number> {
+    const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString();
+    const result = await env.DB.prepare(
+        ` DELETE FROM whatsapp_messages 
+        WHERE created_at < ? 
+        `)
+        .bind(threeDaysAgo)
+        .run();
+    const changes = result.meta.changes;
+    if (changes > 0) {
+        await sendGeneralMessageToAdmin(`Es wurden ${changes} WhatsApp-Nachrichten gelöscht, die älter als 3 Tage waren.`, env, false);
+    }
+    return changes;
 }

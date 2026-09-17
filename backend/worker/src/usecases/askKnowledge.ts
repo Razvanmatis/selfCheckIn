@@ -1,8 +1,12 @@
 import type {Env} from "../types/env";
 import {sendGeneralMessageToAdmin} from "../services/mailService";
-import {ConversationHistory} from "../types/conversationHistory";
+import {ConversationHistoryEntry} from "../types/conversationHistoryEntry";
 
-type AskKnowledgeRequest = { question: string; language?: string; };
+type AskKnowledgeRequest = {
+    question: string;
+    language?: string;
+    conversationHistory?: ConversationHistoryEntry[];
+};
 
 function getLanguageString(language: string | undefined): string {
     switch (language?.trim().toLowerCase()) {
@@ -47,8 +51,7 @@ function getLanguageString(language: string | undefined): string {
 
 export async function askKnowledge(
     payload: AskKnowledgeRequest,
-    env: Env,
-    conversationHistory?: ConversationHistory[],
+    env: Env
 ): Promise<string> {
     const languageString = getLanguageString(payload.language);
     // 1. Frage in einen Vektor umwandeln
@@ -116,7 +119,7 @@ export async function askKnowledge(
                     role: "system",
                     content: systemPromptContent
                 },
-                ...(conversationHistory ?? []),
+                ...(payload.conversationHistory ?? []),
                 {
                     role: "user",
                     content:

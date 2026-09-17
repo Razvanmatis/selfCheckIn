@@ -1,7 +1,7 @@
 import {sendGeneralMessageToAdmin} from "./mailService";
 import {informAllGuestsAboutCheckIn} from "./whatsappService";
 import {deleteOldCodesHandler} from "../usecases/deleteOldNukiCodes";
-import {deleteExpiredReservations} from "../handler/dbHandler";
+import {deleteAllWhatsAppMessagesWhichAreOlderThan3Days, deleteExpiredReservations} from "../handler/dbHandler";
 import {Env} from "../types/env";
 
 export async function runScheduledTasks(env: Env) {
@@ -41,6 +41,18 @@ export async function runScheduledTasks(env: Env) {
                 : "Unbekannter Fehler beim Informieren der Gäste über den Check-In.";
         await sendGeneralMessageToAdmin(
             `Fehler beim täglichen Informieren der Gäste über den Check-In: ${message}`,
+            env
+        );
+    }
+    try {
+        await deleteAllWhatsAppMessagesWhichAreOlderThan3Days(env);
+    } catch (error) {
+        const message =
+            error instanceof Error
+                ? error.message
+                : "Unbekannter Fehler beim Löschen alter WhatsApp-Nachrichten.";
+        await sendGeneralMessageToAdmin(
+            `Fehler beim täglichen Löschen alter WhatsApp-Nachrichten: ${message}`,
             env
         );
     }

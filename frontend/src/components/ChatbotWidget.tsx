@@ -11,6 +11,11 @@ type ChatMessage = {
   isError?: boolean;
 };
 
+type ConversationHistoryEntry = {
+  role: ChatRole;
+  content: string;
+};
+
 const STORAGE_KEY = "selfcheckin-chatbot-messages";
 const POSITION_KEY = "selfcheckin-chatbot-position";
 
@@ -173,6 +178,14 @@ export function ChatbotWidget({ language }: ChatbotWidgetProps) {
     }
   };
 
+  const getConversationHistory = (): ConversationHistoryEntry[] =>
+    messages
+      .filter((message) => message.role === "user" || message.role === "assistant")
+      .map((message) => ({
+        role: message.role,
+        content: message.text
+      }));
+
   const submitQuestion = async () => {
     const trimmedQuestion = question.trim();
 
@@ -186,6 +199,8 @@ export function ChatbotWidget({ language }: ChatbotWidgetProps) {
       text: trimmedQuestion
     };
 
+    const conversationHistory = getConversationHistory();
+
     setMessages((prev) => [...prev, userMessage]);
     setQuestion("");
     setIsLoading(true);
@@ -193,7 +208,8 @@ export function ChatbotWidget({ language }: ChatbotWidgetProps) {
     try {
       const answer = await askKnowledge({
         question: trimmedQuestion,
-        language
+        language,
+        conversationHistory
       });
       setMessages((prev) => [
         ...prev,

@@ -84,7 +84,15 @@ app.post("/api/getCheckInInformation", async (req, res) => {
 });
 
 app.post("/api/ai/ask", async (req, res) => {
-  const result = await askKnowledge(req.body, env);
+  const result = await askKnowledge(
+    {
+      ...req.body,
+      conversationHistory: Array.isArray(req.body?.conversationHistory)
+        ? req.body.conversationHistory
+        : undefined
+    },
+    env
+  );
   res.status(200).send(result);
 });
 

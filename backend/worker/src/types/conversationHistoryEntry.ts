@@ -1,4 +1,4 @@
-export interface ConversationHistory {
+export interface ConversationHistoryEntry {
     role: "user" | "assistant";
     content: string;
 }

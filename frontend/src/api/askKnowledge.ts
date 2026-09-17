@@ -1,4 +1,14 @@
-type AskKnowledgeRequest = { question: string;  language?: string;};
+type ConversationHistoryEntry = {
+    role: "user" | "assistant";
+    content: string;
+};
+
+type AskKnowledgeRequest = {
+    question: string;
+    language?: string;
+    conversationHistory?: ConversationHistoryEntry[];
+};
+
 type AskKnowledgeResponse = { answer: string; };
 
 const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL ?? "").replace(/\/$/, "");

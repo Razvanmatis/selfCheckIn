@@ -10,7 +10,11 @@ import { askKnowledge } from "./usecases/askKnowledge";
 import {sendGeneralMessageToAdmin} from "./services/mailService";
 import {deleteOldCodesHandler} from "./usecases/deleteOldNukiCodes";
 import {handleSmoobuWebhook} from "./services/smoobuWebhookService";
-import {deleteExpiredReservations, initWholeDatabase} from "./handler/dbHandler";
+import {
+	deleteAllWhatsAppMessagesWhichAreOlderThan3Days,
+	deleteExpiredReservations,
+	initWholeDatabase
+} from "./handler/dbHandler";
 import {runScheduledTasks} from "./services/scheduledService";
 import {verifyWhatsAppSignature} from "./helper/whatsAppSignature";
 import {handleWhatsAppWebhookMessage} from "./services/whatsappService";
@@ -145,7 +149,7 @@ app.post("/api/ai/ask", async (c) => {
 
 		const answer = await askKnowledge(
 			body,
-			c.env
+			c.env,
 		);
 
 		return c.json({
@@ -177,6 +181,7 @@ app.post("/api/deleteOldCodes", async (c) => {
 		}
 
 		await deleteExpiredReservations(c.env);
+		await deleteAllWhatsAppMessagesWhichAreOlderThan3Days(c.env);
 		const answer = await deleteOldCodesHandler(
 			{ body: adminUser },
 			c.env

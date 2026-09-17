@@ -3843,14 +3843,14 @@ declare abstract class AgentMemoryProfile {
 /**
  * Namespace-level Agent Memory binding.
  *
- * Used as the type of an `env.MEMORY`-style binding backed by the Agent
+ * Used as the type of an `.env.MEMORY`-style binding backed by the Agent
  * Memory product.
  *
  * @example
  * ```ts
  * export default {
- *   async fetch(_request: Request, env: Env): Promise<Response> {
- *     const profile = await env.MEMORY.getProfile("wrangler-e2e");
+ *   async fetch(_request: Request, .env: Env): Promise<Response> {
+ *     const profile = await .env.MEMORY.getProfile("wrangler-e2e");
  *     const summary = await profile.getSummary();
  *     return Response.json(summary);
  *   },
@@ -4476,20 +4476,20 @@ declare abstract class AiSearchJobs {
  *
  * Used as:
  * - The return type of `AiSearchNamespace.get(name)` (namespace binding)
- * - The type of `env.BLOG_SEARCH` (single instance binding via `ai_search`)
+ * - The type of `.env.BLOG_SEARCH` (single instance binding via `ai_search`)
  *
  * Provides search, chat, update, stats, items, and jobs operations.
  *
  * @example
  * ```ts
  * // Via namespace binding
- * const instance = env.AI_SEARCH.get("blog");
+ * const instance = .env.AI_SEARCH.get("blog");
  * const results = await instance.search({
  *   query: "How does caching work?",
  * });
  *
  * // Via single instance binding
- * const results = await env.BLOG_SEARCH.search({
+ * const results = await .env.BLOG_SEARCH.search({
  *   messages: [{ role: "user", content: "How does caching work?" }],
  * });
  * ```
@@ -4536,33 +4536,33 @@ declare abstract class AiSearchInstance {
 /**
  * Namespace-level AI Search service.
  *
- * Used as the type of `env.AI_SEARCH` (namespace binding via `ai_search_namespaces`).
+ * Used as the type of `.env.AI_SEARCH` (namespace binding via `ai_search_namespaces`).
  * Scoped to a single namespace. Provides dynamic instance access, creation, deletion,
  * and multi-instance search/chat operations.
  *
  * @example
  * ```ts
  * // Access an instance within the namespace
- * const blog = env.AI_SEARCH.get("blog");
+ * const blog = .env.AI_SEARCH.get("blog");
  * const results = await blog.search({ query: "How does caching work?" });
  *
  * // List all instances in the namespace
- * const instances = await env.AI_SEARCH.list();
+ * const instances = await .env.AI_SEARCH.list();
  *
  * // Create a new instance with built-in storage
- * const tenant = await env.AI_SEARCH.create({ id: "tenant-123" });
+ * const tenant = await .env.AI_SEARCH.create({ id: "tenant-123" });
  *
  * // Upload items into the instance
  * await tenant.items.upload("doc.pdf", fileContent);
  *
  * // Search across multiple instances
- * const multi = await env.AI_SEARCH.search({
+ * const multi = await .env.AI_SEARCH.search({
  *   query: "caching",
  *   ai_search_options: { instance_ids: ["blog", "docs"] },
  * });
  *
  * // Delete an instance
- * await env.AI_SEARCH.delete("tenant-123");
+ * await .env.AI_SEARCH.delete("tenant-123");
  * ```
  */
 declare abstract class AiSearchNamespace {
@@ -4586,10 +4586,10 @@ declare abstract class AiSearchNamespace {
      * @example
      * ```ts
      * // Create with built-in storage (upload items manually)
-     * const instance = await env.AI_SEARCH.create({ id: "my-search" });
+     * const instance = await .env.AI_SEARCH.create({ id: "my-search" });
      *
      * // Create with web crawler source
-     * const instance = await env.AI_SEARCH.create({
+     * const instance = await .env.AI_SEARCH.create({
      *   id: "docs-search",
      *   type: "web-crawler",
      *   source: "https://developers.cloudflare.com",
@@ -12527,16 +12527,16 @@ interface FlagshipEvaluationError extends Error {
  * @example
  * ```typescript
  * // Get a boolean flag value with a default
- * const enabled = await env.FLAGS.getBooleanValue('my-feature', false);
+ * const enabled = await .env.FLAGS.getBooleanValue('my-feature', false);
  *
  * // Get a flag value with evaluation context for targeting
- * const variant = await env.FLAGS.getStringValue('experiment', 'control', {
+ * const variant = await .env.FLAGS.getStringValue('experiment', 'control', {
  *   userId: 'user-123',
  *   country: 'US',
  * });
  *
  * // Get full evaluation details including variant and reason
- * const details = await env.FLAGS.getBooleanDetails('my-feature', false);
+ * const details = await .env.FLAGS.getBooleanDetails('my-feature', false);
  * console.log(details.variant, details.reason);
  * ```
  */
@@ -13322,7 +13322,7 @@ declare namespace Rpc {
     }, Exclude<keyof T, Reserved | symbol | keyof StubBase<never>>>;
 }
 declare namespace Cloudflare {
-    // Type of `env`.
+    // Type of `.env`.
     //
     // The specific project can extend `Env` by redeclaring it in project-specific files. Typescript
     // will merge all declarations.
@@ -13550,19 +13550,19 @@ declare module "cloudflare:sockets" {
  *
  * Usage:
  * - Binding-level operations:
- *   `await env.STREAM.videos.upload`
- *   `await env.STREAM.videos.createDirectUpload`
- *   `await env.STREAM.videos.*`
- *   `await env.STREAM.watermarks.*`
+ *   `await .env.STREAM.videos.upload`
+ *   `await .env.STREAM.videos.createDirectUpload`
+ *   `await .env.STREAM.videos.*`
+ *   `await .env.STREAM.watermarks.*`
  * - Per-video operations:
- *   `await env.STREAM.video(id).downloads.*`
- *   `await env.STREAM.video(id).captions.*`
+ *   `await .env.STREAM.video(id).downloads.*`
+ *   `await .env.STREAM.video(id).captions.*`
  *
  * Example usage:
  * ```ts
- * await env.STREAM.video(id).downloads.generate();
+ * await .env.STREAM.video(id).downloads.generate();
  *
- * const video = env.STREAM.video(id)
+ * const video = .env.STREAM.video(id)
  * const captions = video.captions.list();
  * const videoDetails = video.details()
  * ```
@@ -14866,7 +14866,7 @@ type WebSearchSearchResponse = {
  *
  * @example
  * ```ts
- * const { items, metadata } = await env.WEBSEARCH.search({
+ * const { items, metadata } = await .env.WEBSEARCH.search({
  *   query: "Cloudflare Workers",
  * });
  *
