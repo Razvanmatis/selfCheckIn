@@ -4,6 +4,7 @@ import {NukiCreateAuthPayload} from "../types/nukiCreateAuthPayload.js";
 import {NukiAuthEntry} from "../types/nukiAuthEntry.js";
 import {EnvBoth} from "../types/envBoth";
 import {SmoobuReservationsResponse} from "../types/smoobuReservationsResponse";
+import {sendGeneralMessageToAdmin} from "../services/mailService";
 
 function toLocalInputDate(date: Date): string {
   const localTime = new Date(date.getTime() - date.getTimezoneOffset() * 60_000);
@@ -228,7 +229,7 @@ export function buildNukiCreatePayload(payload: DefineKeypadCodeRequest,
   };
 }
 
-export function getExistingNameInitialsOfNukiAuthEntry(nukiAuthEntry: NukiAuthEntry): string {
+export async function getExistingNameInitialsOfNukiAuthEntry(nukiAuthEntry: NukiAuthEntry, env: EnvBoth): Promise<string> {
   const nameParts = nukiAuthEntry.name.split(",");
   let existingNameInitials = ",XX";
   if (nameParts.length > 1) {
@@ -237,7 +238,7 @@ export function getExistingNameInitialsOfNukiAuthEntry(nukiAuthEntry: NukiAuthEn
       existingNameInitials += "," + nameParts[i].trim();
     }
   } else {
-    console.log("Keine Initialen im bestehenden Nuki-Code gefunden, obwohl erwartet.");
+    await sendGeneralMessageToAdmin("Keine Initialen im bestehenden Nuki-Code gefunden, obwohl erwartet.", env);
   }
   return existingNameInitials;
 }

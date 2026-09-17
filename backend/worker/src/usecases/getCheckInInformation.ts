@@ -1,7 +1,6 @@
 import { initiateCheckInProcess } from "./initiateCheckInProcess";
-import type { Env } from "./types/env";
-import {CheckInLookupPayload} from "./types/checkInLookupPayload";
-import {sendErrorNotificationEmail} from "./services/mailService";
+import type { Env } from "../types/env";
+import {CheckInLookupPayload} from "../types/checkInLookupPayload";
 
 export async function getCheckInInformation(
     request: CheckInLookupPayload,
@@ -21,8 +20,6 @@ export async function getCheckInInformation(
   );
 
   if (!response.ok) {
-    await sendErrorNotificationEmail("Check-In-PDF konnte nicht geladen werden.",
-        request.firstName + " " + request.lastName, request.checkInDate + "-" + request.checkOutDate, env);
     throw new Error("Check-In-PDF konnte nicht geladen werden.");
   }
 

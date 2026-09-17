@@ -1,6 +1,7 @@
 import {EnvBoth} from "../types/envBoth";
 import {getSmoobuHeaders} from "../helper/smoobuSignature";
 import {SmoobuReservationsResponse} from "../types/smoobuReservationsResponse";
+import {sendGeneralMessageToAdmin} from "../services/mailService";
 
 const smoobuSendMessageUrl = "https://login.smoobu.com/api/reservations/{reservationId}/messages/send-message-to-guest";
 
@@ -21,7 +22,7 @@ export async function sendMessageToGuestBySmoobu(reservationId: number, header: 
 
     if (!response.ok) {
         const error = await response.text();
-        throw new Error(`Smoobu Benachrichtigung eines Gasts fehlgeschlagen: ${response.status}: ${error}`);
+        await sendGeneralMessageToAdmin(`Smoobu Benachrichtigung eines Gasts fehlgeschlagen: ${response.status}: ${error}`, env);
     }
 }
 

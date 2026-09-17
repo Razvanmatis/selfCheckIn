@@ -7,22 +7,20 @@ import {
     getOlderDate,
     isAdminRequest, normalizePhone,
     parseAndValidateDefineKeypadCodeRequest,
-} from "./helper/validation.js";
-import {NukiAuthEntry} from "./types/nukiAuthEntry.js";
-import {DefineKeypadCodeRequest} from "./types/defineKeypadCodeRequest.js";
+} from "../helper/validation.js";
+import {NukiAuthEntry} from "../types/nukiAuthEntry.js";
+import {DefineKeypadCodeRequest} from "../types/defineKeypadCodeRequest.js";
 import {
     getBookingConfirmationText,
     sendBookingConfirmationEmailToAdmin,
-    sendErrorNotificationEmail,
-    sendGeneralMessageToAdmin
-} from "./services/mailService.js";
-import {SmoobuReservationsResponse} from "./types/smoobuReservationsResponse.js";
-import {EnvBoth} from "./types/envBoth";
-import {sendMessageToGuestBySmoobu} from "./handler/smoobuHandler";
-import {createKeypadCode, forceNukiSync, getAllKeypadCodes, handleDeletionOfEntries} from "./handler/nukiHandler";
-import {SmoobuBooking} from "./types/smoobuBooking";
-import {sendCodeMessageToGuestByWhatsApp} from "./handler/whatsappHandler";
-import {Env} from "./types/env";
+    sendErrorNotificationEmail
+} from "../services/mailService.js";
+import {SmoobuReservationsResponse} from "../types/smoobuReservationsResponse.js";
+import {EnvBoth} from "../types/envBoth";
+import {sendMessageToGuestBySmoobu} from "../handler/smoobuHandler";
+import {createKeypadCode, forceNukiSync, getAllKeypadCodes, handleDeletionOfEntries} from "../handler/nukiHandler";
+import {SmoobuBooking} from "../types/smoobuBooking";
+import {sendCodeMessageToGuestByWhatsApp} from "../handler/whatsappHandler";
 
 const IS_ADMIN_NUMBER = 0;
 
@@ -48,7 +46,6 @@ async function getNameInitialsOfRequest(request: DefineKeypadCodeRequest, allBoo
         if (bookingMatch) {
             nameCharacters = `${bookingMatch.firstname.trim().charAt(0).toUpperCase()}${bookingMatch.lastname.trim().charAt(0).toUpperCase()}`;
         } else {
-            console.log("Keine Buchung gefunden, um Initialen zu ermitteln.");
             await sendErrorNotificationEmail(`Keine Buchung gefunden, um Initialen zu ermitteln. Ankunft: ${request.checkInDate},
              Abreise: ${request.checkOutDate}`, request.firstName + " " + request.lastName,
                 `${request.checkInDate} - ${request.checkOutDate}`, env, request.pinCode);
@@ -64,7 +61,6 @@ async function getIdOfGuestBooking(request: DefineKeypadCodeRequest, allBookings
     }
     const bookingMatch = getMatchedBookingOfList(allBookings, request);
     if (bookingMatch === undefined) {
-        console.log("Keine Buchung gefunden, um Buchungs-ID zu ermitteln.");
         await sendErrorNotificationEmail(`Keine Buchung gefunden, um Buchungs-ID zu ermitteln. Ankunft: ${request.checkInDate},
              Abreise: ${request.checkOutDate}`, request.firstName + " " + request.lastName,
             `${request.checkInDate} - ${request.checkOutDate}`, env, request.pinCode);
@@ -81,7 +77,6 @@ async function getGuestName(request: DefineKeypadCodeRequest, allBookings: Smoob
     }
     const bookingMatch = getMatchedBookingOfList(allBookings, request);
     if (bookingMatch === undefined) {
-        console.log("Keine Buchung gefunden, um Namen zu ermitteln.");
         await sendErrorNotificationEmail(`Keine Buchung gefunden, um Namen zu ermitteln. Ankunft: ${request.checkInDate},
              Abreise: ${request.checkOutDate}`, request.firstName + " " + request.lastName,
             `${request.checkInDate} - ${request.checkOutDate}`, env, request.pinCode);
@@ -95,7 +90,6 @@ async function getGuestPhoneNumber(request: DefineKeypadCodeRequest, allBookings
     }
     const bookingMatch = getMatchedBookingOfList(allBookings, request);
     if (bookingMatch === undefined) {
-        console.log("Keine Buchung gefunden, um Telefonnummer zu ermitteln.");
         await sendErrorNotificationEmail(`Keine Buchung gefunden, um Telefonnummer zu ermitteln. Ankunft: ${request.checkInDate},
              Abreise: ${request.checkOutDate}`, request.firstName + " " + request.lastName,
             `${request.checkInDate} - ${request.checkOutDate}`, env, request.pinCode);
@@ -103,7 +97,7 @@ async function getGuestPhoneNumber(request: DefineKeypadCodeRequest, allBookings
     return normalizePhone(bookingMatch?.phone);
 }
 
-async function sendConfirmationMail(request: DefineKeypadCodeRequest, allBookings: SmoobuReservationsResponse, env: EnvBoth, formattedDateAsName: string) {
+async function sendConfirmationInformationAboutCreatedCode(request: DefineKeypadCodeRequest, allBookings: SmoobuReservationsResponse, env: EnvBoth, formattedDateAsName: string) {
     const bookingId = await getIdOfGuestBooking(request, allBookings, env);
     const guestName = await getGuestName(request, allBookings, env);
     const phoneNumber = await getGuestPhoneNumber(request, allBookings, env);
@@ -129,7 +123,6 @@ export async function defineKeypadCode(request: DefineKeypadCodeRequest,
         return "validationError";
     }
     await forceNukiSync(env);
-    console.log("Nuki-Sync erfolgreich durchgeführt.");
     const allCurrentKeypadCodes = await getAllKeypadCodes(env);
     let formattedDateAsName = getFormattedDateAsName(request.checkInDate, request.checkOutDate);
     const allBookings = await getAllOpenBookings(env);
@@ -139,7 +132,6 @@ export async function defineKeypadCode(request: DefineKeypadCodeRequest,
         (entry) => String(entry.code) === request.pinCode && entry.name === formattedDateAsNameWithInitials
     );
     if (existingEntriesWithSameCodeAndName.length > 0) {
-        console.log(`Nuki-Code ${request.pinCode} bereits vorhanden: ${existingEntriesWithSameCodeAndName[0].name}`);
         return "OK";
     }
     const nukiPayload = buildNukiCreatePayload(request, env);
@@ -150,11 +142,9 @@ export async function defineKeypadCode(request: DefineKeypadCodeRequest,
         formattedDateAsName = getFormattedDateAsName(
             getOlderDate(request.checkInDate, (entriesToDeleteBecauseOfSameCode.at(0) as NukiAuthEntry).allowedFromDate),
             getNewerDate(request.checkOutDate, (entriesToDeleteBecauseOfSameCode.at(0) as NukiAuthEntry).allowedUntilDate));
-        console.log(`Neuer Zeitraum ermittelt: ${formattedDateAsName}`);
-        const existingNameInitials = getExistingNameInitialsOfNukiAuthEntry(entriesToDeleteBecauseOfSameCode.at(0) as NukiAuthEntry);
+        const existingNameInitials = await getExistingNameInitialsOfNukiAuthEntry(entriesToDeleteBecauseOfSameCode.at(0) as NukiAuthEntry, env);
         formattedDateAsNameWithInitials = `${formattedDateAsName}${existingNameInitials}${requestNameInitials}`;
         if (formattedDateAsNameWithInitials.length > 20) {
-            console.log(`Warnung: Der Name des Nuki-Codes ist länger als 20 Zeichen: ${formattedDateAsNameWithInitials}`);
             await sendErrorNotificationEmail(`Warnung: Der Name des Nuki-Codes ist länger als 20 Zeichen: ${formattedDateAsNameWithInitials}`,
                 request.firstName + " " + request.lastName, `${request.checkInDate} - ${request.checkOutDate}`, env, request.pinCode);
         }
@@ -171,14 +161,7 @@ export async function defineKeypadCode(request: DefineKeypadCodeRequest,
     }
     nukiPayload.name = formattedDateAsNameWithInitials;
     await createKeypadCode(nukiPayload, env);
-    console.log(`Neuer Nuki-Code ${request.pinCode} gesetzt: ${formattedDateAsNameWithInitials}`);
-    try {
-        await sendConfirmationMail(request, allBookings, env, formattedDateAsName);
-    } catch (error) {
-        console.log(`Fehler beim Senden der Bestätigungs-E-Mail: ${error}`);
-        await sendGeneralMessageToAdmin(`Fehler beim Senden der Bestätigungs-E-Mail: ${error}`, env);
-        return "OK, aber Bestätigungs-E-Mail konnte nicht gesendet werden.";
-    }
+    await sendConfirmationInformationAboutCreatedCode(request, allBookings, env, formattedDateAsName);
     return "OK";
 }
 
@@ -214,7 +197,6 @@ export async function handler(event: LambdaLikeEvent,
     } catch (error) {
         const message =
             error instanceof Error ? error.message : "Unbekannter Fehler im Keypad-Code Prozess.";
-        console.log(`Fehler im Keypad-Code Prozess: ${message}`);
         await sendErrorNotificationEmail(`Fehler im Keypad-Code Prozess: ${message}`,
             payload?.firstName + " " + payload?.lastName, `${payload?.checkInDate} - ${payload?.checkOutDate}`, env, payload?.pinCode);
         return {

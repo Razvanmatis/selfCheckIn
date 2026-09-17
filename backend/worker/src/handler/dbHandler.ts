@@ -117,7 +117,6 @@ export async function initWholeDatabase(env: Env) {
         }
         await sendGeneralMessageToAdmin(`Die Datenbank wurde erfolgreich mit ${allBookings.bookings.length} Buchungen initialisiert.`, env, false);
     } catch (error) {
-        console.error("Fehler beim Initialisieren der Datenbank:", error);
         throw new Error("Fehler beim Initialisieren der Datenbank: " + (error instanceof Error ? error.message : "Unbekannter Fehler"));
     }
 }

@@ -1,22 +1,19 @@
 import { Hono } from "hono";
 import type { Env } from "./types/env";
-import { initiateCheckInProcess } from "./initiateCheckInProcess";
+import { initiateCheckInProcess } from "./usecases/initiateCheckInProcess";
 import { parseAndValidateCheckInLookupPayload } from "./helper/validation";
-import { defineKeypadCode } from "./defineKeypadCode";
-import { getCheckInInformation } from "./getCheckInInformation";
+import { defineKeypadCode } from "./usecases/defineKeypadCode";
+import { getCheckInInformation } from "./usecases/getCheckInInformation";
 import { cors } from "hono/cors";
-import { seedKnowledge } from "./seedKnowledge";
-import { askKnowledge } from "./askKnowledge";
+import { seedKnowledge } from "./usecases/seedKnowledge";
+import { askKnowledge } from "./usecases/askKnowledge";
 import {sendGeneralMessageToAdmin} from "./services/mailService";
-import {deleteOldCodesHandler} from "./deleteOldCodes";
-import {handleSmoobuWebhook} from "./handleSmoobuWebhooks";
-import {timingSafeEqual} from "node:crypto";
+import {deleteOldCodesHandler} from "./usecases/deleteOldNukiCodes";
+import {handleSmoobuWebhook} from "./services/smoobuWebhookService";
 import {deleteExpiredReservations, initWholeDatabase} from "./handler/dbHandler";
-import {informAllGuestsAboutCheckIn} from "./services/whatsappService";
 import {runScheduledTasks} from "./services/scheduledService";
-import {WhatsAppWebhookPayload} from "./types/whatsAppWebhookPayload";
-import {handleWhatsAppWebhookMessage} from "./services/whatsAppWebhookService";
 import {verifyWhatsAppSignature} from "./helper/whatsAppSignature";
+import {handleWhatsAppWebhookMessage} from "./services/whatsappService";
 
 const app = new Hono<{ Bindings: Env }>();
 

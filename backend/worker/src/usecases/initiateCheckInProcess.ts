@@ -1,12 +1,12 @@
-import {isAdminRequest, parseAndValidateCheckInLookupPayload} from "./helper/validation.js";
-import {CheckInLookupPayload} from "./types/checkInLookupPayload.js";
-import {sendErrorNotificationEmail} from "./services/mailService.js";
-import {getAllBookingsBySmoobu} from "./handler/smoobuHandler";
-import {EnvBoth} from "./types/envBoth";
-import {getAllReservationsFromDb} from "./handler/dbHandler";
-import {Env} from "./types/env";
-import {SmoobuReservationsResponse} from "./types/smoobuReservationsResponse";
-import {checkForBookingMatchByNameOrPhone} from "./helper/validation.js";
+import {isAdminRequest, parseAndValidateCheckInLookupPayload} from "../helper/validation.js";
+import {CheckInLookupPayload} from "../types/checkInLookupPayload.js";
+import {sendErrorNotificationEmail} from "../services/mailService.js";
+import {getAllBookingsBySmoobu} from "../handler/smoobuHandler";
+import {EnvBoth} from "../types/envBoth";
+import {getAllReservationsFromDb} from "../handler/dbHandler";
+import {Env} from "../types/env";
+import {SmoobuReservationsResponse} from "../types/smoobuReservationsResponse";
+import {checkForBookingMatchByNameOrPhone} from "../helper/validation.js";
 
 export async function getAllOpenBookings(env: EnvBoth): Promise<SmoobuReservationsResponse> {
   try {
@@ -27,14 +27,7 @@ export async function initiateCheckInProcess(
   if (isAdminRequest(request, env)) {
     return "OK";
   }
-  let data;
-  try {
-    data = await getAllOpenBookings(env as Env);
-  } catch (error) {
-    await sendErrorNotificationEmail(error instanceof Error ? error.message : String(error),
-        request.firstName + " " + request.lastName, `${request.checkInDate} - ${request.checkOutDate}`, env);
-    throw error;
-  }
+  let data= await getAllOpenBookings(env as Env);
   if (!data || !data.bookings || data.bookings.length === 0) {
     await sendErrorNotificationEmail("Keine offenen Buchungen gefunden!",
         request.firstName + " " + request.lastName, `${request.checkInDate} - ${request.checkOutDate}`, env);

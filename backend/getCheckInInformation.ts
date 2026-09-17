@@ -1,9 +1,9 @@
 import { readFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { initiateCheckInProcess } from "./worker/src/initiateCheckInProcess.js";
+import { initiateCheckInProcess } from "./worker/src/usecases/initiateCheckInProcess.js";
 import type { Env } from "./env.js";
-import {CheckInLookupPayload} from "./types/checkInLookupPayload.js";
+import {CheckInLookupPayload} from "./worker/src/types/checkInLookupPayload.js";
 
 const currentDir = dirname(fileURLToPath(import.meta.url));
 const checkInInstructionsPdfPath = resolve(

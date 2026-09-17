@@ -4,14 +4,14 @@ import "dotenv/config";
 import type { Env } from "./env.js";
 import {
   handler as defineKeypadCodeHandler
-} from "./worker/src/defineKeypadCode.js";
+} from "./worker/src/usecases/defineKeypadCode.js";
 import { getCheckInInformation } from "./getCheckInInformation.js";
 import {
   handler as initiateCheckInProcessHandler
-} from "./worker/src/initiateCheckInProcess.js";
+} from "./worker/src/usecases/initiateCheckInProcess.js";
 import {sendErrorNotificationEmail} from "./worker/src/services/mailService.js";
 import {askKnowledge} from "./askKnowledge.js";
-import {deleteOldCodesHandler} from "./worker/src/deleteOldCodes.js";
+import {deleteOldCodesHandler} from "./worker/src/usecases/deleteOldNukiCodes.js";
 
 const app = express();
 const port = Number(process.env.PORT ?? 7071);
@@ -86,10 +86,6 @@ app.post("/api/getCheckInInformation", async (req, res) => {
 app.post("/api/ai/ask", async (req, res) => {
   const result = await askKnowledge(req.body, env);
   res.status(200).send(result);
-});
-
-app.get("/health", (_req, res) => {
-  res.status(200).json({ status: "ok" });
 });
 
 app.post("/api/deleteOldCodes", async (req, res) => {

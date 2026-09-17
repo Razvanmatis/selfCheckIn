@@ -1,5 +1,5 @@
-import type {Env} from "./types/env";
-import {sendGeneralMessageToAdmin} from "./services/mailService";
+import type {Env} from "../types/env";
+import {sendGeneralMessageToAdmin} from "../services/mailService";
 
 type AskKnowledgeRequest = { question: string; language?: string; };
 
@@ -48,7 +48,6 @@ export async function askKnowledge(
     payload: AskKnowledgeRequest,
     env: Env
 ): Promise<string> {
-    console.log("sprache: " + getLanguageString(payload.language));
     const languageString = getLanguageString(payload.language);
     // 1. Frage in einen Vektor umwandeln
     const embedding = await env.AI.run(
@@ -97,13 +96,6 @@ export async function askKnowledge(
         );
     }
     const content = systemPrompt.replaceAll("${languageString}", languageString);
-    console.log(
-        "Vectorize matches:",
-        results.matches.map(match => ({
-            id: match.id,
-            score: match.score
-        }))
-    );
     let alreadySentAdminMessage = false;
     if (
         !results.matches ||

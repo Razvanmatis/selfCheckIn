@@ -28,8 +28,6 @@ export async function forceNukiSync(env: EnvBoth): Promise<void> {
 async function wait(ms: number): Promise<void> {
     const start = Date.now();
     let remaining = ms;
-
-    // Enforce a minimum wait duration even with timer jitter.
     while (remaining > 0) {
         await new Promise((resolve) => setTimeout(resolve, remaining));
         remaining = ms - (Date.now() - start);
@@ -102,18 +100,15 @@ export async function createKeypadCode(payload: NukiCreateAuthPayload, env: EnvB
                 );
 
                 if (alreadyPresent) {
-                    console.log("Nuki-Code bereits vorhanden, keine weiteren Versuche.");
                     return;
                 }
             }
         } else if (!response.ok) {
-            console.log(`Fehler beim Setzen des Nuki-Codes: ${response.status} ${response.statusText}`);
             throw new Error("Neuer Nuki-Keypad Code konnte nicht gesetzt werden. Code: " + expectedCode + ", Name: " + expectedName);
         }
 
         if (attempt < 5) {
             await wait(retryDelayMs);
-            console.log("Erneuter Versuch, Nuki-Code zu setzen..." + ` (Versuch ${attempt + 2} von 6)`);
         }
     }
 }
@@ -121,9 +116,7 @@ export async function createKeypadCode(payload: NukiCreateAuthPayload, env: EnvB
 export async function handleDeletionOfEntries(existingEntriesToDelete: NukiAuthEntry[], env: EnvBoth) {
     for (const entry of existingEntriesToDelete) {
         await deleteKeypadCode(entry.id, env);
-        console.log(`Nuki-Code ${entry.code} entfernt: ${entry.name}`);
     }
 
     await forceNukiSync(env);
-    console.log("Nuki-Sync erfolgreich durchgeführt.");
 }

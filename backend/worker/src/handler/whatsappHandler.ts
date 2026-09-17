@@ -93,30 +93,18 @@ export async function sendResponseToGuestByWhatsApp(
             body: JSON.stringify({
                 messaging_product: "whatsapp",
                 to: guestPhoneNumber,
-                type: "template",
-                template: {
-                    name: "antwort",
-                    language: {
-                        code: "de"
-                    },
-                    components: [
-                        {
-                            type: "header",
-                            parameters: [
-                                {
-                                    type: "text",
-                                    parameter_name: "text",
-                                    text: text
-                                }
-                            ]
-                        }
-                    ]
+                type: "text",
+                text: {
+                    body: text
                 }
             })
         }
     );
     const responseText = await response.text();
     if (!response.ok) {
-        await sendGeneralMessageToAdmin(`WhatsApp API Fehler beim Versuch, die Antwort Nachricht an ${guestPhoneNumber} zu senden (${response.status}): ${responseText}`, env);
+        await sendGeneralMessageToAdmin(
+            `WhatsApp API Fehler beim Versuch, die Antwort Nachricht an ${guestPhoneNumber} zu senden (${response.status}): ${responseText}`,
+            env
+        );
     }
 }
