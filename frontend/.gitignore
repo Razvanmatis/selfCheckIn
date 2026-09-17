@@ -9,3 +9,4 @@ vite.config.d.ts
 tsconfig.app.tsbuildinfo
 tsconfig.node.tsbuildinfo
 package-lock.json
+vite.config.js
