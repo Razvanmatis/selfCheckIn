@@ -320,7 +320,7 @@ export default {
 		env: Env,
 		ctx: ExecutionContext
 	) {
-		if (controller.cron !== "0 2 * * *") {
+		if (controller.cron !== "0 12 * * *") {
 			return;
 		}
 		await runScheduledTasks(env);
