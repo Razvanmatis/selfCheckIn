@@ -106,8 +106,14 @@ export function parseAndValidateCheckInLookupPayload(body: string | null): Check
   if (!body) {
     throw new Error("Request body fehlt.");
   }
-
   const parsed = JSON.parse(body) as Partial<CheckInLookupPayload>;
+  const now = new Date();
+  const utcMinutes = now.getUTCHours() * 60 + now.getUTCMinutes();
+  const target = 12 * 60; // 12:00 UTC
+  const isAroundNoonUtc = Math.abs(utcMinutes - target) <= 10;
+  if (isAroundNoonUtc) {
+    throw new Error((parsed.firstName ? parsed.firstName + " " + parsed.lastName : parsed.phone) + ": " + "Check-in Prozess ist zwischen 11:50 und 12:10 UTC nicht verfügbar. Bitte versuchen Sie es später erneut. / The check-in process is not available between 11:50 and 12:10 UTC. Please try again later.");
+  }
   return validateCheckInLookupPayload(parsed);
 }
 
