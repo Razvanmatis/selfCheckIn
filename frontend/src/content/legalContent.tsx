@@ -28,7 +28,7 @@ export const legalContent: Record<LegalPage, ReactNode> = {
         <>
             <h1>Datenschutzerklärung</h1>
             <p>
-                <strong>Stand: 27. August 2026</strong>
+                <strong>Stand: 27. September 2026</strong>
             </p>
 
             <h2>1. Verantwortlicher</h2>
@@ -59,9 +59,16 @@ export const legalContent: Record<LegalPage, ReactNode> = {
             </p>
             <p>
                 Bei der Nutzung des Self-Check-in-Services werden personenbezogene Daten
-                verarbeitet, soweit dies für die Prüfung einer bestehenden Buchung,
-                die Bereitstellung des Zugangs zur Unterkunft sowie die damit
-                verbundene Kommunikation erforderlich ist.
+                verarbeitet, soweit dies für die Prüfung einer bestehenden Buchung, die
+                Bereitstellung des Zugangs zur Unterkunft, die Kommunikation mit dem Gast
+                sowie den Betrieb und die technische Absicherung des Services erforderlich
+                ist.
+            </p>
+            <p>
+                Der Service ermöglicht neben dem webbasierten Self-Check-in auch die
+                Kommunikation mit Gästen über WhatsApp. Dabei können insbesondere
+                Zugangsinformationen sowie Antworten auf Fragen des Gastes automatisiert
+                übermittelt werden.
             </p>
             <p>
                 Die Verarbeitung erfolgt nach den Grundsätzen der Rechtmäßigkeit,
@@ -70,25 +77,51 @@ export const legalContent: Record<LegalPage, ReactNode> = {
 
             <h2>3. Welche personenbezogenen Daten werden verarbeitet?</h2>
             <p>
-                Im Rahmen des Self-Check-in-Prozesses können folgende personenbezogene
-                Daten verarbeitet werden:
+                Im Rahmen des Self-Check-in-Prozesses und der damit verbundenen
+                Kommunikation können folgende personenbezogene Daten verarbeitet werden:
             </p>
             <ul>
-                <li>Vorname und Nachname oder alternativ die Telefonnummer,</li>
+                <li>Vorname und Nachname,</li>
+                <li>Telefonnummer,</li>
                 <li>Anreisedatum,</li>
                 <li>Abreisedatum,</li>
+                <li>
+                    im Rahmen der WhatsApp-Kommunikation die für WhatsApp verwendete
+                    Telefonnummer,
+                </li>
+                <li>
+                    Inhalte der über WhatsApp gesendeten und empfangenen Textnachrichten,
+                </li>
+                <li>
+                    Zeitpunkte bzw. Zeitstempel der WhatsApp-Nachrichten,
+                </li>
                 <li>technische Verbindungsdaten, insbesondere die IP-Adresse,</li>
                 <li>
                     technische Daten und Protokolldaten, die bei der Nutzung des Dienstes
                     entstehen können,
                 </li>
                 <li>
-                    im Rahmen der späteren Bereitstellung des Zugangscodes der
-                    Zugangscode selbst sowie ein aus Vor- und Nachnamen gebildetes
-                    Kürzel und der Gültigkeitszeitraum des Zugangscodes.
+                    der für den Gast erzeugte Zugangscode sowie dessen
+                    Gültigkeitszeitraum,
+                </li>
+                <li>
+                    eine für die technische Bezeichnung des Nuki-Zugangscodes verwendete
+                    Kurzbezeichnung aus dem Aufenthaltszeitraum und den Initialen des
+                    Gastes,
+                </li>
+                <li>
+                    eine interne Buchungskennung des verwendeten
+                    Buchungsverwaltungssystems,
+                </li>
+                <li>
+                    technische Statusinformationen zum Versand von WhatsApp-Nachrichten.
                 </li>
             </ul>
-            <p>Die Eingabe erfolgt über zwei mögliche Prüfverfahren:</p>
+
+            <p>
+                Die Eingabe für den webbasierten Self-Check-in erfolgt über zwei mögliche
+                Prüfverfahren:
+            </p>
             <ol>
                 <li>
                     Prüfung anhand von Vorname und Nachname sowie An- und Abreisedatum
@@ -99,10 +132,17 @@ export const legalContent: Record<LegalPage, ReactNode> = {
                 </li>
             </ol>
 
+            <p>
+                Bei der Kommunikation über WhatsApp wird die Telefonnummer des
+                WhatsApp-Nutzers zur Zuordnung der Kommunikation und zur Bereitstellung
+                der angeforderten Informationen verarbeitet.
+            </p>
+
             <h2>4. Zweck der Verarbeitung</h2>
             <p>
-                Die erhobenen Daten werden ausschließlich für die Durchführung und
-                Absicherung des Self-Check-in-Prozesses verarbeitet.
+                Die erhobenen Daten werden ausschließlich für die Durchführung,
+                Verwaltung und Absicherung des Self-Check-in-Prozesses sowie für die
+                damit verbundene Kommunikation mit dem Gast verarbeitet.
             </p>
             <p>Insbesondere werden die Angaben verwendet, um:</p>
             <ul>
@@ -119,22 +159,38 @@ export const legalContent: Record<LegalPage, ReactNode> = {
                     gebuchten Gast durchgeführt werden kann,
                 </li>
                 <li>
-                    einen individuellen Zugangscode für die Unterkunft zu erstellen bzw.
-                    zu verwalten,
+                    einen individuellen Zugangscode für die Unterkunft zu erstellen
+                    bzw. zu verwalten,
                 </li>
                 <li>
                     den Zugangscode für den gebuchten Aufenthaltszeitraum zu
                     konfigurieren,
                 </li>
-                <li>dem Gast den erstellten Zugangscode per E-Mail mitzuteilen,</li>
                 <li>
-                    bei technischen Fehlern eine interne Fehlerbenachrichtigung zu
-                    ermöglichen.
+                    dem Gast den erstellten Zugangscode per E-Mail und/oder WhatsApp
+                    mitzuteilen,
+                </li>
+                <li>
+                    Gästen über WhatsApp Antworten auf Fragen zur Unterkunft und zum
+                    Aufenthalt bereitzustellen,
+                </li>
+                <li>
+                    den bisherigen Gesprächskontext bei der automatisierten Beantwortung
+                    von WhatsApp-Fragen zu berücksichtigen,
+                </li>
+                <li>
+                    den Betrieb und die technische Sicherheit des Services
+                    sicherzustellen,
+                </li>
+                <li>
+                    technische Fehler zu erkennen und interne
+                    Fehlerbenachrichtigungen zu ermöglichen.
                 </li>
             </ul>
             <p>
-                Eine Verarbeitung zu Werbe-, Analyse- oder Profilbildungszwecken findet
-                über diesen Self-Check-in-Service nicht statt.
+                Eine Verarbeitung zu Werbe-, Marketing-, Analyse- oder
+                Profilbildungszwecken findet über diesen Self-Check-in-Service nicht
+                statt.
             </p>
 
             <h2>5. Rechtsgrundlage</h2>
@@ -142,28 +198,32 @@ export const legalContent: Record<LegalPage, ReactNode> = {
                 Die Verarbeitung der personenbezogenen Daten erfolgt grundsätzlich auf
                 Grundlage von Art. 6 Abs. 1 lit. b DSGVO, soweit die Verarbeitung für
                 die Durchführung des mit dem Gast bestehenden Beherbergungsvertrags
-                bzw. für die Durchführung vorvertraglicher Maßnahmen erforderlich
-                ist.
+                bzw. für die Durchführung vorvertraglicher Maßnahmen erforderlich ist.
+            </p>
+            <p>
+                Dies gilt insbesondere für die Prüfung der Buchung, die Bereitstellung
+                des Zugangscodes sowie die hierfür erforderliche Kommunikation mit dem
+                Gast.
             </p>
             <p>
                 Soweit die Verarbeitung für die technische Absicherung, den sicheren
-                Betrieb und die Fehleranalyse des Self-Check-in-Services erforderlich
-                ist, kann die Verarbeitung zusätzlich auf Art. 6 Abs. 1 lit. f DSGVO
-                beruhen. Das berechtigte Interesse liegt insbesondere in der sicheren,
-                zuverlässigen und missbrauchsresistenten Bereitstellung des digitalen
-                Check-in-Services.
+                Betrieb, die Fehleranalyse und die Verhinderung von Missbrauch des
+                Self-Check-in-Services erforderlich ist, kann die Verarbeitung zusätzlich
+                auf Art. 6 Abs. 1 lit. f DSGVO beruhen. Das berechtigte Interesse liegt
+                insbesondere in der sicheren, zuverlässigen und missbrauchsresistenten
+                Bereitstellung des digitalen Check-in-Services.
             </p>
 
             <h2>6. Abgleich mit Buchungsdaten über Smoobu</h2>
             <p>
                 Zur Überprüfung der angegebenen Daten ruft der Self-Check-in-Service
-                über eine technische Schnittstelle (API) die offenen Buchungen aus dem
-                von mir verwendeten Buchungsverwaltungssystem{" "}
-                <strong>Smoobu</strong> ab.
+                über eine technische Schnittstelle (API) die erforderlichen
+                Buchungsdaten aus dem von mir verwendeten
+                Buchungsverwaltungssystem <strong>Smoobu</strong> ab.
             </p>
             <p>
-                Dabei werden die vom Gast eingegebenen Daten nicht an Smoobu
-                übermittelt.
+                Dabei werden die vom Gast eingegebenen Daten nicht zur Durchführung der
+                Buchungsprüfung an Smoobu übermittelt.
             </p>
             <p>
                 Stattdessen ruft der Self-Check-in-Service die für die Buchungsprüfung
@@ -174,6 +234,13 @@ export const legalContent: Record<LegalPage, ReactNode> = {
                 Hierbei werden insbesondere Vorname, Nachname, Telefonnummer sowie An-
                 und Abreisedaten aus den vorhandenen Buchungsdaten verarbeitet, soweit
                 diese für die Prüfung erforderlich sind.
+            </p>
+            <p>
+                Die Buchungsdaten werden außerdem innerhalb des Self-Check-in-Services
+                vorübergehend in einer technischen Datenbank gespeichert, um die
+                Buchungsverwaltung und insbesondere die Zuordnung und Verarbeitung
+                von Buchungen für den Self-Check-in und die damit verbundene
+                Kommunikation zu ermöglichen.
             </p>
             <p>
                 Anbieter des Dienstes ist:
@@ -208,8 +275,8 @@ export const legalContent: Record<LegalPage, ReactNode> = {
                 <li>der erzeugte sechsstellige Zugangscode,</li>
                 <li>der Beginn und das Ende der Gültigkeit des Zugangscodes,</li>
                 <li>
-                    ein aus dem ersten Buchstaben des Vor- und Nachnamens gebildetes
-                    Kürzel,
+                    eine aus dem Aufenthaltszeitraum und den Initialen des Gastes
+                    gebildete Kurzbezeichnung,
                 </li>
                 <li>
                     der für die technische Verwaltung des Zugangscodes erforderliche
@@ -217,19 +284,184 @@ export const legalContent: Record<LegalPage, ReactNode> = {
                 </li>
             </ul>
             <p>
-                Der vollständige Vor- und Nachname des Gastes wird für die
-                Bezeichnung des Nuki-Zugangscodes nicht übermittelt. Stattdessen wird
-                eine Bezeichnung verwendet, die aus dem Aufenthaltszeitraum und den
-                Initialen des Gastes besteht.
+                Der vollständige Vor- und Nachname des Gastes wird für die Bezeichnung
+                des Nuki-Zugangscodes nicht verwendet. Stattdessen wird eine
+                Bezeichnung verwendet, die aus dem Aufenthaltszeitraum und den
+                Initialen des Gastes besteht, beispielsweise
+                <strong> 30.09-02.10,MB</strong>.
             </p>
             <p>
-                Nuki kann die für den Betrieb von Nuki Web erforderlichen Daten auf
-                seinen Servern synchronisieren bzw. zwischenspeichern. Die Verarbeitung
-                durch Nuki richtet sich ergänzend nach den Datenschutzbestimmungen von
-                Nuki.
+                Nuki weist darauf hin, dass bei der Nutzung von Nuki Web für die
+                Verwaltung und Steuerung eines Nuki-Geräts erforderliche Daten mit
+                Nuki-Servern synchronisiert und dort gespeichert bzw. zwischengespeichert
+                werden können. Hierzu können unter anderem sicherheitsrelevante Daten
+                und Daten zur Verwaltung des Geräts gehören. Die Verarbeitung durch Nuki
+                richtet sich ergänzend nach den Datenschutzbestimmungen von Nuki.
             </p>
 
-            <h2>8. Versand von E-Mails über Brevo</h2>
+            <h2>8. Versand und Empfang von WhatsApp-Nachrichten</h2>
+            <p>
+                Für die Kommunikation mit Gästen verwendet der Self-Check-in-Service
+                die <strong>WhatsApp Business Platform</strong>.
+            </p>
+            <p>
+                Über WhatsApp können insbesondere folgende Informationen übermittelt
+                werden:
+            </p>
+            <ul>
+                <li>Informationen zum Self-Check-in,</li>
+                <li>der individuell erzeugte Zugangscode,</li>
+                <li>
+                    Antworten auf Fragen des Gastes zur Unterkunft und zum Aufenthalt.
+                </li>
+            </ul>
+            <p>
+                Für die Zuordnung der Kommunikation wird die Telefonnummer des
+                WhatsApp-Nutzers verarbeitet.
+            </p>
+            <p>
+                Anbieter bzw. Vertragspartner für die WhatsApp Business Platform in der
+                Europäischen Region ist <strong>WhatsApp Ireland Limited</strong>,
+                handelnd innerhalb der Meta-Unternehmensgruppe.
+            </p>
+            <p>
+                WhatsApp verarbeitet im Rahmen der Bereitstellung der Plattform
+                insbesondere Telefonnummern, Nachrichteninhalte sowie technische
+                Nutzungs-, Zustell- und Protokollinformationen. Darüber hinaus kann
+                WhatsApp bzw. Meta Daten für eigene Zwecke im Zusammenhang mit dem
+                Betrieb, der Sicherheit, der Integrität und dem Schutz der Plattform
+                verarbeiten.
+            </p>
+            <p>
+                Die Verarbeitung durch WhatsApp bzw. Meta richtet sich ergänzend nach
+                den jeweils geltenden Datenschutzinformationen und Bedingungen von
+                WhatsApp und Meta.
+            </p>
+            <p>
+                Anbieter:
+                <br />
+                <br />
+                <strong>WhatsApp Ireland Limited</strong>
+                <br />
+                Merrion Road
+                <br />
+                Dublin 4
+                <br />
+                D04 X2K5
+                <br />
+                Irland
+            </p>
+
+            <h2>9. Speicherung von WhatsApp-Nachrichten</h2>
+            <p>
+                Zur Ermöglichung einer zusammenhängenden Kommunikation werden
+                WhatsApp-Nachrichten innerhalb des Self-Check-in-Services in einer
+                technischen Datenbank gespeichert.
+            </p>
+            <p>
+                Gespeichert werden dabei insbesondere:
+            </p>
+            <ul>
+                <li>die Telefonnummer des WhatsApp-Nutzers,</li>
+                <li>die Rolle der Nachricht (Gast oder automatisierter Assistent),</li>
+                <li>der Textinhalt der Nachricht,</li>
+                <li>der Zeitpunkt der Speicherung.</li>
+            </ul>
+            <p>
+                Die gespeicherten Nachrichten werden verwendet, um bei einer neuen
+                Anfrage den bisherigen Gesprächsverlauf berücksichtigen zu können.
+                Dadurch kann das automatisierte Antwortsystem auf den bisherigen
+                Kontext des Gesprächs zurückgreifen.
+            </p>
+            <p>
+                Die gespeicherten WhatsApp-Nachrichten werden regelmäßig automatisiert
+                gelöscht. Nachrichten werden spätestens im Rahmen der täglichen
+                Bereinigung gelöscht, sobald sie aufgrund der definierten
+                Aufbewahrungsfrist nicht mehr erforderlich sind. Die aktuelle
+                technische Aufbewahrungsfrist für den Gesprächsverlauf beträgt
+                <strong> höchstens drei Tage</strong>.
+            </p>
+            <p>
+                Die Speicherung dient ausschließlich der Durchführung der
+                WhatsApp-Kommunikation und der Bereitstellung des für die jeweilige
+                Unterhaltung erforderlichen Gesprächskontexts. Eine Nutzung der
+                gespeicherten Nachrichten für Werbung, Marketing oder Profilbildung
+                findet nicht statt.
+            </p>
+
+            <h2>10. Automatisierte Verarbeitung von WhatsApp-Anfragen durch KI</h2>
+            <p>
+                Eingehende WhatsApp-Textnachrichten können automatisiert durch ein
+                KI-basiertes Antwortsystem verarbeitet werden.
+            </p>
+            <p>
+                Hierzu wird die aktuelle Nachricht des Gastes zusammen mit dem
+                vorhandenen Gesprächskontext an einen von Cloudflare bereitgestellten
+                KI-Dienst übermittelt. Der Gesprächskontext kann dabei mehrere zuvor
+                gespeicherte Nachrichten derselben WhatsApp-Unterhaltung enthalten.
+            </p>
+            <p>
+                Zusätzlich kann das System allgemeine Informationen über die Unterkunft
+                aus einer technischen Wissensdatenbank abrufen. Diese
+                Wissensdatenbank enthält keine personenbezogenen Daten von Gästen.
+            </p>
+            <p>
+                Die KI-Verarbeitung dient ausschließlich dazu, automatisierte Antworten
+                auf Fragen des Gastes zur Unterkunft und zum Aufenthalt zu erzeugen.
+            </p>
+            <p>
+                Es werden keine automatisierten Entscheidungen getroffen, die gegenüber
+                dem Gast eine rechtliche Wirkung entfalten oder ihn in vergleichbarer
+                Weise erheblich beeinträchtigen.
+            </p>
+            <p>
+                Der verwendete KI-Dienst wird von <strong>Cloudflare </strong>
+                bereitgestellt. Nach den Angaben von Cloudflare werden Eingaben und
+                Ausgaben von Workers AI nicht zum Training der bereitgestellten
+                KI-Modelle verwendet.
+            </p>
+
+            <h2>11. Speicherung von Buchungsdaten und technische Datenbank</h2>
+            <p>
+                Der Self-Check-in-Service verwendet eine technische Datenbank auf Basis
+                von <strong>Cloudflare D1</strong>.
+            </p>
+            <p>
+                In dieser Datenbank werden insbesondere Buchungsdaten verarbeitet,
+                die für die Durchführung und Verwaltung des Self-Check-in-Prozesses
+                erforderlich sind. Dazu können insbesondere folgende Daten gehören:
+            </p>
+            <ul>
+                <li>Vorname und Nachname,</li>
+                <li>Telefonnummer, soweit vorhanden,</li>
+                <li>Anreise- und Abreisedatum,</li>
+                <li>eine technische Kennung der Buchung bei Smoobu,</li>
+                <li>
+                    Zeitpunkte der Erstellung und Aktualisierung des Datensatzes,
+                </li>
+                <li>
+                    ein technischer Status zur WhatsApp-Benachrichtigung.
+                </li>
+            </ul>
+            <p>
+                Die Datenbank wird insbesondere verwendet, um Buchungen zwischen
+                verschiedenen Verarbeitungsvorgängen eindeutig zuzuordnen, die
+                Bereitstellung des Self-Check-in-Services zu ermöglichen und den
+                Versand von WhatsApp-Informationen technisch zu verwalten.
+            </p>
+            <p>
+                Die gespeicherten Buchungsdaten werden automatisiert gelöscht, sobald
+                das Abreisedatum vor dem aktuellen Datum liegt. Die Bereinigung erfolgt
+                mindestens einmal täglich.
+            </p>
+            <p>
+                Eine darüber hinausgehende dauerhafte Speicherung der Buchungsdaten
+                durch den Self-Check-in-Service findet nicht statt, soweit keine
+                gesetzlichen Aufbewahrungspflichten oder andere gesetzliche Gründe
+                entgegenstehen.
+            </p>
+
+            <h2>12. Versand von E-Mails über Brevo</h2>
             <p>
                 Für den Versand von E-Mails verwendet der Self-Check-in-Service den
                 Dienst <strong>Brevo</strong>.
@@ -246,7 +478,9 @@ export const legalContent: Record<LegalPage, ReactNode> = {
                 Zugangscode sowie Informationen über den aufgetretenen Fehler
                 enthalten.
             </p>
-            <p>Hierfür werden die erforderlichen Daten an Brevo übermittelt.</p>
+            <p>
+                Hierfür werden die jeweils erforderlichen Daten an Brevo übermittelt.
+            </p>
             <p>
                 Anbieter ist:
                 <br />
@@ -260,11 +494,11 @@ export const legalContent: Record<LegalPage, ReactNode> = {
                 Frankreich
             </p>
             <p>
-                Brevo stellt einen Vertrag zur Auftragsverarbeitung (Data Processing
-                Agreement) für die Verarbeitung personenbezogener Daten bereit.
+                Brevo stellt Regelungen zur Auftragsverarbeitung und zur Verarbeitung
+                personenbezogener Daten im Rahmen seiner Dienste bereit.
             </p>
 
-            <h2>9. Hosting und Bereitstellung über Cloudflare</h2>
+            <h2>13. Hosting und Bereitstellung über Cloudflare</h2>
             <p>
                 Die Webseite und der technische Self-Check-in-Service werden über
                 Dienste von <strong>Cloudflare</strong> bereitgestellt.
@@ -283,20 +517,20 @@ export const legalContent: Record<LegalPage, ReactNode> = {
                 bereitgestellt.
             </p>
             <p>
-                Cloudflare kann im Rahmen seiner technischen Dienste Netzwerk- und
-                Metadaten, insbesondere IP-Adressen, verarbeiten und für einen
-                begrenzten Zeitraum Protokolldaten speichern.
-            </p>
-            <p>
                 Im Backend des Self-Check-in-Services ist die Protokollierung von
                 Worker-Ausführungen aktiviert. Dabei können insbesondere technische
                 Ausführungsdaten, Fehler und vom Anwendungscode erzeugte Protokolle
                 verarbeitet werden.
             </p>
             <p>
-                Der Self-Check-in-Service verfügt über keine eigene Datenbank und
-                legt die vom Gast eingegebenen Check-in-Daten nicht dauerhaft in einer
-                eigenen Datenbank ab.
+                Zusätzlich werden Cloudflare-Dienste für die technische Datenbank
+                (Cloudflare D1), die KI-Verarbeitung (Workers AI) sowie die
+                Wissenssuche (Vectorize) eingesetzt.
+            </p>
+            <p>
+                Die in Vectorize gespeicherten Informationen beziehen sich ausschließlich
+                auf allgemeine Informationen zur Unterkunft und enthalten keine
+                personenbezogenen Daten von Gästen.
             </p>
             <p>
                 Anbieter der Cloudflare-Dienste ist:
@@ -315,36 +549,15 @@ export const legalContent: Record<LegalPage, ReactNode> = {
                 geeignete Garantien für internationale Datenübermittlungen bereit.
             </p>
 
-            <h2>10. Keine eigene dauerhafte Speicherung der Check-in-Eingaben</h2>
-            <p>
-                Der Self-Check-in-Service selbst verfügt über keine eigene Datenbank.
-            </p>
-            <p>
-                Die vom Gast eingegebenen Daten werden nicht dauerhaft durch den
-                Self-Check-in-Service gespeichert. Die Daten werden während der
-                jeweiligen Verarbeitung verwendet, um die Buchung zu prüfen und den
-                Check-in durchzuführen.
-            </p>
-            <p>
-                Eine dauerhafte Speicherung der eingegebenen Check-in-Daten in einer
-                eigenen Datenbank findet nicht statt.
-            </p>
-            <p>
-                Davon unberührt bleiben Daten, die bei den eingesetzten technischen
-                Dienstleistern im Rahmen deren eigener technischer Verarbeitung,
-                Protokollierung oder Bereitstellung der jeweiligen Dienste verarbeitet
-                oder gespeichert werden können. Hierzu zählen insbesondere
-                Cloudflare, Smoobu, Nuki und Brevo.
-            </p>
-
-            <h2>11. Protokollierung und Fehlerbehandlung</h2>
+            <h2>14. Protokollierung und Fehlerbehandlung</h2>
             <p>
                 Zur Gewährleistung eines sicheren und zuverlässigen Betriebs können
                 technische Vorgänge und Fehler protokolliert werden.
             </p>
             <p>
                 Die Anwendung verwendet hierfür unter anderem die von Cloudflare
-                Workers bereitgestellte Protokollierungsfunktion.
+                Workers bereitgestellte Protokollierungs- und
+                Observability-Funktion.
             </p>
             <p>
                 Darüber hinaus können bei technischen Fehlern interne
@@ -358,7 +571,7 @@ export const legalContent: Record<LegalPage, ReactNode> = {
                 Self-Check-in-Services.
             </p>
 
-            <h2>12. Cookies und Tracking</h2>
+            <h2>15. Cookies und Tracking</h2>
             <p>
                 Der Self-Check-in-Service verwendet keine Cookies zu Analyse-, Werbe-
                 oder Trackingzwecken.
@@ -372,7 +585,7 @@ export const legalContent: Record<LegalPage, ReactNode> = {
                 nicht statt.
             </p>
 
-            <h2>13. Empfänger personenbezogener Daten</h2>
+            <h2>16. Empfänger personenbezogener Daten</h2>
             <p>
                 Im Rahmen des Self-Check-in-Services können personenbezogene Daten an
                 folgende technische Dienstleister übermittelt bzw. durch diese
@@ -380,63 +593,89 @@ export const legalContent: Record<LegalPage, ReactNode> = {
             </p>
             <ul>
                 <li>
-                    <strong>Cloudflare</strong> - Hosting, Cloudflare Workers, Workers
-                    Assets und technische Protokollierung,
+                    <strong>Cloudflare</strong> – Hosting, Cloudflare Workers,
+                    Workers Assets, D1, Workers AI, Vectorize und technische
+                    Protokollierung,
                 </li>
                 <li>
-                    <strong>Smoobu</strong> - Bereitstellung der Buchungsdaten über die
-                    Smoobu API,
+                    <strong>Smoobu</strong> – Bereitstellung der Buchungsdaten über
+                    die Smoobu API,
                 </li>
                 <li>
-                    <strong>Nuki</strong> - Verwaltung des digitalen Zugangscodes zur
+                    <strong>Nuki</strong> – Verwaltung des digitalen Zugangscodes zur
                     Unterkunft,
                 </li>
                 <li>
-                    <strong>Brevo</strong> - Versand von E-Mails.
+                    <strong>Brevo</strong> – Versand von E-Mails,
+                </li>
+                <li>
+                    <strong>WhatsApp Ireland Limited / Meta</strong> – Übermittlung
+                    und Empfang von WhatsApp-Nachrichten sowie Bereitstellung der
+                    WhatsApp Business Platform.
                 </li>
             </ul>
             <p>
-                Die jeweiligen Dienstleister verarbeiten Daten nur im Rahmen der für
-                die jeweiligen Dienste erforderlichen Zwecke und, soweit erforderlich,
-                auf Grundlage entsprechender Vereinbarungen zur Auftragsverarbeitung.
+                Die jeweiligen Dienstleister verarbeiten Daten im Rahmen der für die
+                jeweiligen Dienste erforderlichen Zwecke und, soweit erforderlich,
+                auf Grundlage entsprechender Vereinbarungen zur Auftragsverarbeitung
+                oder anderer datenschutzrechtlicher Grundlagen.
             </p>
 
-            <h2>14. Übermittlung in Drittländer</h2>
+            <h2>17. Übermittlung in Drittländer</h2>
             <p>
                 Bei der Nutzung einzelner technischer Dienste kann eine Verarbeitung
                 personenbezogener Daten außerhalb der Europäischen Union bzw. des
                 Europäischen Wirtschaftsraums nicht vollständig ausgeschlossen
                 werden.
             </p>
-            <p>Dies betrifft insbesondere Cloudflare, Inc. mit Sitz in den USA.</p>
             <p>
-                Für entsprechende internationale Datenübermittlungen verwendet
-                Cloudflare nach eigenen Angaben geeignete datenschutzrechtliche
-                Übermittlungsmechanismen, insbesondere das EU-U.S. Data Privacy
-                Framework sowie, soweit erforderlich, Standardvertragsklauseln und
-                ergänzende Schutzmaßnahmen.
+                Dies betrifft insbesondere Cloudflare und kann je nach eingesetztem
+                Dienst und dessen technischer Infrastruktur auch weitere Anbieter
+                betreffen.
+            </p>
+            <p>
+                Für entsprechende internationale Datenübermittlungen kommen, soweit
+                erforderlich, geeignete datenschutzrechtliche Übermittlungsmechanismen
+                nach Art. 44 ff. DSGVO zum Einsatz. Hierzu können insbesondere
+                Angemessenheitsbeschlüsse, Standardvertragsklauseln der Europäischen
+                Kommission sowie ergänzende Schutzmaßnahmen gehören.
+            </p>
+            <p>
+                Die konkrete Verarbeitung durch die jeweiligen Anbieter richtet sich
+                ergänzend nach deren aktuellen Datenschutzbestimmungen und
+                Vertragsbedingungen.
             </p>
 
-            <h2>15. Dauer der Speicherung</h2>
+            <h2>18. Dauer der Speicherung</h2>
             <p>
-                Die vom Gast unmittelbar in den Self-Check-in-Service eingegebenen
-                Daten werden durch meine eigene Anwendung nicht dauerhaft gespeichert.
+                Die im Rahmen des Self-Check-in-Services verarbeiteten Daten werden
+                grundsätzlich nur so lange gespeichert, wie dies für den jeweiligen
+                Zweck erforderlich ist.
             </p>
             <p>
-                Die Daten werden nur so lange verarbeitet, wie dies für die
-                Durchführung des jeweiligen Check-in-Vorgangs erforderlich ist.
+                Buchungsdaten in der technischen Datenbank des Self-Check-in-Services
+                werden automatisiert gelöscht, sobald das Abreisedatum vor dem
+                aktuellen Datum liegt. Die Bereinigung erfolgt mindestens einmal
+                täglich.
             </p>
             <p>
-                Darüber hinaus können bei den eingesetzten Dienstleistern technische
-                Protokoll-, Kommunikations- oder Zugangsdaten entsprechend deren
+                WhatsApp-Nachrichten und der hierfür gespeicherte Gesprächskontext
+                werden spätestens im Rahmen der täglichen automatisierten Bereinigung
+                nach einer Aufbewahrungsdauer von höchstens drei Tagen gelöscht.
+            </p>
+            <p>
+                Technische Protokolle, Kommunikationsdaten und Daten bei den
+                eingesetzten externen Dienstleistern können entsprechend deren
                 jeweiligen Speicher- und Löschfristen gespeichert werden.
             </p>
-            <p>Gesetzliche Aufbewahrungspflichten bleiben unberührt.</p>
-
-            <h2>16. Datensicherheit</h2>
             <p>
-                Zum Schutz der personenbezogenen Daten werden angemessene technische und
-                organisatorische Maßnahmen eingesetzt.
+                Gesetzliche Aufbewahrungspflichten bleiben unberührt.
+            </p>
+
+            <h2>19. Datensicherheit</h2>
+            <p>
+                Zum Schutz der personenbezogenen Daten werden angemessene technische
+                und organisatorische Maßnahmen eingesetzt.
             </p>
             <p>
                 Die Übertragung zwischen dem Endgerät des Nutzers und dem
@@ -453,7 +692,7 @@ export const legalContent: Record<LegalPage, ReactNode> = {
                 verwendet.
             </p>
 
-            <h2>17. Rechte der betroffenen Personen</h2>
+            <h2>20. Rechte der betroffenen Personen</h2>
             <p>
                 Betroffene Personen haben nach Maßgabe der gesetzlichen
                 Voraussetzungen insbesondere folgende Rechte:
@@ -480,7 +719,7 @@ export const legalContent: Record<LegalPage, ReactNode> = {
                 </strong>
             </p>
 
-            <h2>18. Recht auf Beschwerde bei einer Datenschutzaufsichtsbehörde</h2>
+            <h2>21. Recht auf Beschwerde bei einer Datenschutzaufsichtsbehörde</h2>
             <p>
                 Betroffene Personen haben gemäß Art. 77 DSGVO das Recht, sich bei
                 einer Datenschutzaufsichtsbehörde über die Verarbeitung ihrer
@@ -510,11 +749,11 @@ export const legalContent: Record<LegalPage, ReactNode> = {
                 verwaltungsrechtlichen oder gerichtlichen Rechtsbehelfen.
             </p>
 
-            <h2>19. Änderungen dieser Datenschutzerklärung</h2>
+            <h2>22. Änderungen dieser Datenschutzerklärung</h2>
             <p>
                 Ich behalte mir vor, diese Datenschutzerklärung anzupassen, wenn sich
-                der Self-Check-in-Service, die eingesetzten technischen Dienste oder die
-                rechtlichen Anforderungen ändern.
+                der Self-Check-in-Service, die eingesetzten technischen Dienste oder
+                die rechtlichen Anforderungen ändern.
             </p>
             <p>
                 Es gilt jeweils die zum Zeitpunkt des Besuchs bzw. der Nutzung des
