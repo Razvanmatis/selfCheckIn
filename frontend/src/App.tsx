@@ -1,4 +1,4 @@
-import { useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import appPackage from "../package.json";
 import { deleteOldCodes } from "./api/deleteOldCodes";
 import { defineKeypadCode } from "./api/defineKeypadCode";
@@ -14,6 +14,7 @@ import type { Language } from "./i18n/translations";
 import { translations } from "./i18n/translations";
 import type { GuestLookupForm } from "./types/forms";
 import type { DialogStep, LoginMode } from "./types/ui";
+import { isCheckInUnavailable } from "./utils/checkInAvailability";
 import {
   buildSubmissionForm,
   getDateBounds,
@@ -44,6 +45,36 @@ function App() {
   const [isAdminDeleteOpen, setIsAdminDeleteOpen] = useState(false);
   const [adminUser, setAdminUser] = useState("");
   const [isDeletingOldCodes, setIsDeletingOldCodes] = useState(false);
+  const [isUnavailable, setIsUnavailable] = useState(() => isCheckInUnavailable(new Date()));
+
+  useEffect(() => {
+    let timeoutId: number;
+
+    const syncAvailability = () => {
+      const now = new Date();
+      const unavailable = isCheckInUnavailable(now);
+      setIsUnavailable(unavailable);
+
+      const nextBoundary = new Date(now);
+      nextBoundary.setUTCHours(unavailable ? 12 : 11, unavailable ? 10 : 50, 0, 0);
+      if (nextBoundary.getTime() <= now.getTime()) {
+        nextBoundary.setUTCDate(nextBoundary.getUTCDate() + 1);
+      }
+
+      window.clearTimeout(timeoutId);
+      timeoutId = window.setTimeout(syncAvailability, nextBoundary.getTime() - now.getTime());
+    };
+
+    syncAvailability();
+    window.addEventListener("focus", syncAvailability);
+    document.addEventListener("visibilitychange", syncAvailability);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+      window.removeEventListener("focus", syncAvailability);
+      document.removeEventListener("visibilitychange", syncAvailability);
+    };
+  }, []);
 
   const t = translations[language];
   const appVersion = appPackage.version;
@@ -147,7 +178,7 @@ function App() {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (isFormActionDisabled) {
+    if (isFormActionDisabled || isCheckInUnavailable(new Date())) {
       return;
     }
 
@@ -437,9 +468,15 @@ function App() {
             {isLoadingInstructions ? t.loadingInstructions : t.getInstructionsButton}
           </button>
 
-          <button type="submit" disabled={isFormActionDisabled}>
-            {isSubmitting ? t.submitting : t.submitButton}
-          </button>
+          {isUnavailable ? (
+            <p className="status status--error" role="status" lang={language}>
+              {t.checkInUnavailable}
+            </p>
+          ) : (
+            <button type="submit" disabled={isFormActionDisabled}>
+              {isSubmitting ? t.submitting : t.submitButton}
+            </button>
+          )}
 
           {submitError ? (
             <p className="status status--error" role="alert">

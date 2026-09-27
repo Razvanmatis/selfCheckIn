@@ -24,6 +24,7 @@ export const translations: Record<Language, Record<string, string>> = {
   en: {
     title: "Self Check-In",
     hint: "Please enter your data to create a check-in code.",
+    checkInUnavailable: "The check-in process is unavailable between 11:50 and 12:10 UTC. Please try again later.",
     loginMode: "Login Method",
     nameOption: "Name (First Name + Last Name)",
     phoneOption: "Phone Number",
@@ -85,6 +86,7 @@ export const translations: Record<Language, Record<string, string>> = {
   de: {
     title: "Self Check-In",
     hint: "Bitte geben Sie Ihre Daten ein, um einen Check-In Code zu erstellen.",
+    checkInUnavailable: "Check-in Prozess ist zwischen 11:50 und 12:10 UTC nicht verfügbar. Bitte versuchen Sie es später erneut.",
     loginMode: "Anmeldungsmethode",
     nameOption: "Name (Vorname + Nachname)",
     phoneOption: "Telefonnummer",
@@ -146,6 +148,7 @@ export const translations: Record<Language, Record<string, string>> = {
   ru: {
     title: "Самовключение",
     hint: "Пожалуйста, введите свои данные для создания кода регистрации.",
+    checkInUnavailable: "Процесс заселения недоступен с 11:50 до 12:10 UTC. Пожалуйста, попробуйте позже.",
     loginMode: "Способ входа",
     nameOption: "Имя (Имя + Фамилия)",
     phoneOption: "Номер телефона",
@@ -207,6 +210,7 @@ export const translations: Record<Language, Record<string, string>> = {
   zh: {
     title: "自助入住",
     hint: "请输入您的信息以创建入住代码。",
+    checkInUnavailable: "入住办理服务在 UTC 时间 11:50 至 12:10 期间不可用。请稍后重试。",
     loginMode: "登录方式",
     nameOption: "姓名（名字+姓氏）",
     phoneOption: "电话号码",
@@ -268,6 +272,7 @@ export const translations: Record<Language, Record<string, string>> = {
   hi: {
     title: "स्वचेक-इन",
     hint: "कृपया चेक-इन कोड बनाने के लिए अपना डेटा दर्ज करें।",
+    checkInUnavailable: "चेक-इन प्रक्रिया 11:50 से 12:10 UTC के बीच उपलब्ध नहीं है। कृपया बाद में पुनः प्रयास करें।",
     loginMode: "लॉगिन विधि",
     nameOption: "नाम (पहला नाम + अंतिम नाम)",
     phoneOption: "फोन नंबर",
@@ -329,6 +334,7 @@ export const translations: Record<Language, Record<string, string>> = {
   it: {
     title: "Self Check-In",
     hint: "Inserisci i tuoi dati per creare un codice di check-in.",
+    checkInUnavailable: "La procedura di check-in non è disponibile dalle 11:50 alle 12:10 UTC. Riprova più tardi.",
     loginMode: "Metodo di accesso",
     nameOption: "Nome (Nome + Cognome)",
     phoneOption: "Numero di telefono",
@@ -390,6 +396,7 @@ export const translations: Record<Language, Record<string, string>> = {
   es: {
     title: "Auto Check-In",
     hint: "Ingrese sus datos para crear un código de check-in.",
+    checkInUnavailable: "El proceso de check-in no está disponible entre las 11:50 y las 12:10 UTC. Inténtelo de nuevo más tarde.",
     loginMode: "Método de inicio de sesión",
     nameOption: "Nombre (Nombre + Apellido)",
     phoneOption: "Número de teléfono",
@@ -451,6 +458,7 @@ export const translations: Record<Language, Record<string, string>> = {
   el: {
     title: "Αυτόματη Εγγραφή",
     hint: "Παρακαλώ εισάγετε τα στοιχεία σας για να δημιουργήσετε κωδικό εγγραφής.",
+    checkInUnavailable: "Η διαδικασία check-in δεν είναι διαθέσιμη από τις 11:50 έως τις 12:10 UTC. Παρακαλούμε δοκιμάστε ξανά αργότερα.",
     loginMode: "Μέθοδος Σύνδεσης",
     nameOption: "Όνομα (Όνομα + Επώνυμο)",
     phoneOption: "Αριθμός τηλεφώνου",
@@ -512,6 +520,7 @@ export const translations: Record<Language, Record<string, string>> = {
   pt: {
     title: "Auto Check-in",
     hint: "Por favor, insira seus dados para criar um código de check-in.",
+    checkInUnavailable: "O processo de check-in não está disponível entre as 11:50 e as 12:10 UTC. Tente novamente mais tarde.",
     loginMode: "Método de Login",
     nameOption: "Nome (Nome + Sobrenome)",
     phoneOption: "Número de Telefone",
@@ -573,6 +582,7 @@ export const translations: Record<Language, Record<string, string>> = {
   ja: {
     title: "セルフチェックイン",
     hint: "チェックインコードを作成するために、あなたのデータを入力してください。",
+    checkInUnavailable: "チェックイン手続きは UTC 11:50 から 12:10 までご利用いただけません。後ほどもう一度お試しください。",
     loginMode: "ログイン方法",
     nameOption: "名前（名前+姓）",
     phoneOption: "電話番号",
@@ -634,6 +644,7 @@ export const translations: Record<Language, Record<string, string>> = {
   th: {
     title: "เช็คอินเอง",
     hint: "กรุณากรอกข้อมูลของคุณเพื่อสร้างรหัสเช็คอิน",
+    checkInUnavailable: "ไม่สามารถดำเนินการเช็คอินได้ระหว่างเวลา 11:50 ถึง 12:10 UTC โปรดลองอีกครั้งในภายหลัง",
     loginMode: "วิธีการเข้าสู่ระบบ",
     nameOption: "ชื่อ (ชื่อ + นามสกุล)",
     phoneOption: "หมายเลขโทรศัพท์",
@@ -695,6 +706,7 @@ export const translations: Record<Language, Record<string, string>> = {
   vi: {
     title: "Tự Kiểm Tra",
     hint: "Vui lòng nhập dữ liệu của bạn để tạo mã check-in.",
+    checkInUnavailable: "Quy trình nhận phòng không khả dụng từ 11:50 đến 12:10 UTC. Vui lòng thử lại sau.",
     loginMode: "Phương Pháp Đăng Nhập",
     nameOption: "Tên (Tên + Họ)",
     phoneOption: "Số Điện Thoại",
@@ -756,6 +768,7 @@ export const translations: Record<Language, Record<string, string>> = {
   cs: {
     title: "Vlastní Check-in",
     hint: "Prosím zadejte své údaje pro vytvoření kódu check-in.",
+    checkInUnavailable: "Proces přihlášení k pobytu není mezi 11:50 a 12:10 UTC dostupný. Zkuste to prosím později.",
     loginMode: "Metoda Přihlášení",
     nameOption: "Jméno (Jméno + Příjmení)",
     phoneOption: "Telefonní Číslo",
@@ -817,6 +830,7 @@ export const translations: Record<Language, Record<string, string>> = {
   pl: {
     title: "Samoobsługowe Zameldowanie",
     hint: "Proszę podaj swoje dane, aby utworzyć kod check-in.",
+    checkInUnavailable: "Proces zameldowania jest niedostępny między 11:50 a 12:10 UTC. Spróbuj ponownie później.",
     loginMode: "Metoda Logowania",
     nameOption: "Imię i Nazwisko",
     phoneOption: "Numer Telefonu",
@@ -878,6 +892,7 @@ export const translations: Record<Language, Record<string, string>> = {
   ro: {
     title: "Autoînregistrare",
     hint: "Vă rugăm introduceți datele pentru a crea un cod de check-in.",
+    checkInUnavailable: "Procesul de check-in nu este disponibil între 11:50 și 12:10 UTC. Vă rugăm să încercați din nou mai târziu.",
     loginMode: "Metoda de Conectare",
     nameOption: "Nume (Prenume + Nume)",
     phoneOption: "Număr de Telefon",
@@ -939,6 +954,7 @@ export const translations: Record<Language, Record<string, string>> = {
   sr: {
     title: "Самопријава",
     hint: "Молимо уnesite своје податке за прављење кода за пријаву.",
+    checkInUnavailable: "Пријава није доступна између 11:50 и 12:10 UTC. Покушајте поново касније.",
     loginMode: "Начин Пријаве",
     nameOption: "Име (Име и Презиме)",
     phoneOption: "Телефонски Број",
@@ -1000,6 +1016,7 @@ export const translations: Record<Language, Record<string, string>> = {
   fr: {
     title: "Auto Check-in",
     hint: "Veuillez entrer vos données pour créer un code de check-in.",
+    checkInUnavailable: "Le processus d'enregistrement n'est pas disponible entre 11 h 50 et 12 h 10 UTC. Veuillez réessayer plus tard.",
     loginMode: "Méthode de Connexion",
     nameOption: "Nom (Prénom + Nom)",
     phoneOption: "Numéro de Téléphone",

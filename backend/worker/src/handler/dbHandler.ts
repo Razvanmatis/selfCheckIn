@@ -149,11 +149,7 @@ export async function deleteExpiredReservations(env: Env): Promise<number> {
         `)
         .bind(today)
         .run();
-    const changes = result.meta.changes;
-    if (changes > 0) {
-        await sendGeneralMessageToAdmin(`Es wurden ${changes} abgelaufene Reservierungen gelöscht.`, env, false);
-    }
-    return changes;
+    return result.meta.changes;
 }
 
 export async function getAllReservationsWithinNextFiveDays(env: Env): Promise<DbReservationEntry[]> {
@@ -234,9 +230,5 @@ export async function deleteAllWhatsAppMessagesWhichAreOlderThan3Days(env: Env):
         `)
         .bind(threeDaysAgo)
         .run();
-    const changes = result.meta.changes;
-    if (changes > 0) {
-        await sendGeneralMessageToAdmin(`Es wurden ${changes} WhatsApp-Nachrichten gelöscht, die älter als 3 Tage waren.`, env, false);
-    }
-    return changes;
+    return result.meta.changes;
 }

@@ -1,7 +1,7 @@
 {
   "name": "selfcheckin-backend",
   "private": true,
-  "version": "0.1.0",
+  "version": "1.2.0",
   "type": "module",
   "scripts": {
     "dev": "tsx watch server.ts",
