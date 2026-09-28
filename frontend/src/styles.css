@@ -47,6 +47,7 @@ body {
   letter-spacing: 0.04em;
   font-weight: 600;
   text-transform: lowercase;
+  cursor: default;
 }
 
 .chatbot {
@@ -296,10 +297,6 @@ body {
 h1 {
   margin-top: 0;
   margin-bottom: 0;
-}
-
-.card-header__title-button {
-  cursor: pointer;
 }
 
 .card-header {

@@ -1,41 +1,37 @@
-type TranslationValues = Record<string, string>;
-
-type AdminDeleteDialogProps = {
-  t: TranslationValues;
+type AdminDailyRoutineDialogProps = {
   adminUser: string;
-  isDeletingOldCodes: boolean;
+  isRunningDailyRoutine: boolean;
   onAdminUserChange: (value: string) => void;
   onConfirm: () => void;
   onClose: () => void;
 };
 
-export function AdminDeleteDialog({
-  t,
+export function AdminDailyRoutineDialog({
   adminUser,
-  isDeletingOldCodes,
+  isRunningDailyRoutine,
   onAdminUserChange,
   onConfirm,
   onClose
-}: AdminDeleteDialogProps) {
+}: AdminDailyRoutineDialogProps) {
   return (
     <div className="dialog-backdrop" role="presentation">
-      <div className="dialog dialog--compact" role="dialog" aria-modal="true" aria-labelledby="admin-delete-dialog-title">
+      <div className="dialog dialog--compact" role="dialog" aria-modal="true" aria-labelledby="admin-daily-routine-dialog-title">
         <div className="dialog-hero">
           <span className="dialog-hero__badge" aria-hidden="true">
             🛠️
           </span>
           <div>
-            <h2 id="admin-delete-dialog-title">Delete old codes</h2>
-            <p className="hint dialog-description">Admin-Funktion zum Bereinigen alter Nuki-Codes.</p>
+            <h2 id="admin-daily-routine-dialog-title">Tägliche Routine triggern</h2>
+            <p className="hint dialog-description">Admin-Funktion zum Ausführen der täglichen Routine.</p>
           </div>
         </div>
 
         <label>
-          Admin-User:
+          Admin-User
           <input
             value={adminUser}
             onChange={(event) => onAdminUserChange(event.target.value)}
-            disabled={isDeletingOldCodes}
+            disabled={isRunningDailyRoutine}
             autoFocus
           />
         </label>
@@ -44,12 +40,12 @@ export function AdminDeleteDialog({
           <button
             type="button"
             onClick={onConfirm}
-            disabled={isDeletingOldCodes || !adminUser.trim()}
+            disabled={isRunningDailyRoutine || !adminUser.trim()}
           >
-            {isDeletingOldCodes ? "..." : "OK"}
+            {isRunningDailyRoutine ? "..." : "OK"}
           </button>
-          <button type="button" onClick={onClose} className="button-secondary" disabled={isDeletingOldCodes}>
-            {t.abortButton}
+          <button type="button" onClick={onClose} className="button-secondary" disabled={isRunningDailyRoutine}>
+            {"Abbrechen"}
           </button>
         </div>
       </div>

@@ -5,6 +5,7 @@ import {Env} from "../types/env";
 import {SmoobuReservationsResponse} from "../types/smoobuReservationsResponse";
 import {getAllBookingsBySmoobu} from "./smoobuHandler";
 import {ConversationHistoryEntry} from "../types/conversationHistoryEntry";
+import {normalizePhone} from "../helper/validation";
 
 export async function createReservation(
     env: Env,
@@ -162,7 +163,7 @@ export async function getAllReservationsWithinNextFiveDays(env: Env): Promise<Db
     return result.results.map(row => ({
         ...row,
         whatsapp_status: row.whatsapp_status ?? "message_not_sent"
-    })).filter(entry => entry.whatsapp_status === "message_not_sent");
+    })).filter(entry => entry.whatsapp_status === "message_not_sent" && entry.phone !== undefined && entry.phone.trim() !== "");
 }
 
 export async function markWhatsAppMessagesAsSent(
@@ -231,4 +232,23 @@ export async function deleteAllWhatsAppMessagesWhichAreOlderThan3Days(env: Env):
         .bind(threeDaysAgo)
         .run();
     return result.meta.changes;
+}
+
+export async function updatePhoneNumberOfEntry(
+    env: Env,
+    phone: string,
+    arrival: string,
+    departure: string
+): Promise<void> {
+    await env.DB.prepare(`
+                UPDATE reservations
+                SET phone = ?
+                WHERE arrival = ? AND departure = ?
+            `)
+            .bind(
+                normalizePhone(phone),
+                arrival,
+                departure
+            )
+            .run();
 }

@@ -1,14 +1,19 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import appPackage from "../package.json";
-import { deleteOldCodes } from "./api/deleteOldCodes";
+import { dailyRoutine } from "./api/dailyRoutine";
 import { defineKeypadCode } from "./api/defineKeypadCode";
 import { getCheckInInformation } from "./api/getCheckInInformation";
 import { initiateCheckInProcess } from "./api/initiateCheckInProcess";
-import { AdminDeleteDialog } from "./components/AdminDeleteDialog";
+import {
+  updatePhoneNumber,
+  type UpdatePhoneNumberPayload
+} from "./api/updatePhoneNumber";
+import { AdminDailyRoutineDialog } from "./components/AdminDailyRoutineDialog";
 import { ChatbotWidget } from "./components/ChatbotWidget";
 import { LanguageSelector } from "./components/LanguageSelector";
 import { PinDialog } from "./components/PinDialog";
 import { PreCheckInDialog } from "./components/PreCheckInDialog";
+import { UpdatePhoneNumberDialog } from "./components/UpdatePhoneNumberDialog";
 import { legalContent, type LegalPage } from "./content/legalContent";
 import type { Language } from "./i18n/translations";
 import { translations } from "./i18n/translations";
@@ -25,6 +30,13 @@ import {
 } from "./utils/checkInForm";
 import { generateAutoPinCode, isPinCodeValid, sanitizePinInput } from "./utils/pinCode";
 import { sanitizePhoneInput } from "./utils/phone";
+
+const initialUpdatePhoneNumberForm: UpdatePhoneNumberPayload = {
+  adminUser: "",
+  phone: "",
+  arrival: "",
+  departure: ""
+};
 
 function App() {
   type PageView = "main" | LegalPage;
@@ -44,7 +56,12 @@ function App() {
   const [dialogPhoneNumber, setDialogPhoneNumber] = useState("");
   const [isAdminDeleteOpen, setIsAdminDeleteOpen] = useState(false);
   const [adminUser, setAdminUser] = useState("");
-  const [isDeletingOldCodes, setIsDeletingOldCodes] = useState(false);
+  const [isRunningDailyRoutine, setIsRunningDailyRoutine] = useState(false);
+  const [isUpdatePhoneNumberOpen, setIsUpdatePhoneNumberOpen] = useState(false);
+  const [updatePhoneNumberForm, setUpdatePhoneNumberForm] = useState<UpdatePhoneNumberPayload>(
+    initialUpdatePhoneNumberForm
+  );
+  const [isUpdatingPhoneNumber, setIsUpdatingPhoneNumber] = useState(false);
   const [isUnavailable, setIsUnavailable] = useState(() => isCheckInUnavailable(new Date()));
 
   useEffect(() => {
@@ -239,12 +256,12 @@ function App() {
       return;
     }
 
-    setIsDeletingOldCodes(true);
+    setIsRunningDailyRoutine(true);
     setSubmitError(null);
     setSubmitResult(null);
 
     try {
-      const result = await deleteOldCodes(adminUser.trim());
+      const result = await dailyRoutine(adminUser.trim());
       window.alert(result);
       setSubmitResult(result);
       setIsAdminDeleteOpen(false);
@@ -256,13 +273,51 @@ function App() {
       setIsAdminDeleteOpen(false);
       setAdminUser("");
     } finally {
-      setIsDeletingOldCodes(false);
+      setIsRunningDailyRoutine(false);
     }
   };
 
   const handleAdminDeleteCancel = () => {
     setIsAdminDeleteOpen(false);
     setAdminUser("");
+  };
+
+  const handleUpdatePhoneNumberSubmit = async () => {
+    const payload: UpdatePhoneNumberPayload = {
+      ...updatePhoneNumberForm,
+      adminUser: updatePhoneNumberForm.adminUser.trim(),
+      phone: updatePhoneNumberForm.phone.trim()
+    };
+
+    if (!payload.adminUser || !payload.phone || !payload.arrival || !payload.departure) {
+      return;
+    }
+
+    setIsUpdatingPhoneNumber(true);
+    setSubmitError(null);
+    setSubmitResult(null);
+
+    try {
+      const result = await updatePhoneNumber(payload);
+      window.alert(result);
+      setSubmitResult(result);
+      setIsUpdatePhoneNumberOpen(false);
+      setUpdatePhoneNumberForm(initialUpdatePhoneNumberForm);
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Die Telefonnummer konnte nicht aktualisiert werden.";
+      window.alert(errorMessage);
+      setSubmitError(errorMessage);
+    } finally {
+      setIsUpdatingPhoneNumber(false);
+    }
+  };
+
+  const handleUpdatePhoneNumberCancel = () => {
+    setIsUpdatePhoneNumberOpen(false);
+    setUpdatePhoneNumberForm(initialUpdatePhoneNumberForm);
   };
 
   const closePinDialog = () => {
@@ -345,7 +400,14 @@ function App() {
           >
             {t.title}
           </h1>
-          <span className="app-version">v{appVersion}</span>
+          <button
+            type="button"
+            className="app-version"
+            onClick={() => setIsUpdatePhoneNumberOpen(true)}
+            aria-label="Telefonnummer updaten"
+          >
+            v{appVersion}
+          </button>
         </div>
         <LanguageSelector language={language} onLanguageChange={setLanguage} />
         </div>
@@ -521,13 +583,28 @@ function App() {
       ) : null}
 
       {isAdminDeleteOpen ? (
-        <AdminDeleteDialog
-          t={t}
+        <AdminDailyRoutineDialog
           adminUser={adminUser}
-          isDeletingOldCodes={isDeletingOldCodes}
+          isRunningDailyRoutine={isRunningDailyRoutine}
           onAdminUserChange={setAdminUser}
           onConfirm={handleAdminDeleteSubmit}
           onClose={handleAdminDeleteCancel}
+        />
+      ) : null}
+
+      {isUpdatePhoneNumberOpen ? (
+        <UpdatePhoneNumberDialog
+          form={updatePhoneNumberForm}
+          today={today}
+          isSubmitting={isUpdatingPhoneNumber}
+          onChange={(nextForm) =>
+            setUpdatePhoneNumberForm({
+              ...nextForm,
+              phone: sanitizePhoneInput(nextForm.phone)
+            })
+          }
+          onConfirm={handleUpdatePhoneNumberSubmit}
+          onClose={handleUpdatePhoneNumberCancel}
         />
       ) : null}
 

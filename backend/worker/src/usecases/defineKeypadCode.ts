@@ -1,4 +1,4 @@
-import {getAllOpenBookings, initiateCheckInProcess} from "./initiateCheckInProcess.js";
+import {initiateCheckInProcess} from "./initiateCheckInProcess.js";
 import {
     buildNukiCreatePayload,
     getExistingNameInitialsOfNukiAuthEntry,
@@ -21,6 +21,8 @@ import {sendMessageToGuestBySmoobu} from "../handler/smoobuHandler";
 import {createKeypadCode, forceNukiSync, getAllKeypadCodes, handleDeletionOfEntries} from "../handler/nukiHandler";
 import {SmoobuBooking} from "../types/smoobuBooking";
 import {sendCodeMessageToGuestByWhatsApp} from "../handler/whatsappHandler";
+import {getAllReservationsFromDb} from "../handler/dbHandler";
+import {Env} from "../types/env";
 
 const IS_ADMIN_NUMBER = 0;
 
@@ -125,7 +127,7 @@ export async function defineKeypadCode(request: DefineKeypadCodeRequest,
     await forceNukiSync(env);
     const allCurrentKeypadCodes = await getAllKeypadCodes(env);
     let formattedDateAsName = getFormattedDateAsName(request.checkInDate, request.checkOutDate);
-    const allBookings = await getAllOpenBookings(env);
+    const allBookings = await getAllReservationsFromDb(env as Env);
     const requestNameInitials = "," + await getNameInitialsOfRequest(request, allBookings, env);
     let formattedDateAsNameWithInitials = `${formattedDateAsName}${requestNameInitials}`;
     const existingEntriesWithSameCodeAndName = allCurrentKeypadCodes.filter(

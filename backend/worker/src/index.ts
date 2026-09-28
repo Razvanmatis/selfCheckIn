@@ -13,7 +13,7 @@ import {handleSmoobuWebhook} from "./services/smoobuWebhookService";
 import {
 	deleteAllWhatsAppMessagesWhichAreOlderThan3Days,
 	deleteExpiredReservations,
-	initWholeDatabase
+	initWholeDatabase, updatePhoneNumberOfEntry
 } from "./handler/dbHandler";
 import {runScheduledTasks} from "./services/scheduledService";
 import {verifyWhatsAppSignature} from "./helper/whatsAppSignature";
@@ -168,7 +168,7 @@ app.post("/api/ai/ask", async (c) => {
 	}
 });
 
-app.post("/api/deleteOldCodes", async (c) => {
+app.post("/api/dailyRoutine", async (c) => {
 	try {
 		const body = await c.req.json();
 		const adminUser = String(body?.adminUser ?? "").trim();
@@ -179,24 +179,23 @@ app.post("/api/deleteOldCodes", async (c) => {
 				400
 			);
 		}
-
-		await deleteExpiredReservations(c.env);
-		await deleteAllWhatsAppMessagesWhichAreOlderThan3Days(c.env);
-		const answer = await deleteOldCodesHandler(
-			{ body: adminUser },
-			c.env
+		if (adminUser !== c.env.ADMIN_NAME) {
+			return c.json(
+				{ message: "Ungültiger Admin-Benutzer." },
+				403
+			);
+		}
+		await runScheduledTasks(c.env);
+		return c.json(
+			"Die täglichen Routinen wurden erfolgreich ausgeführt."
 		);
-
-		return c.json({
-			answer
-		});
 	} catch (error) {
 		const message =
 			error instanceof Error
 				? error.message
-				: "Unbekannter Fehler beim Löschen der alten Codes.";
+				: "Unbekannter Fehler beim Ausführen der täglichen Routine.";
 		await sendGeneralMessageToAdmin(
-			`Fehler beim Löschen der alten Codes: ${message}`,
+			`Fehler beim Ausführen der täglichen Routine: ${message}`,
 			c.env
 		);
 		return c.json({ message }, 500);
@@ -306,6 +305,46 @@ app.post("/api/whatsapp/webhook", async (c) => {
 				: "Unbekannter Fehler beim Verarbeiten des WhatsApp-Webhooks.";
 		await sendGeneralMessageToAdmin(
 			`Fehler beim Verarbeiten des WhatsApp-Webhooks: ${message}`,
+			c.env
+		);
+		return c.json({ message }, 500);
+	}
+});
+
+app.post("/api/updatePhoneNumber", async (c) => {
+	console.log("Received request to update phone number");
+	try {
+		const body = await c.req.json();
+		const adminUser = String(body?.adminUser ?? "").trim();
+		if (!adminUser) {
+			return c.json(
+				{ message: "Kein Admin-Benutzer übergeben." },
+				400
+			);
+		}
+		if (adminUser !== c.env.ADMIN_NAME) {
+			return c.json(
+				{ message: "Ungültiger Admin-Benutzer." },
+				403
+			);
+		}
+		if (!body?.phone || !body?.arrival || !body?.departure) {
+			return c.json(
+				{ message: "Fehlende Parameter: phone, arrival oder departure." },
+				400
+			);
+		}
+		await updatePhoneNumberOfEntry(c.env, String(body?.phone).trim(), String(body?.arrival).trim(), String(body?.departure).trim());
+		return c.json(
+			"Telefonnummer erfolgreich aktualisiert."
+		);
+	} catch (error) {
+		const message =
+			error instanceof Error
+				? error.message
+				: "Unbekannter Fehler beim Aktualisieren der Telefonnummer.";
+		await sendGeneralMessageToAdmin(
+			`Fehler beim Aktualisieren der Telefonnummer: ${message}`,
 			c.env
 		);
 		return c.json({ message }, 500);

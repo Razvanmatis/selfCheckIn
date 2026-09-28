@@ -13,9 +13,7 @@ import {ConversationHistoryEntry} from "../types/conversationHistoryEntry";
 export async function informAllGuestsAboutCheckIn(env: Env) {
     const guestsToInform: DbReservationEntry[] = await getAllReservationsWithinNextFiveDays(env);
     for (const guest of guestsToInform) {
-        if (guest.phone) {
-            await sendCheckInMessageToGuestByWhatsApp(env, guest.phone);
-        }
+        await sendCheckInMessageToGuestByWhatsApp(env, guest.phone!);
     }
     await markWhatsAppMessagesAsSent(env, guestsToInform);
 }

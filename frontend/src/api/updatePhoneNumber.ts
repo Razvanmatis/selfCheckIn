@@ -1,19 +1,26 @@
 const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL ?? "").replace(/\/$/, "");
-const endpoint = `${apiBaseUrl}/api/deleteOldCodes`;
+const endpoint = `${apiBaseUrl}/api/updatePhoneNumber`;
 
-export async function deleteOldCodes(payload: string): Promise<string> {
+export type UpdatePhoneNumberPayload = {
+    adminUser: string;
+    phone: string;
+    arrival: string;
+    departure: string;
+};
+
+export async function updatePhoneNumber(payload: UpdatePhoneNumberPayload): Promise<string> {
     const response = await fetch(endpoint, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({ adminUser: payload })
+        body: JSON.stringify(payload)
     });
 
     if (!response.ok) {
         const errorText = await response.text();
 
-        let errorMessage = "Die alten Codes konnten nicht gelöscht werden.";
+        let errorMessage = "Das Aktualisieren der Telefonnummer konnte nicht ausgeführt werden.";
 
         if (errorText) {
             try {
