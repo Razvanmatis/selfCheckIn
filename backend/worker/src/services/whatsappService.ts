@@ -16,6 +16,10 @@ export async function informAllGuestsAboutCheckIn(env: Env) {
         await sendCheckInMessageToGuestByWhatsApp(env, guest.phone!);
     }
     await markWhatsAppMessagesAsSent(env, guestsToInform);
+    if (guestsToInform.length > 0) {
+        return `Es wurden ${guestsToInform.length} Gäste über den Check-In informiert.\n`;
+    }
+    return "";
 }
 
 export async function handleWhatsAppWebhookMessage(env: Env, phone: string, text: string) {

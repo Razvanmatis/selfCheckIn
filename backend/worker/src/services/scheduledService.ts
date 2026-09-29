@@ -1,12 +1,13 @@
 import {sendGeneralMessageToAdmin} from "./mailService";
 import {informAllGuestsAboutCheckIn} from "./whatsappService";
-import {deleteOldCodesHandler} from "../usecases/deleteOldNukiCodes";
+import {deleteAllOldCodes, deleteOldCodesHandler} from "../usecases/deleteOldNukiCodes";
 import {deleteAllWhatsAppMessagesWhichAreOlderThan3Days, deleteExpiredReservations} from "../handler/dbHandler";
 import {Env} from "../types/env";
 
-export async function runScheduledTasks(env: Env) {
+export async function runScheduledTasks(env: Env): Promise<string> {
+    let answer = "";
     try {
-        await deleteExpiredReservations(env);
+        answer += await deleteExpiredReservations(env);
     } catch (error) {
         const message =
             error instanceof Error
@@ -16,12 +17,10 @@ export async function runScheduledTasks(env: Env) {
             `Fehler beim täglichen Löschen alter Reservierungen: ${message}`,
             env
         );
+        answer += `Fehler beim Löschen alter Reservierungen: ${message}\n`;
     }
     try {
-        await deleteOldCodesHandler(
-            { body: env.ADMIN_NAME },
-            env
-        );
+        answer += await deleteAllOldCodes(env)
     } catch (error) {
         const message =
             error instanceof Error
@@ -31,9 +30,10 @@ export async function runScheduledTasks(env: Env) {
             `Fehler im täglichen Löschen alter Codes: ${message}`,
             env
         );
+        answer += `Fehler beim Löschen alter Codes: ${message}\n`;
     }
     try {
-        await informAllGuestsAboutCheckIn(env);
+        answer += await informAllGuestsAboutCheckIn(env);
     } catch (error) {
         const message =
             error instanceof Error
@@ -43,9 +43,10 @@ export async function runScheduledTasks(env: Env) {
             `Fehler beim täglichen Informieren der Gäste über den Check-In: ${message}`,
             env
         );
+        answer += `Fehler beim Informieren der Gäste über den Check-In: ${message}\n`;
     }
     try {
-        await deleteAllWhatsAppMessagesWhichAreOlderThan3Days(env);
+        answer += await deleteAllWhatsAppMessagesWhichAreOlderThan3Days(env);
     } catch (error) {
         const message =
             error instanceof Error
@@ -55,5 +56,7 @@ export async function runScheduledTasks(env: Env) {
             `Fehler beim täglichen Löschen alter WhatsApp-Nachrichten: ${message}`,
             env
         );
+        answer += `Fehler beim Löschen alter WhatsApp-Nachrichten: ${message}\n`;
     }
+    return answer;
 }

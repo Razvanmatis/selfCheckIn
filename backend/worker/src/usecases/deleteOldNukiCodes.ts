@@ -109,7 +109,7 @@ async function createNewCodesForRemainingUsers(listWithNewCodesToCreate: NukiCre
     }
 }
 
-async function deleteAllOldCodes(env: EnvBoth) {
+export async function deleteAllOldCodes(env: EnvBoth) {
     const allActiveBookings = await getAllBookingsBySmoobu(env);
     await forceNukiSync(env);
     const allActiveCodes = await getAllKeypadCodes(env);
@@ -164,6 +164,15 @@ async function deleteAllOldCodes(env: EnvBoth) {
     if (listWithNewCodesToCreate.length > 0) {
         await forceNukiSync(env);
         await createNewCodesForRemainingUsers(listWithNewCodesToCreate, env);
+    }
+    if (listWithIdsToDelete.length == 0 && listWithNewCodesToCreate.length == 0) {
+        return "";
+    }
+    if (listWithIdsToDelete.length > 0 && listWithNewCodesToCreate.length == 0) {
+        return `Es wurden ${listWithIdsToDelete.length} alte Codes gefunden, die gelöscht wurden.`;
+    }
+    if (listWithIdsToDelete.length == 0 && listWithNewCodesToCreate.length > 0) {
+        return `Es wurden ${listWithNewCodesToCreate.length} neue Codes für die verbleibenden Nutzer erstellt.`;
     }
     return `Es wurden ${listWithIdsToDelete.length} alte Codes gefunden, die gelöscht wurden. Und es wurden ${listWithNewCodesToCreate.length} neue Codes für die verbleibenden Nutzer erstellt.`;
 }

@@ -8,11 +8,8 @@ import { cors } from "hono/cors";
 import { seedKnowledge } from "./usecases/seedKnowledge";
 import { askKnowledge } from "./usecases/askKnowledge";
 import {sendGeneralMessageToAdmin} from "./services/mailService";
-import {deleteOldCodesHandler} from "./usecases/deleteOldNukiCodes";
 import {handleSmoobuWebhook} from "./services/smoobuWebhookService";
 import {
-	deleteAllWhatsAppMessagesWhichAreOlderThan3Days,
-	deleteExpiredReservations,
 	initWholeDatabase, updatePhoneNumberOfEntry
 } from "./handler/dbHandler";
 import {runScheduledTasks} from "./services/scheduledService";
@@ -185,9 +182,12 @@ app.post("/api/dailyRoutine", async (c) => {
 				403
 			);
 		}
-		await runScheduledTasks(c.env);
+		let answer = await runScheduledTasks(c.env);
+		if (!answer) {
+			answer = "Die tägliche Routine wurde erfolgreich ausgeführt, es gab jedoch keine neuen Aufgaben.";
+		}
 		return c.json(
-			"Die täglichen Routinen wurden erfolgreich ausgeführt."
+			answer
 		);
 	} catch (error) {
 		const message =
@@ -334,9 +334,12 @@ app.post("/api/updatePhoneNumber", async (c) => {
 				400
 			);
 		}
-		await updatePhoneNumberOfEntry(c.env, String(body?.phone).trim(), String(body?.arrival).trim(), String(body?.departure).trim());
+		let answer = await updatePhoneNumberOfEntry(c.env, String(body?.phone).trim(), String(body?.arrival).trim(), String(body?.departure).trim());
+		if (!answer) {
+			answer = "Die Telefonnummer wurde erfolgreich aktualisiert, es gab jedoch keine passenden Einträge.";
+		}
 		return c.json(
-			"Telefonnummer erfolgreich aktualisiert."
+			answer
 		);
 	} catch (error) {
 		const message =

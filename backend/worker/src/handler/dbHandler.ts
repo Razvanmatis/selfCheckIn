@@ -142,7 +142,7 @@ export async function getAllReservationsFromDb(env: Env): Promise<SmoobuReservat
     };
 }
 
-export async function deleteExpiredReservations(env: Env): Promise<number> {
+export async function deleteExpiredReservations(env: Env): Promise<string> {
     const today = new Date().toISOString().split("T")[0];
     const result = await env.DB.prepare(
         ` DELETE FROM reservations 
@@ -150,7 +150,10 @@ export async function deleteExpiredReservations(env: Env): Promise<number> {
         `)
         .bind(today)
         .run();
-    return result.meta.changes;
+    if (result.meta.changes > 0) {
+        return "Es wurden " + result.meta.changes + " abgelaufene Reservierungen gelöscht.\n";
+    }
+    return "";
 }
 
 export async function getAllReservationsWithinNextFiveDays(env: Env): Promise<DbReservationEntry[]> {
@@ -223,7 +226,7 @@ export async function getAllWhatsAppMessagesForPhone(
     return result.results;
 }
 
-export async function deleteAllWhatsAppMessagesWhichAreOlderThan3Days(env: Env): Promise<number> {
+export async function deleteAllWhatsAppMessagesWhichAreOlderThan3Days(env: Env): Promise<string> {
     const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString();
     const result = await env.DB.prepare(
         ` DELETE FROM whatsapp_messages 
@@ -231,7 +234,10 @@ export async function deleteAllWhatsAppMessagesWhichAreOlderThan3Days(env: Env):
         `)
         .bind(threeDaysAgo)
         .run();
-    return result.meta.changes;
+    if (result.meta.changes > 0) {
+        return `Es wurden ${result.meta.changes} abgelaufene WhatsApp-Nachrichten gelöscht.\n`;
+    }
+    return "";
 }
 
 export async function updatePhoneNumberOfEntry(
@@ -239,8 +245,8 @@ export async function updatePhoneNumberOfEntry(
     phone: string,
     arrival: string,
     departure: string
-): Promise<void> {
-    await env.DB.prepare(`
+): Promise<string> {
+    const result = await env.DB.prepare(`
                 UPDATE reservations
                 SET phone = ?
                 WHERE arrival = ? AND departure = ?
@@ -251,4 +257,8 @@ export async function updatePhoneNumberOfEntry(
                 departure
             )
             .run();
+    if (result.meta.changes > 0) {
+        return `Die Telefonnummer für die Reservierung vom ${arrival} bis ${departure} wurde erfolgreich auf ${phone} aktualisiert.`;
+    }
+    return "";
 }
