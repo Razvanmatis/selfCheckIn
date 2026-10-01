@@ -195,7 +195,7 @@ export async function sendGeneralMessageToAdmin(message: string, env: EnvBoth, u
     await sendMail(
         {
             to: [{email: env.EMAIL_FROM, name: 'Razvan Matis'}],
-            subject: useAsWarning ? "Warnung: Problem mit der AI-Antwort" : "Info von der Anwendung",
+            subject: useAsWarning ? "Warnung von der Check-In Anwendung" : "Info von der Check-In Anwendung",
             text: useAsWarning ? `Eine Warnung wurde in der Anwendung am ${timestamp}Uhr ausgelöst:\n\n${message}`
                 : `Eine Info wurde in der Anwendung am ${timestamp}Uhr ausgelöst:\n\n${message}`
         },

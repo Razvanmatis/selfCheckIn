@@ -132,7 +132,7 @@ export async function getAllReservationsFromDb(env: Env): Promise<SmoobuReservat
         .all();
     return {
         bookings: result.results.map(row => ({
-            id: +String(row.id),
+            id: +String(row.smoobu_booking_id),
             arrival: String(row.arrival),
             departure: String(row.departure),
             firstname: String(row.firstname),
