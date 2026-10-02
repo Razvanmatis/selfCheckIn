@@ -20,6 +20,7 @@ export function getDateBounds(): {
   maxCheckInDate: string;
 } {
   const now = new Date();
+  now.setDate(now.getDate() - 1);
   const upperBound = new Date(now);
   const twoWeeksAhead = new Date(now);
 

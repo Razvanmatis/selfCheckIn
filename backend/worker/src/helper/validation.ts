@@ -61,6 +61,7 @@ export function validateCheckInLookupPayload(
   }
 
   const today = new Date();
+  today.setDate(today.getDate() - 1);
   const todayDate = toLocalInputDate(today);
   const maxDate = toLocalInputDate(addMonths(today, 2));
   const maxCheckInDate = toLocalInputDate(addDays(today, 14));

@@ -126,13 +126,13 @@ export async function initWholeDatabase(env: Env) {
 export async function getAllReservationsFromDb(env: Env): Promise<SmoobuReservationsResponse> {
     const result = await env.DB
         .prepare(`
-            SELECT id, arrival, departure, firstname, lastname, phone
+            SELECT smoobu_booking_id, arrival, departure, firstname, lastname, phone
             FROM reservations
         `)
         .all();
     return {
         bookings: result.results.map(row => ({
-            id: +String(row.smoobu_booking_id),
+            id: Number(row.smoobu_booking_id),
             arrival: String(row.arrival),
             departure: String(row.departure),
             firstname: String(row.firstname),
