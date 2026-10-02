@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import appPackage from "../package.json";
 import { dailyRoutine } from "./api/dailyRoutine";
 import { defineKeypadCode } from "./api/defineKeypadCode";
@@ -63,6 +63,52 @@ function App() {
   );
   const [isUpdatingPhoneNumber, setIsUpdatingPhoneNumber] = useState(false);
   const [isUnavailable, setIsUnavailable] = useState(() => isCheckInUnavailable(new Date()));
+  const wakeLockRef = useRef<WakeLockSentinel | null>(null);
+
+  const acquireWakeLock = async () => {
+    if (!("wakeLock" in navigator) || wakeLockRef.current) {
+      return;
+    }
+
+    try {
+      const wakeLock = await navigator.wakeLock.request("screen");
+      wakeLockRef.current = wakeLock;
+
+      wakeLock.addEventListener("release", () => {
+        if (wakeLockRef.current === wakeLock) {
+          wakeLockRef.current = null;
+        }
+      });
+    } catch (error) {
+      console.warn("Wake Lock konnte nicht aktiviert werden:", error);
+    }
+  };
+
+  const releaseWakeLock = async () => {
+    if (wakeLockRef.current) {
+      const wakeLock = wakeLockRef.current;
+      wakeLockRef.current = null;
+      await wakeLock.release();
+    }
+  };
+
+  useEffect(() => {
+    const handleVisibilityChange = async () => {
+      if (
+          document.visibilityState === "visible" &&
+          isDefiningPin &&
+          !wakeLockRef.current
+      ) {
+        await acquireWakeLock();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [isDefiningPin]);
 
   useEffect(() => {
     let timeoutId: number;
@@ -160,9 +206,8 @@ function App() {
     if (!pinCodeIsValid) {
       return;
     }
-
     setIsDefiningPin(true);
-
+    await acquireWakeLock();
     try {
       const formData = getFormDataForSubmission();
       const result = await defineKeypadCode({
@@ -188,6 +233,7 @@ function App() {
       setSubmitError(errorMessage);
       window.alert(errorMessage);
     } finally {
+      await releaseWakeLock();
       setIsDefiningPin(false);
     }
   };
