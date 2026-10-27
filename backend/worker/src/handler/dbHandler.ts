@@ -166,7 +166,7 @@ export async function getAllReservationsWithinNextFiveDays(env: Env): Promise<Db
     return result.results.map(row => ({
         ...row,
         whatsapp_status: row.whatsapp_status ?? "message_not_sent"
-    })).filter(entry => entry.whatsapp_status === "message_not_sent" && entry.phone !== undefined && entry.phone.trim() !== "");
+    })).filter(entry => entry.whatsapp_status === "message_not_sent");
 }
 
 export async function markWhatsAppMessagesAsSent(

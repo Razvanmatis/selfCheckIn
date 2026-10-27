@@ -13,11 +13,19 @@ import {ConversationHistoryEntry} from "../types/conversationHistoryEntry";
 export async function informAllGuestsAboutCheckIn(env: Env) {
     const guestsToInform: DbReservationEntry[] = await getAllReservationsWithinNextFiveDays(env);
     for (const guest of guestsToInform) {
-        await sendCheckInMessageToGuestByWhatsApp(env, guest.phone!);
+        if (guest.phone !== undefined && guest.phone.trim() !== "") {
+            await sendCheckInMessageToGuestByWhatsApp(env, guest.phone!);
+        } else {
+            await sendGeneralMessageToAdmin(
+                `Die Reservierung für den ${guest.arrival} mit dem Namen ${guest.firstname} ${guest.lastname} hat keine Telefonnummer. Bitte Telefonnummer nachpflegen!.`,
+                env
+            );
+        }
     }
-    await markWhatsAppMessagesAsSent(env, guestsToInform);
-    if (guestsToInform.length > 0) {
-        return `Es wurden ${guestsToInform.length} Gäste über den Check-In informiert.\n`;
+    const guestsWithPhone = guestsToInform.filter(guest => guest.phone !== undefined && guest.phone.trim() !== "");
+    await markWhatsAppMessagesAsSent(env, guestsWithPhone);
+    if (guestsWithPhone.length > 0) {
+        return `Es wurden ${guestsWithPhone.length} Gäste über den Check-In informiert.\n`;
     }
     return "";
 }
