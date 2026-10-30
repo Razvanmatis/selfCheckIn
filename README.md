@@ -258,3 +258,5 @@ curl "http://localhost:8787/cdn-cgi/local/scheduled?cron=0+2+*+*+*"
 ```bash
 npx wrangler tail
 ```
+## Wichtig bei Smoobu
+Bei Smoobu muss wenn eine manuelle Sperrung eines Zeitraums vorliegt auch das Notizen Feld befüllt werden, damit der Vorname so gesetzt wird
